@@ -1,0 +1,40 @@
+<div class="topbar-shell">
+  <div class="topbar-glow topbar-glow-left"></div>
+  <div class="topbar-glow topbar-glow-right"></div>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-kicker-row">
+        <span class="topbar-kicker">Administration</span>
+        <span class="topbar-divider"></span>
+        <span class="topbar-date">{{ getCurrentDate() }}</span>
+      </div>
+
+      <div class="topbar-title">{{ title }}</div>
+      <div class="topbar-subtitle">{{ subtitle }}</div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="topbar-status-card">
+        <span class="status-label">Système</span>
+        <strong>Opérationnel</strong>
+      </div>
+
+      <button class="notif-btn" type="button" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 01-3.46 0"></path>
+        </svg>
+        <span class="notif-dot"></span>
+      </button>
+
+      <button class="btn-primary" type="button" (click)="onNewClaim()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Nouveau dossier
+      </button>
+    </div>
+  </div>
+</div>

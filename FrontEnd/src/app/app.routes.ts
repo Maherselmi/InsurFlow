@@ -8,7 +8,7 @@ import {AgentResultListComponent} from "./admin/agent-result-list/agent-result-l
 import {HomeComponent} from "./pages/home/home.component";
 
 
-import {ConsultationDecisionsComponent} from "./client/consultation-decisions/consultation-decisions.component";
+import {ConsultationDecisionsComponent} from "./FrontOffice/consultation-decisions/consultation-decisions.component";
 import {ClaimValidationComponent} from "./claim/claim-validation/claim-validation.component";
 import {InsuranceHomeComponent} from "./FrontOffice/insurance-home/insurance-home.component";
 import {LoginComponent} from "./FrontOffice/login/login.component";
@@ -30,6 +30,7 @@ import {
 import {ClaimStep1Component} from "./FrontOffice/Auto/claim-step1/claim-step1.component";
 import {ClaimStep2Component} from "./FrontOffice/Auto/claim-step2/claim-step2.component";
 import {ClaimStep3Component} from "./FrontOffice/Auto/claim-step3/claim-step3.component";
+import {ClaimReportPageComponent} from "./FrontOffice/claim-report-page/claim-report-page.component";
 
 export const routes: Routes = [
   { path: 'PolicesList', component: PolicesComponent },
@@ -38,7 +39,7 @@ export const routes: Routes = [
 
 
   { path: 'Client_Space', component: ClientSpaceComponent },
-
+  {path: 'claim-report/:id', component: ClaimReportPageComponent},
 
   { path: 'login', component: LoginComponent },
   { path: 'Validation', component: ClaimValidationComponent },

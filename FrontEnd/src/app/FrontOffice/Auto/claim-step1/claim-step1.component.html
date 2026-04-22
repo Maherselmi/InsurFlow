@@ -1,4 +1,7 @@
 <div class="claim-page">
+  <div class="bg-orb orb-left"></div>
+  <div class="bg-orb orb-right"></div>
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
@@ -9,7 +12,7 @@
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
-          [class.active]="item.label === 'Sinistres'"
+          [class.active]="isActiveNav(item.route)"
         >
           {{ item.label }}
         </a>
@@ -26,11 +29,11 @@
     <div class="container">
       <section class="hero-card">
         <div class="hero-copy">
-          <p class="eyebrow">Sinistre automobile</p>
+          <div class="hero-badge">Sinistre automobile</div>
 
           <h1>
             Déclarez votre sinistre auto
-            <span>dans un parcours simple et guidé.</span>
+            <span>dans un parcours plus clair et plus moderne.</span>
           </h1>
 
           <p class="hero-text">
@@ -38,6 +41,13 @@
             l’analyse de votre dossier. Votre police auto est vérifiée avant la
             suite du processus.
           </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-secondary" routerLink="/Claim_Home">Retour aux sinistres</a>
+            <button class="btn btn-primary" type="button" (click)="next()" [disabled]="loading || loadingPolicies">
+              Continuer
+            </button>
+          </div>
 
           <div class="hero-points">
             <div class="hero-point">
@@ -47,12 +57,12 @@
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Validation de police automatique</span>
+              <span>Validation automatique de la police</span>
             </div>
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Traitement prioritaire du dossier</span>
+              <span>Déclaration simple et guidée</span>
             </div>
           </div>
         </div>
@@ -81,7 +91,7 @@
       <section class="claim-layout">
         <aside class="process-sidebar">
           <div class="sidebar-card">
-            <p class="sidebar-title">Processus</p>
+            <p class="sidebar-title">Progression</p>
 
             <div class="step-list">
               <div class="step-item active">
@@ -113,13 +123,16 @@
           <div class="sidebar-card support-card">
             <div class="support-icon">A</div>
             <h3>Assistance auto dédiée</h3>
-            <p>Un parcours pensé pour les sinistres automobiles et leur traitement rapide.</p>
+            <p>
+              Un parcours pensé pour les sinistres automobiles avec une lecture plus simple
+              et une progression plus rassurante.
+            </p>
 
             <ul class="support-list">
-              <li>Analyse structurée du dossier</li>
-              <li>Vérification de la police active</li>
-              <li>Passage rapide à l’étape justificatifs</li>
-              <li>Suivi unifié dans InSurFlow</li>
+              <li *ngFor="let tip of stepTips">
+                <strong>{{ tip.title }}</strong><br />
+                <span>{{ tip.text }}</span>
+              </li>
             </ul>
           </div>
         </aside>
@@ -140,7 +153,7 @@
               <div class="card-icon">A</div>
               <div>
                 <h2>Détails du sinistre automobile</h2>
-                <p>Renseignez les informations nécessaires pour lancer votre dossier.</p>
+                <p>Renseignez les informations nécessaires pour lancer votre dossier auto.</p>
               </div>
             </div>
 
@@ -156,12 +169,18 @@
                       name="policyId"
                       (change)="onPolicyChange()"
                     >
-                      <option [ngValue]="null">Sélectionnez votre police auto</option>
+                      <option [ngValue]="null">
+                        {{ loadingPolicies ? 'Chargement des polices auto...' : 'Sélectionnez votre police auto' }}
+                      </option>
                       <option *ngFor="let p of policies" [ngValue]="p.id">
                         {{ p.policyNumber }} — {{ p.type }}
                       </option>
                     </select>
                     <span class="select-arrow">▼</span>
+                  </div>
+
+                  <div class="helper-text" *ngIf="!loadingPolicies && policies.length === 0">
+                    Aucune police auto active n’a été trouvée pour ce parcours.
                   </div>
 
                   <div class="selected-policy" *ngIf="selectedPolicy">
@@ -179,6 +198,16 @@
                       <div class="policy-detail">
                         <span class="detail-label">Période</span>
                         <strong>{{ getSelectedPolicyPeriod() }}</strong>
+                      </div>
+
+                      <div class="policy-detail">
+                        <span class="detail-label">Statut</span>
+                        <strong>{{ getSelectedPolicyStatus() }}</strong>
+                      </div>
+
+                      <div class="policy-detail">
+                        <span class="detail-label">Code produit</span>
+                        <strong>{{ selectedPolicy.productCode || '-' }}</strong>
                       </div>
                     </div>
                   </div>
@@ -221,6 +250,10 @@
                     rows="5"
                     placeholder="Décrivez les circonstances, le lieu, les dommages constatés et les éléments importants du sinistre."
                   ></textarea>
+
+                  <div class="helper-text">
+                    Conseil : indiquez clairement le lieu, le contexte et les dégâts visibles pour accélérer le traitement.
+                  </div>
                 </div>
               </div>
             </div>
@@ -233,9 +266,9 @@
 
               <button
                 type="button"
-                class="btn-primary"
+                class="btn-primary submit-btn"
                 (click)="next()"
-                [disabled]="loading"
+                [disabled]="loading || loadingPolicies"
               >
                 <span *ngIf="loading">Traitement en cours...</span>
                 <span *ngIf="!loading">Continuer vers les justificatifs</span>

@@ -1,82 +1,88 @@
 <div class="login-page">
+  <div class="bg-orb orb-left"></div>
+  <div class="bg-orb orb-right"></div>
+  <div class="bg-grid"></div>
+
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="/">
+      <a class="brand" routerLink="/">
         <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
       </a>
 
       <div class="header-actions">
-        <a class="btn btn-ghost" href="/">Retour à l'accueil</a>
+        <a class="btn btn-ghost" routerLink="/">Retour à l'accueil</a>
       </div>
     </div>
   </header>
 
   <main class="login-main">
     <div class="container">
-      <div class="login-grid">
-        <section class="login-side">
-          <p class="eyebrow">Espace client sécurisé</p>
+      <div class="login-shell">
+        <section class="login-showcase">
+          <div class="showcase-badge">Espace client premium</div>
 
           <h1>
-            Connectez-vous à votre
-            <span>espace assurance.</span>
+            Connectez-vous à une
+            <span>expérience assurance plus moderne.</span>
           </h1>
 
-          <p class="side-text">
-            Retrouvez vos contrats, vos documents et le suivi de vos sinistres
-            dans un espace unique, simple et pensé pour aller à l’essentiel.
+          <p class="showcase-text">
+            InSurFlow centralise vos contrats, vos documents et le suivi de vos
+            sinistres dans une interface claire, élégante et conçue pour rassurer.
           </p>
 
-          <div class="side-points">
-            <div class="side-point">
-              <span class="point-icon"></span>
-              <span>Accès rapide à vos dossiers</span>
-            </div>
-
-            <div class="side-point">
-              <span class="point-icon"></span>
-              <span>Documents centralisés et sécurisés</span>
-            </div>
-
-            <div class="side-point">
-              <span class="point-icon"></span>
-              <span>Suivi des démarches en temps réel</span>
-            </div>
+          <div class="trust-grid">
+            <article class="trust-card" *ngFor="let item of trustItems">
+              <strong>{{ item.value }}</strong>
+              <span>{{ item.label }}</span>
+            </article>
           </div>
 
-          <div class="side-showcase">
-            <div class="showcase-top">
-              <div class="showcase-card">
-                <strong>24/7</strong>
-                <span>Accès à votre espace</span>
+          <div class="showcase-panel">
+            <div class="showcase-panel-top">
+              <div class="window-actions">
+                <span></span>
+                <span></span>
+                <span></span>
               </div>
-
-              <div class="showcase-card">
-                <strong>100%</strong>
-                <span>Données protégées</span>
-              </div>
+              <div class="panel-chip">Accès assuré</div>
             </div>
 
-            <div class="showcase-image">
-              <img
-                src="../../../assets/images/Login.png"
-                alt="Illustration espace client assurance"
-              />
+            <div class="showcase-visual">
+              <div class="visual-copy">
+                <p class="visual-kicker">Votre espace</p>
+                <h2>Une connexion simple, un accès immédiat à l’essentiel.</h2>
+                <p>
+                  Connectez-vous pour retrouver vos contrats, vos dossiers et vos
+                  documents dans un environnement sécurisé.
+                </p>
+              </div>
+
+              <div class="visual-image">
+                <img
+                  src="../../../assets/images/Login.png"
+                  alt="Illustration espace client assurance"
+                />
+              </div>
             </div>
           </div>
         </section>
 
         <section class="login-card">
-          <div class="card-badge">Connexion</div>
+          <div class="card-badge">Connexion sécurisée</div>
 
           <div class="card-head">
-            <h2>Bienvenue</h2>
-            <p>Entrez vos identifiants pour accéder à votre espace personnel.</p>
+            <h2>Bienvenue sur InSurFlow</h2>
+            <p>
+              Entrez vos identifiants pour accéder à votre espace personnel
+              et retrouver tous vos services.
+            </p>
           </div>
 
           <form class="login-form" (ngSubmit)="onLogin()">
             <div class="form-group">
               <label for="email">Adresse email</label>
+
               <div class="input-wrap">
                 <span class="input-icon">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -97,6 +103,7 @@
 
             <div class="form-group">
               <label for="password">Mot de passe</label>
+
               <div class="input-wrap">
                 <span class="input-icon">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -113,7 +120,12 @@
                   placeholder="Votre mot de passe"
                 />
 
-                <button type="button" class="toggle-password" (click)="togglePassword()">
+                <button
+                  type="button"
+                  class="toggle-password"
+                  (click)="togglePassword()"
+                  aria-label="Afficher ou masquer le mot de passe"
+                >
                   <svg *ngIf="!showPassword" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
@@ -139,36 +151,28 @@
             </button>
           </form>
 
-          <div class="login-meta">
-            <div class="meta-item">
-              <span class="meta-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+          <div class="features-list">
+            <article class="feature-item" *ngFor="let item of featureItems">
+              <div class="feature-icon" [ngSwitch]="item.icon">
+                <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"></path>
                 </svg>
-              </span>
-              <span>Accès sécurisé</span>
-            </div>
 
-            <div class="meta-item">
-              <span class="meta-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M4 5h16v14H4z"></path>
-                  <path d="M8 9h8"></path>
-                  <path d="M8 13h5"></path>
+                <svg *ngSwitchCase="'folder'" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"></path>
                 </svg>
-              </span>
-              <span>Documents centralisés</span>
-            </div>
 
-            <div class="meta-item">
-              <span class="meta-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" aria-hidden="true">
                   <circle cx="12" cy="12" r="9"></circle>
                   <path d="M12 7v5l3 2"></path>
                 </svg>
-              </span>
-              <span>Suivi en temps réel</span>
-            </div>
+              </div>
+
+              <div class="feature-copy">
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.text }}</p>
+              </div>
+            </article>
           </div>
         </section>
       </div>

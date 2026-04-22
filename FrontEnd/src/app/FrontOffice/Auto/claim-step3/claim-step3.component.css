@@ -11,10 +11,10 @@
   --success-bg: #eaf8ef;
   --success-text: #197343;
   --success-line: #bde3c9;
-  --shadow-sm: 0 8px 24px rgba(12, 31, 61, 0.06);
-  --shadow-md: 0 18px 48px rgba(12, 31, 61, 0.10);
-  --radius-xl: 28px;
-  --radius-lg: 22px;
+  --shadow-sm: 0 10px 24px rgba(12, 31, 61, 0.06);
+  --shadow-md: 0 18px 48px rgba(12, 31, 61, 0.12);
+  --radius-xl: 30px;
+  --radius-lg: 24px;
   --radius-md: 18px;
   --radius-sm: 14px;
 
@@ -43,10 +43,35 @@ a {
 }
 
 .claim-page {
+  position: relative;
   min-height: 100vh;
+  overflow: hidden;
   background:
     radial-gradient(circle at top left, rgba(217, 230, 255, 0.45), transparent 24%),
     linear-gradient(180deg, #f7f9fc 0%, var(--bg) 100%);
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(8px);
+}
+
+.orb-left {
+  top: 110px;
+  left: -90px;
+  width: 230px;
+  height: 230px;
+  background: rgba(194, 214, 245, 0.38);
+}
+
+.orb-right {
+  top: 150px;
+  right: -90px;
+  width: 260px;
+  height: 260px;
+  background: rgba(214, 226, 247, 0.28);
 }
 
 .container {
@@ -101,7 +126,7 @@ a {
 .main-nav a {
   position: relative;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #244061;
   transition: color 0.2s ease;
 }
@@ -150,22 +175,24 @@ a {
 /* main */
 
 .claim-main {
-  padding: 38px 0 72px;
+  padding: 42px 0 72px;
 }
 
 .hero-card {
   display: grid;
   grid-template-columns: 1.08fr 0.92fr;
   gap: 24px;
-  padding: 30px;
+  padding: 32px;
   border: 1px solid rgba(207, 217, 229, 0.9);
   border-radius: var(--radius-xl);
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(245,249,254,0.96) 100%);
+    radial-gradient(circle at top right, rgba(217, 230, 255, 0.28), transparent 26%),
+    linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(245,249,254,0.96) 100%);
   box-shadow: var(--shadow-md);
   margin-bottom: 28px;
 }
 
+.hero-badge,
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -179,6 +206,7 @@ a {
   font-weight: 700;
 }
 
+.hero-badge::before,
 .eyebrow::before {
   content: "";
   width: 26px;
@@ -189,9 +217,9 @@ a {
 
 .hero-copy h1 {
   margin: 0 0 16px;
-  font-size: clamp(32px, 3.2vw, 48px);
-  line-height: 1.02;
-  letter-spacing: -0.05em;
+  font-size: clamp(34px, 3.5vw, 52px);
+  line-height: 0.98;
+  letter-spacing: -0.07em;
   font-weight: 800;
 }
 
@@ -204,7 +232,7 @@ a {
   max-width: 620px;
   margin: 0 0 24px;
   font-size: 15px;
-  line-height: 1.8;
+  line-height: 1.82;
   color: var(--text-soft);
 }
 
@@ -721,7 +749,8 @@ a {
   .hero-panel-top,
   .success-top,
   .timeline,
-  .steps-grid {
+  .steps-grid,
+  .actions-row {
     display: grid;
     grid-template-columns: 1fr;
   }
@@ -730,10 +759,6 @@ a {
     width: 2px;
     height: 26px;
     justify-self: center;
-  }
-
-  .actions-row {
-    flex-direction: column;
   }
 
   .hero-copy h1 span {

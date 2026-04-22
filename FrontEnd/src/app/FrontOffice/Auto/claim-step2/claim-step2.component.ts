@@ -3,6 +3,17 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ClaimService } from '../../../claim.service';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface UploadTip {
+  title: string;
+  text: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-claim-step2',
   standalone: true,
@@ -12,11 +23,34 @@ import { ClaimService } from '../../../claim.service';
   host: { ngSkipHydration: 'true' }
 })
 export class ClaimStep2Component implements OnInit {
-  navItems = [
+  navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/documents' }
+    { label: 'Mes dossiers', route: '/Consulter' }
+  ];
+
+  uploadTips: UploadTip[] = [
+    {
+      title: 'Vue d’ensemble',
+      text: 'Prenez une photo générale du véhicule et de la scène.',
+      icon: 'P'
+    },
+    {
+      title: 'Dégâts visibles',
+      text: 'Ajoutez des gros plans des zones endommagées.',
+      icon: 'D'
+    },
+    {
+      title: 'Immatriculation',
+      text: 'Ajoutez la plaque ou le contexte si possible.',
+      icon: 'I'
+    },
+    {
+      title: 'Lieu du sinistre',
+      text: 'Une photo du lieu peut aider à l’analyse du dossier.',
+      icon: 'L'
+    }
   ];
 
   files: File[] = [];
@@ -44,6 +78,21 @@ export class ClaimStep2Component implements OnInit {
         console.error('claimId introuvable dans localStorage');
       }
     }
+  }
+
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+          currentUrl.startsWith('/Claim_Home') ||
+          currentUrl.startsWith('/claim') ||
+          currentUrl.startsWith('/Sante') ||
+          currentUrl.startsWith('/Habitation')
+      );
+    }
+
+    return currentUrl === route;
   }
 
   onFileSelected(event: Event): void {
@@ -130,6 +179,10 @@ export class ClaimStep2Component implements OnInit {
   get totalSize(): string {
     const total = this.files.reduce((sum, file) => sum + file.size, 0);
     return this.formatSize(total);
+  }
+
+  get canUpload(): boolean {
+    return !this.loading && this.files.length > 0 && !!this.claimId;
   }
 
   back(): void {

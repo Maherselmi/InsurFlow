@@ -4,6 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ClaimData, ClaimService, Policy } from '../../../claim.service';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface StepTip {
+  title: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-claim-step1',
   standalone: true,
@@ -13,11 +23,11 @@ import { ClaimData, ClaimService, Policy } from '../../../claim.service';
   host: { ngSkipHydration: 'true' }
 })
 export class ClaimStep1Component implements OnInit {
-  navItems = [
-      { label: 'Tableau de bord', route: '/Client_Space' },
-      { label: 'Mes contrats', route: '/contrats' },
-      { label: 'Sinistres', route: '/Claim_Home' },
-      { label: 'Documents', route: '/documents' }
+  navItems: NavItem[] = [
+    { label: 'Tableau de bord', route: '/Client_Space' },
+    { label: 'Mes contrats', route: '/contrats' },
+    { label: 'Sinistres', route: '/Claim_Home' },
+    { label: 'Mes dossiers', route: '/Consulter' }
   ];
 
   autoClaimTypes = [
@@ -27,6 +37,21 @@ export class ClaimStep1Component implements OnInit {
     { value: 'INCENDIE', label: 'Incendie / Explosion' },
     { value: 'VOL', label: 'Vol / Vandalisme' },
     { value: 'CATASTROPHE', label: 'Catastrophe naturelle' }
+  ];
+
+  stepTips: StepTip[] = [
+    {
+      title: 'Déclarez rapidement',
+      text: 'Renseignez les informations essentielles de l’accident pour lancer le dossier.'
+    },
+    {
+      title: 'Police vérifiée',
+      text: 'Votre contrat auto est contrôlé avant de passer à l’étape suivante.'
+    },
+    {
+      title: 'Parcours guidé',
+      text: 'Chaque étape est pensée pour rendre la déclaration plus simple.'
+    }
   ];
 
   claim: ClaimData = {
@@ -39,34 +64,51 @@ export class ClaimStep1Component implements OnInit {
 
   policies: Policy[] = [];
   selectedPolicy: Policy | null = null;
+
+  loadingPolicies = false;
   loading = false;
   errorMessage = '';
   successMessage = '';
 
   constructor(
-    private claimService: ClaimService,
-    private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object
+      private claimService: ClaimService,
+      private router: Router,
+      @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
     this.loadPolicies();
   }
 
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+          currentUrl.startsWith('/Claim_Home') ||
+          currentUrl.startsWith('/claim') ||
+          currentUrl.startsWith('/Sante') ||
+          currentUrl.startsWith('/Habitation')
+      );
+    }
+
+    return currentUrl === route;
+  }
+
   loadPolicies(): void {
-    this.loading = true;
+    this.loadingPolicies = true;
     this.errorMessage = '';
 
     this.claimService.getPolicies().subscribe({
       next: (res) => {
         const allPolicies = res || [];
         this.policies = allPolicies.filter(
-          (p) => this.normalizeType(p.type) === 'AUTO'
+            (p) => this.normalizeType(p.type) === 'AUTO'
         );
-        this.loading = false;
+        this.loadingPolicies = false;
       },
       error: (err) => {
-        this.loading = false;
+        this.loadingPolicies = false;
         this.errorMessage = 'Erreur lors du chargement des polices auto.';
         console.error('Erreur chargement polices auto:', err);
       }
@@ -78,14 +120,14 @@ export class ClaimStep1Component implements OnInit {
     this.successMessage = '';
 
     this.selectedPolicy =
-      this.policies.find(p => p.id === Number(this.claim.policyId)) || null;
+        this.policies.find((p) => p.id === Number(this.claim.policyId)) || null;
 
     if (!this.selectedPolicy) {
       this.claim.clientId = null;
       return;
     }
 
-    if (this.selectedPolicy?.client?.id) {
+    if (this.selectedPolicy.client?.id) {
       this.claim.clientId = this.selectedPolicy.client.id;
     } else {
       this.claim.clientId = null;
@@ -103,7 +145,6 @@ export class ClaimStep1Component implements OnInit {
 
     if (!this.isPolicyActive(this.selectedPolicy)) {
       this.errorMessage = 'Cette police auto est expirée ou inactive.';
-      return;
     }
   }
 
@@ -149,13 +190,21 @@ export class ClaimStep1Component implements OnInit {
       return false;
     }
 
-    if (this.selectedPolicy.startDate && incidentDate < new Date(this.selectedPolicy.startDate)) {
-      this.errorMessage = 'La date du sinistre est antérieure au début de validité de la police.';
+    if (
+        this.selectedPolicy.startDate &&
+        incidentDate < new Date(this.selectedPolicy.startDate)
+    ) {
+      this.errorMessage =
+          'La date du sinistre est antérieure au début de validité de la police.';
       return false;
     }
 
-    if (this.selectedPolicy.endDate && incidentDate > new Date(this.selectedPolicy.endDate)) {
-      this.errorMessage = 'La date du sinistre dépasse la fin de validité de la police.';
+    if (
+        this.selectedPolicy.endDate &&
+        incidentDate > new Date(this.selectedPolicy.endDate)
+    ) {
+      this.errorMessage =
+          'La date du sinistre dépasse la fin de validité de la police.';
       return false;
     }
 
@@ -206,7 +255,8 @@ export class ClaimStep1Component implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err?.message || 'Erreur serveur lors de la création du dossier.';
+        this.errorMessage =
+            err?.message || 'Erreur serveur lors de la création du dossier.';
         console.error('Erreur création claim auto:', err);
       }
     });
@@ -218,6 +268,14 @@ export class ClaimStep1Component implements OnInit {
     }
 
     return `${this.formatDate(this.selectedPolicy.startDate)} → ${this.formatDate(this.selectedPolicy.endDate)}`;
+  }
+
+  getSelectedPolicyStatus(): string {
+    if (!this.selectedPolicy) {
+      return '-';
+    }
+
+    return this.isPolicyActive(this.selectedPolicy) ? 'Active' : 'Inactive';
   }
 
   formatDate(date: string): string {

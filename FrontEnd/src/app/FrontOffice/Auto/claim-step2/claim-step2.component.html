@@ -1,4 +1,7 @@
 <div class="claim-page">
+  <div class="bg-orb orb-left"></div>
+  <div class="bg-orb orb-right"></div>
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
@@ -9,7 +12,7 @@
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
-          [class.active]="item.label === 'Sinistres'"
+          [class.active]="isActiveNav(item.route)"
         >
           {{ item.label }}
         </a>
@@ -26,7 +29,7 @@
     <div class="container">
       <section class="hero-card">
         <div class="hero-copy">
-          <p class="eyebrow">Pièces justificatives auto</p>
+          <div class="hero-badge">Pièces justificatives auto</div>
 
           <h1>
             Ajoutez vos documents
@@ -37,6 +40,17 @@
             Déposez les photos du véhicule, le constat amiable et les documents utiles
             pour accélérer l’analyse de votre sinistre automobile.
           </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-secondary" type="button" (click)="back()">
+              Retour
+            </button>
+
+            <button class="btn btn-primary" type="button" (click)="upload()" [disabled]="!canUpload">
+              <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
+              <span *ngIf="!loading">Soumettre les justificatifs</span>
+            </button>
+          </div>
 
           <div class="hero-points">
             <div class="hero-point">
@@ -80,7 +94,7 @@
       <section class="claim-layout">
         <aside class="process-sidebar">
           <div class="sidebar-card">
-            <p class="sidebar-title">Processus</p>
+            <p class="sidebar-title">Progression</p>
 
             <div class="step-list">
               <div class="step-item done">
@@ -112,12 +126,15 @@
           <div class="sidebar-card support-card">
             <div class="support-icon">D</div>
             <h3>Documents auto acceptés</h3>
-            <p>Ajoutez les pièces les plus utiles pour accélérer le traitement du dossier.</p>
+            <p>
+              Ajoutez les pièces les plus utiles pour accélérer le traitement du dossier
+              automobile.
+            </p>
 
             <ul class="support-list">
               <li>Photos du véhicule endommagé</li>
               <li>Constat amiable en PDF</li>
-              <li>Factures ou devis réparation</li>
+              <li>Factures ou devis de réparation</li>
               <li>Rapport de police si nécessaire</li>
               <li>Carte grise ou documents utiles</li>
             </ul>
@@ -173,35 +190,11 @@
               </div>
 
               <div class="tips-grid">
-                <div class="tip-card">
-                  <span class="tip-icon">P</span>
+                <div class="tip-card" *ngFor="let tip of uploadTips">
+                  <span class="tip-icon">{{ tip.icon }}</span>
                   <div>
-                    <strong>Vue d’ensemble</strong>
-                    <p>Prenez une photo générale du véhicule.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">D</span>
-                  <div>
-                    <strong>Dégâts détaillés</strong>
-                    <p>Ajoutez un gros plan des dommages visibles.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">I</span>
-                  <div>
-                    <strong>Immatriculation</strong>
-                    <p>Ajoutez si possible la plaque ou le contexte.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">L</span>
-                  <div>
-                    <strong>Lieu du sinistre</strong>
-                    <p>Une photo du lieu peut aider à l’analyse.</p>
+                    <strong>{{ tip.title }}</strong>
+                    <p>{{ tip.text }}</p>
                   </div>
                 </div>
               </div>
@@ -253,15 +246,16 @@
             </div>
 
             <div class="card-footer">
-              <button type="button" class="btn-secondary" (click)="back()">
-                Retour
-              </button>
+              <div class="footer-note">
+                <span class="footer-bullet"></span>
+                <span>Étape 2 sur 3 — Ajout des justificatifs</span>
+              </div>
 
               <button
                 type="button"
-                class="btn-primary"
+                class="btn-primary submit-btn"
                 (click)="upload()"
-                [disabled]="loading || files.length === 0"
+                [disabled]="!canUpload"
               >
                 <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
                 <span *ngIf="!loading">Soumettre mes justificatifs</span>

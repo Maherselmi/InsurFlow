@@ -1,210 +1,319 @@
 <header class="site-header">
-  <div class="container header-inner">
-    <a class="brand" href="/">
-      <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
-    </a>
+    <div class="container header-inner">
+        <a class="brand" href="/">
+      <span class="brand-symbol">
+        <span class="brand-shape shape-back"></span>
+        <span class="brand-shape shape-front"></span>
+      </span>
 
-    <nav class="main-nav">
-      <a *ngFor="let item of navItems" [href]="item.href">{{ item.label }}</a>
-    </nav>
+            <span class="brand-copy">
+        <span class="brand-main">INsurFlow</span>
+        <span class="brand-sub">insurance experience platform</span>
+      </span>
+        </a>
 
-    <div class="header-actions">
-      <a class="btn btn-ghost" href="/login">Connexion</a>
+        <nav class="main-nav">
+            <a *ngFor="let item of navItems" [href]="item.href">{{ item.label }}</a>
+        </nav>
+
+        <div class="header-actions">
+            <a class="btn btn-ghost" href="/login">Connexion</a>
+            <a class="btn btn-primary" href="/login">Espace client</a>
+        </div>
     </div>
-  </div>
 </header>
 
 <main class="page-shell">
-  <section class="hero section">
-    <div class="container hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow">Assurance personnelle &amp; patrimoniale</p>
+    <section class="hero">
+        <div class="hero-blur blur-left"></div>
+        <div class="hero-blur blur-right"></div>
 
-        <h1>
-          Une assurance plus claire
-        </h1>
-        <h3>
-        <span>plus humaine, mieux organisée.</span>
-        </h3>
-        <p class="hero-text">
-          Auto, habitation, santé et prévoyance réunis dans un espace simple à
-          comprendre. Vos documents, vos sinistres et votre accompagnement
-          restent accessibles au même endroit.
-        </p>
+        <div class="container hero-container">
+            <div class="hero-copy">
+                <div class="hero-badge">Plateforme d’assurance digitale moderne</div>
 
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="/espace-client">Accéder à mon espace</a>
-          <a class="btn btn-secondary" href="#offres">Découvrir nos offres</a>
-        </div>
+                <h1>
+                    Une assurance plus claire,
+                    <span>plus premium et plus rassurante.</span>
+                </h1>
 
-        <div class="hero-points">
-          <div class="hero-point">
-            <span class="hero-point-bullet"></span>
-            <span>Suivi des contrats en temps réel</span>
-          </div>
-          <div class="hero-point">
-            <span class="hero-point-bullet"></span>
-            <span>Gestion des sinistres simplifiée</span>
-          </div>
-          <div class="hero-point">
-            <span class="hero-point-bullet"></span>
-            <span>Conseiller dédié et documents centralisés</span>
-          </div>
-        </div>
-      </div>
+                <p class="hero-text">
+                    InSurFlow réunit auto, habitation, santé et prévoyance dans une expérience
+                    mieux structurée. Contrats, sinistres, justificatifs et accompagnement
+                    restent accessibles dans un seul espace.
+                </p>
 
-      <div class="hero-panel">
-        <div class="hero-panel-head">
-          <span class="panel-badge">Espace client InSurFlow</span>
-          <h2>Un seul espace pour tout gérer.</h2>
-          <p>
-            Consultez vos contrats, suivez vos démarches et retrouvez vos
-            documents dans une interface pensée pour aller à l’essentiel.
-          </p>
-        </div>
-
-        <div class="stats-grid">
-          <article class="stat-card" *ngFor="let stat of stats">
-            <h3>{{ stat.value }}</h3>
-            <p>{{ stat.label }}</p>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="offres" class="section offers">
-    <div class="container">
-      <div class="section-head">
-        <div>
-          <p class="section-kicker">Nos offres</p>
-          <h2>Quatre univers de protection pour accompagner chaque étape de vie.</h2>
-        </div>
-        <span class="section-count">04 domaines</span>
-      </div>
-
-      <div class="offers-grid">
-        <article class="offer-card" *ngFor="let offer of offers">
-          <div class="offer-media">
-            <img [src]="offer.image" [alt]="offer.title" />
-            <span class="offer-index">{{ offer.id }}</span>
-          </div>
-
-          <div class="offer-body">
-            <h3>{{ offer.title }}</h3>
-            <p>{{ offer.description }}</p>
-            <a class="offer-link" href="#">
-              <span>{{ offer.cta }}</span>
-              <span class="offer-arrow">→</span>
-            </a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section id="sinistres" class="section claims">
-    <div class="container claims-grid">
-      <div class="claims-copy">
-        <p class="section-kicker">Gestion des sinistres</p>
-        <h2>En cas de sinistre, nous prenons le relais rapidement.</h2>
-        <p class="claims-text">
-          Déclarez en quelques minutes, suivez chaque étape depuis votre espace
-          et bénéficiez d’un traitement clair, cadré et réactif. L’objectif :
-          vous faire gagner du temps quand vous en avez le plus besoin.
-        </p>
-
-        <div class="steps-card">
-          <div class="step" *ngFor="let step of claimSteps">
-            <div class="step-icon-wrap">
-              <div class="step-icon" [ngSwitch]="step.icon">
-                <svg *ngSwitchCase="'edit'" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 20h9"/>
-                  <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
-                </svg>
-
-                <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M20 21a8 8 0 0 0-16 0"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-
-                <svg *ngSwitchCase="'check'" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="9"/>
-                  <path d="m9 12 2 2 4-4"/>
-                </svg>
-              </div>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="/login">Accéder à mon espace</a>
+                    <a class="btn btn-secondary" href="#offres">Découvrir nos offres</a>
+                </div>
             </div>
 
-            <div class="step-content">
-              <div class="step-top">
-                <span class="step-number">{{ step.id }}</span>
-                <h3>{{ step.title }}</h3>
-              </div>
-              <p>{{ step.text }}</p>
+            <div class="hero-visual">
+                <div class="hero-visual-frame">
+                    <div class="visual-header">
+                        <div class="visual-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="visual-chip">Interface InSurFlow</div>
+                    </div>
+
+                    <div class="visual-body">
+                        <img src="assets/images/sinistre.png" alt="Plateforme InSurFlow" />
+                    </div>
+                </div>
+
+                <div class="floating-card floating-top">
+                    <span class="floating-label">Traitement</span>
+                    <strong>98%</strong>
+                    <p>des sinistres traités sous 7 jours</p>
+                </div>
+
+                <div class="floating-card floating-bottom">
+                    <span class="floating-label">Support</span>
+                    <strong>24/7</strong>
+                    <p>assistance accessible à tout moment</p>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+    </section>
 
-      <div class="claims-visual">
-        <div class="claims-badge">Déclaration 24/7</div>
-        <img src="../../../assets/images/sinistre.png" alt="Gestion des sinistres" />
-      </div>
-    </div>
-  </section>
+    <section class="section stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <article class="stat-card" *ngFor="let stat of stats">
+                    <strong>{{ stat.value }}</strong>
+                    <span>{{ stat.label }}</span>
+                </article>
+            </div>
+        </div>
+    </section>
 
-  <section id="pourquoi" class="section why">
-    <div class="container why-grid">
-      <div class="why-copy">
-        <p class="section-kicker">Pourquoi InSurFlow</p>
-        <h2>Une relation durable, pas une assurance impersonnelle.</h2>
-        <p>
-          Chaque assuré bénéficie d’un accompagnement plus lisible, avec un
-          interlocuteur identifié, des réponses rapides et une expérience pensée
-          pour rester simple au quotidien.
-        </p>
-      </div>
+    <section id="plateforme" class="section">
+        <div class="container">
+            <div class="section-head centered">
+                <p class="section-kicker">Plateforme</p>
+                <h2>Une expérience d’assurance pensée pour inspirer confiance.</h2>
+                <p class="section-text">
+                    Une approche plus lisible, plus élégante et plus simple à utiliser,
+                    sans copier le style du site d’exemple.
+                </p>
+            </div>
 
-      <div class="advantages-grid">
-        <article class="adv-card" *ngFor="let item of advantages">
-          <div class="adv-icon" [ngSwitch]="item.icon">
-            <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M20 21a8 8 0 0 0-16 0"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
+            <div class="solutions-grid">
+                <article class="solution-card" *ngFor="let item of solutions">
+                    <div class="solution-icon" [ngSwitch]="item.icon">
+                        <svg *ngSwitchCase="'pilot'" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="5" y="5" width="14" height="14" rx="4"></rect>
+                            <path d="M12 2v3"></path>
+                            <path d="M12 19v3"></path>
+                            <path d="M2 12h3"></path>
+                            <path d="M19 12h3"></path>
+                        </svg>
 
-            <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 7v5l3 2"/>
-            </svg>
+                        <svg *ngSwitchCase="'claim'" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 7h10"></path>
+                            <path d="M4 12h16"></path>
+                            <path d="M4 17h9"></path>
+                            <circle cx="18" cy="7" r="2"></circle>
+                            <circle cx="15" cy="17" r="2"></circle>
+                        </svg>
 
-            <svg *ngSwitchCase="'pin'" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"/>
-              <circle cx="12" cy="10" r="2.5"/>
-            </svg>
+                        <svg *ngSwitchCase="'safe'" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"></path>
+                            <path d="m9.5 12 1.7 1.7 3.3-3.4"></path>
+                        </svg>
+                    </div>
 
-            <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"/>
-            </svg>
-          </div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.text }}</p>
+                </article>
+            </div>
+        </div>
+    </section>
 
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.text }}</p>
-        </article>
-      </div>
-    </div>
-  </section>
+    <section id="offres" class="section offers-section">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Nos offres</p>
+                    <h2>Quatre univers de protection dans la même expérience InSurFlow.</h2>
+                </div>
 
-  <section class="cta-band">
-    <div class="container cta-band-inner">
-      <div class="cta-copy">
-        <p class="eyebrow eyebrow-light">Espace assuré</p>
-        <h2>Tous vos contrats accessibles dans un espace unique, simple et sécurisé.</h2>
-      </div>
+                <span class="section-count">04 domaines</span>
+            </div>
 
-      <div class="cta-actions">
-        <a class="btn btn-light-solid" href="/login">Connexion à mon espace</a>
-      </div>
-    </div>
-  </section>
+            <div class="offers-grid">
+                <article class="offer-card" *ngFor="let offer of offers">
+                    <div class="offer-media">
+                        <img [src]="offer.image" [alt]="offer.title" />
+                        <span class="offer-index">{{ offer.id }}</span>
+                    </div>
+
+                    <div class="offer-body">
+                        <h3>{{ offer.title }}</h3>
+                        <p>{{ offer.description }}</p>
+
+                        <a class="offer-link" href="#">
+                            <span>{{ offer.cta }}</span>
+                            <span class="offer-arrow">→</span>
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section product-section">
+        <div class="container product-layout">
+            <div class="product-visual">
+                <div class="product-visual-badge">Vue produit</div>
+                <img src="assets/images/sinistre.png" alt="Dashboard InSurFlow" />
+            </div>
+
+            <div class="product-copy">
+                <p class="section-kicker">Architecture expérience</p>
+                <h2>Un environnement digital plus soigné, plus fluide et vraiment cohérent.</h2>
+                <p class="section-text left">
+                    InSurFlow ne reprend pas le site exemple à l’identique. On garde une
+                    sensation premium, mais avec une identité visuelle plus personnelle,
+                    plus proche de ton projet.
+                </p>
+
+                <div class="product-cards">
+                    <article class="product-card" *ngFor="let item of productCards">
+                        <div class="product-mark"></div>
+                        <div>
+                            <h3>{{ item.title }}</h3>
+                            <p>{{ item.text }}</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sinistres" class="section process-section">
+        <div class="container process-shell">
+            <div class="section-head process-head">
+                <div>
+                    <p class="section-kicker section-kicker-light">Gestion des sinistres</p>
+                    <h2>Quand un sinistre arrive, tout doit rester simple et compréhensible.</h2>
+                </div>
+            </div>
+
+            <div class="process-steps">
+                <article class="process-step" *ngFor="let step of claimSteps">
+                    <div class="step-icon-wrap">
+                        <div class="step-icon" [ngSwitch]="step.icon">
+                            <svg *ngSwitchCase="'edit'" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 20h9"></path>
+                                <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                            </svg>
+
+                            <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+
+                            <svg *ngSwitchCase="'check'" viewBox="0 0 24 24" aria-hidden="true">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <span class="process-step-number">{{ step.id }}</span>
+                    <h3>{{ step.title }}</h3>
+                    <p>{{ step.text }}</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="pourquoi" class="section">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <p class="section-kicker">Pourquoi InSurFlow</p>
+                    <h2>Une assurance plus humaine, plus experte et mieux organisée.</h2>
+                </div>
+            </div>
+
+            <div class="advantages-grid">
+                <article class="adv-card" *ngFor="let item of advantages">
+                    <div class="adv-icon" [ngSwitch]="item.icon">
+                        <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M20 21a8 8 0 0 0-16 0"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+
+                        <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <path d="M12 7v5l3 2"></path>
+                        </svg>
+
+                        <svg *ngSwitchCase="'pin'" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"></path>
+                            <circle cx="12" cy="10" r="2.5"></circle>
+                        </svg>
+
+                        <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"></path>
+                        </svg>
+                    </div>
+
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.text }}</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <div class="container">
+            <div class="section-head centered">
+                <p class="section-kicker">Contact</p>
+                <h2>Des points d’accès simples pour garder le lien avec vos assurés.</h2>
+            </div>
+
+            <div class="contact-grid">
+                <article class="contact-card" *ngFor="let item of contactMethods">
+                    <div class="contact-icon" [ngSwitch]="item.icon">
+                        <svg *ngSwitchCase="'phone'" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 5.15 12.8 19.8 19.8 0 0 1 2.08 4.09 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.65 2.62a2 2 0 0 1-.45 2.11L8 9.71a16 16 0 0 0 6.29 6.29l1.26-1.26a2 2 0 0 1 2.11-.45c.84.31 1.72.53 2.62.65A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+
+                        <svg *ngSwitchCase="'mail'" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                            <path d="m3 7 9 6 9-6"></path>
+                        </svg>
+
+                        <svg *ngSwitchCase="'chat'" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+                        </svg>
+                    </div>
+
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.text }}</p>
+                    <a class="contact-link" [href]="item.href">{{ item.action }}</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-panel">
+        <div class="container cta-panel-inner">
+            <div class="cta-copy">
+                <p class="eyebrow eyebrow-light">Espace assuré</p>
+                <h2>Donnez à votre assurance une présence plus moderne, plus rassurante et plus haut de gamme.</h2>
+            </div>
+
+            <div class="cta-actions">
+                <a class="btn btn-light-solid" href="/login">Connexion à mon espace</a>
+            </div>
+        </div>
+    </section>
 </main>

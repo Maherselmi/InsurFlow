@@ -2,6 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface NextStepItem {
+  id: string;
+  title: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-claim-step3',
   standalone: true,
@@ -10,11 +21,29 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./claim-step3.component.css']
 })
 export class ClaimStep3Component implements OnInit {
-  navItems = [
+  navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/documents' }
+    { label: 'Mes dossiers', route: '/Consulter' }
+  ];
+
+  nextSteps: NextStepItem[] = [
+    {
+      id: '1',
+      title: 'Analyse du dossier',
+      text: 'Vérification des informations et des documents envoyés.'
+    },
+    {
+      id: '2',
+      title: 'Étude du sinistre',
+      text: 'Évaluation du dossier avant décision de traitement.'
+    },
+    {
+      id: '3',
+      title: 'Suivi dans votre espace',
+      text: 'Consultez l’avancement depuis vos dossiers InSurFlow.'
+    }
   ];
 
   reference = '';
@@ -23,6 +52,21 @@ export class ClaimStep3Component implements OnInit {
 
   ngOnInit(): void {
     this.reference = this.generateReference();
+  }
+
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+          currentUrl.startsWith('/Claim_Home') ||
+          currentUrl.startsWith('/claim') ||
+          currentUrl.startsWith('/Sante') ||
+          currentUrl.startsWith('/Habitation')
+      );
+    }
+
+    return currentUrl === route;
   }
 
   generateReference(): string {
@@ -41,7 +85,7 @@ export class ClaimStep3Component implements OnInit {
   }
 
   goToClaimsHome(): void {
-    this.router.navigate(['/sinistres-home']);
+    this.router.navigate(['/Claim_Home']);
   }
 
   goToMyFiles(): void {

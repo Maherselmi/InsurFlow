@@ -1,0 +1,118 @@
+<div class="sidebar-shell">
+  <aside class="sidebar">
+    <div class="sidebar-glow sidebar-glow-top"></div>
+    <div class="sidebar-glow sidebar-glow-bottom"></div>
+
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 2L4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+          </svg>
+        </div>
+
+        <div class="logo-copy">
+          <div class="logo-text">InsurFlow</div>
+          <div class="logo-sub">Admin dashboard</div>
+        </div>
+      </div>
+
+      <div class="admin-highlight">
+        <span class="highlight-label">Pilotage global</span>
+        <strong>Centre de supervision</strong>
+        <p>Dossiers, clients, polices et validation IA dans une interface unique.</p>
+      </div>
+    </div>
+
+    <div class="sidebar-content">
+      <div class="sidebar-group">
+        <div class="sidebar-section">Principal</div>
+
+        <div
+          class="nav-item"
+          *ngFor="let item of mainNavItems"
+          [class.active]="isActive(item.route || '')"
+          (click)="navigate(item.route)"
+        >
+          <div class="nav-left">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <g [innerHTML]="getIconPath(item.icon)"></g>
+              </svg>
+            </span>
+
+            <div class="nav-copy">
+              <span class="nav-title">{{ item.label }}</span>
+            </div>
+          </div>
+
+          <span class="nav-badge" *ngIf="item.badge" [class.red]="item.badgeClass === 'red'">
+            {{ item.badge }}
+          </span>
+        </div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-section">IA & Agents</div>
+
+        <div
+          class="nav-item"
+          *ngFor="let item of iaNavItems"
+          [class.active]="isActive(item.route || '')"
+          (click)="navigate(item.route)"
+        >
+          <div class="nav-left">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <g [innerHTML]="getIconPath(item.icon)"></g>
+              </svg>
+            </span>
+
+            <div class="nav-copy">
+              <span class="nav-title">{{ item.label }}</span>
+            </div>
+          </div>
+
+          <span class="nav-badge" *ngIf="item.badge" [class.red]="item.badgeClass === 'red'">
+            {{ item.badge }}
+          </span>
+        </div>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-section">Configuration</div>
+
+        <div
+          class="nav-item"
+          *ngFor="let item of configNavItems"
+          [class.active]="isActive(item.route || '')"
+          (click)="navigate(item.route)"
+        >
+          <div class="nav-left">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <g [innerHTML]="getIconPath(item.icon)"></g>
+              </svg>
+            </span>
+
+            <div class="nav-copy">
+              <span class="nav-title">{{ item.label }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="admin-card">
+        <div class="admin-avatar">{{ getAdminInitials() }}</div>
+
+        <div class="admin-meta">
+          <div class="admin-name">{{ getAdminName() }}</div>
+          <div class="admin-role">{{ getAdminRole() }}</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>

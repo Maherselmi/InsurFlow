@@ -3,6 +3,17 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ClaimService } from '../../../claim.service';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface UploadTip {
+  title: string;
+  text: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-claim-step2-habitation',
   standalone: true,
@@ -12,11 +23,34 @@ import { ClaimService } from '../../../claim.service';
   host: { ngSkipHydration: 'true' }
 })
 export class ClaimStep2HabitationComponent implements OnInit {
-  navItems = [
+  navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/documents' }
+    { label: 'Mes dossiers', route: '/Consulter' }
+  ];
+
+  uploadTips: UploadTip[] = [
+    {
+      title: 'Vue générale',
+      text: 'Ajoutez une photo complète de la pièce ou de la zone touchée.',
+      icon: 'V'
+    },
+    {
+      title: 'Dégâts détaillés',
+      text: 'Ajoutez un gros plan des éléments endommagés.',
+      icon: 'D'
+    },
+    {
+      title: 'Origine visible',
+      text: 'Montrez la fuite, fissure ou la source du sinistre si possible.',
+      icon: 'O'
+    },
+    {
+      title: 'Pièces utiles',
+      text: 'Ajoutez devis, factures, constats ou autres justificatifs.',
+      icon: 'P'
+    }
   ];
 
   files: File[] = [];
@@ -35,12 +69,28 @@ export class ClaimStep2HabitationComponent implements OnInit {
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       const stored = localStorage.getItem('claimId');
+
       if (stored) {
         this.claimId = Number(stored);
       } else {
         this.errorMessage = 'Aucun dossier trouvé. Retournez à l’étape 1.';
       }
     }
+  }
+
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+        currentUrl.startsWith('/Claim_Home') ||
+        currentUrl.startsWith('/claim') ||
+        currentUrl.startsWith('/Habitation') ||
+        currentUrl.startsWith('/Sante')
+      );
+    }
+
+    return currentUrl === route;
   }
 
   onFileSelected(event: Event): void {
@@ -129,6 +179,10 @@ export class ClaimStep2HabitationComponent implements OnInit {
     return this.formatSize(total);
   }
 
+  get canUpload(): boolean {
+    return !this.loading && this.files.length > 0 && !!this.claimId;
+  }
+
   back(): void {
     this.router.navigate(['/claim/habitation/step1']);
   }
@@ -182,6 +236,10 @@ export class ClaimStep2HabitationComponent implements OnInit {
         }
       });
     });
+  }
+
+  goToClaimsHome(): void {
+    this.router.navigate(['/Claim_Home']);
   }
 
   goToHome(): void {

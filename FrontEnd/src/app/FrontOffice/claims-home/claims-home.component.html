@@ -1,166 +1,171 @@
 <div class="claims-home-page">
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
-      </a>
+    <div class="bg-orb orb-left"></div>
+    <div class="bg-orb orb-right"></div>
 
-      <nav class="main-nav">
-        <a
-          *ngFor="let item of navItems"
-          [routerLink]="item.route"
-          [class.active]="item.label === 'Sinistres'"
-        >
-          {{ item.label }}
-        </a>
-      </nav>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" routerLink="/">
+                <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+            </a>
 
-      <div class="header-user" *ngIf="!loadingProfile && client">
-        <div class="header-user-text">
-          <strong>{{ fullName }}</strong>
-          <span>client · {{ client.email }}</span>
+            <nav class="main-nav">
+                <a
+                        *ngFor="let item of navItems"
+                        [routerLink]="item.route"
+                        [class.active]="isActiveNav(item.route)"
+                >
+                    {{ item.label }}
+                </a>
+            </nav>
+
+            <div class="header-user" *ngIf="!loadingProfile && client">
+                <div class="header-user-text">
+                    <strong>{{ fullName }}</strong>
+                    <span>{{ client.email }}</span>
+                </div>
+                <div class="avatar">{{ initials }}</div>
+            </div>
+
+            <div class="header-user" *ngIf="loadingProfile">
+                <div class="header-user-text">
+                    <strong>Chargement...</strong>
+                    <span>lecture du profil</span>
+                </div>
+                <div class="avatar">...</div>
+            </div>
         </div>
-        <div class="avatar">{{ initials }}</div>
-      </div>
+    </header>
 
-      <div class="header-user" *ngIf="loadingProfile">
-        <div class="header-user-text">
-          <strong>Chargement...</strong>
-          <span>lecture du profil</span>
+    <main class="claims-main">
+        <div class="container">
+            <section class="hero-card">
+                <div class="hero-copy">
+                    <div class="hero-badge">Déclaration & suivi des sinistres</div>
+
+                    <h1>
+                        Gérez vos sinistres
+                        <span>simplement, rapidement et clairement.</span>
+                    </h1>
+
+                    <p class="hero-text">
+                        Déclarez un nouveau sinistre, suivez vos dossiers en cours et
+                        retrouvez toutes les étapes importantes dans un espace unique,
+                        moderne et pensé dans le style InSurFlow.
+                    </p>
+
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" type="button" (click)="goToClaims()">
+                            Voir mes dossiers
+                        </button>
+
+                        <button class="btn btn-secondary" type="button" (click)="goToClaim('AUTO')">
+                            Déclarer maintenant
+                        </button>
+                    </div>
+
+                    <div class="hero-points">
+                        <div class="hero-point">
+                            <span class="hero-point-bullet"></span>
+                            <span>Déclaration rapide</span>
+                        </div>
+
+                        <div class="hero-point">
+                            <span class="hero-point-bullet"></span>
+                            <span>Suivi étape par étape</span>
+                        </div>
+
+                        <div class="hero-point">
+                            <span class="hero-point-bullet"></span>
+                            <span>Documents centralisés</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-panel">
+                    <div class="hero-panel-badge">Espace sinistre</div>
+
+                    <div class="hero-panel-top">
+                        <article class="mini-stat">
+                            <strong>24/7</strong>
+                            <span>Déclaration en ligne</span>
+                        </article>
+
+                        <article class="mini-stat">
+                            <strong>3</strong>
+                            <span>Types de sinistres</span>
+                        </article>
+                    </div>
+
+                    <div class="hero-image">
+                        <img src="assets/images/Sinsitre_image.png" alt="Gestion des sinistres" />
+                    </div>
+                </div>
+            </section>
+
+            <section class="benefits-strip">
+                <article class="benefit-card" *ngFor="let item of benefits">
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.text }}</p>
+                </article>
+            </section>
+
+            <section class="claims-types-section">
+                <div class="section-head">
+                    <div>
+                        <p class="section-kicker">Types de sinistres</p>
+                        <h2>Choisissez le type de sinistre à déclarer</h2>
+                    </div>
+
+                    <a class="section-link" routerLink="/dossiers">Voir mes dossiers →</a>
+                </div>
+
+                <div class="claims-cards">
+                    <article
+                            class="claim-type-card"
+                            *ngFor="let claimType of claimTypes; let i = index"
+                            [class.delay-1]="i === 1"
+                            [class.delay-2]="i === 2"
+                            (click)="handleClaim(claimType.code)"
+                    >
+                        <div class="card-media">
+                            <img [src]="claimType.image" [alt]="claimType.title" />
+                        </div>
+
+                        <div class="card-body">
+                            <div class="card-top">
+                                <div class="card-icon">{{ claimType.icon }}</div>
+                                <span class="card-subtitle">{{ claimType.subtitle }}</span>
+                            </div>
+
+                            <h3>{{ claimType.title }}</h3>
+                            <p>{{ claimType.description }}</p>
+
+                            <button class="card-link" type="button">
+                                {{ claimType.action }} →
+                            </button>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="bottom-banner">
+                <div class="bottom-banner-content">
+                    <div>
+                        <p class="eyebrow eyebrow-light">Suivi des dossiers</p>
+                        <h2>Consultez vos sinistres en cours et restez informé à chaque étape.</h2>
+                    </div>
+
+                    <div class="bottom-banner-actions">
+                        <button class="btn btn-light" type="button" (click)="goToClaims()">
+                            Accéder à mes dossiers
+                        </button>
+
+                        <button class="btn btn-outline-light" type="button" (click)="logout()">
+                            Déconnexion
+                        </button>
+                    </div>
+                </div>
+            </section>
         </div>
-        <div class="avatar">...</div>
-      </div>
-    </div>
-  </header>
-
-  <main class="claims-main">
-    <div class="container">
-      <section class="hero-card">
-        <div class="hero-copy">
-          <p class="eyebrow">Déclaration & suivi des sinistres</p>
-
-          <h1>
-            Gérez vos sinistres
-            <span>simplement, rapidement et clairement.</span>
-          </h1>
-
-          <p class="hero-text">
-            Déclarez un nouveau sinistre, suivez vos dossiers en cours et
-            retrouvez toutes les étapes importantes dans un espace unique,
-            pensé dans le style InSurFlow.
-          </p>
-
-          <div class="hero-actions">
-            <button class="btn btn-primary" type="button" (click)="goToClaims()">
-              Voir mes dossiers
-            </button>
-
-            <button class="btn btn-secondary" type="button" (click)="goToClaim('AUTO')">
-              Déclarer maintenant
-            </button>
-          </div>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Déclaration rapide</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Suivi étape par étape</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Documents centralisés</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Espace sinistre</div>
-
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>24/7</strong>
-              <span>Déclaration en ligne</span>
-            </article>
-
-            <article class="mini-stat">
-              <strong>3</strong>
-              <span>Types de sinistres</span>
-            </article>
-          </div>
-
-          <div class="hero-image">
-            <img src="assets/images/sinistre.jpg" alt="Gestion des sinistres" />
-          </div>
-        </div>
-      </section>
-
-      <section class="claims-types-section">
-        <div class="section-head">
-          <div>
-            <p class="section-kicker">Types de sinistres</p>
-            <h2>Choisissez le type de sinistre à déclarer</h2>
-          </div>
-        </div>
-
-        <div class="claims-cards">
-          <article class="claim-type-card fade-up" (click)="goToClaim('AUTO')">
-            <div class="card-media">
-              <img src="assets/images/auto-insurance.jpg" alt="Sinistre auto" />
-            </div>
-
-            <div class="card-body">
-              <div class="card-icon">A</div>
-              <h3>Sinistre Auto</h3>
-              <p>Accidents, collisions, bris de glace et dommages véhicule.</p>
-              <button class="card-link" type="button">Déclarer un sinistre auto →</button>
-            </div>
-          </article>
-
-          <article class="claim-type-card fade-up delay-1" (click)="goToClaimSante('SANTE')">
-            <div class="card-media">
-              <img src="assets/images/health-insurance.jpg" alt="Sinistre santé" />
-            </div>
-
-            <div class="card-body">
-              <div class="card-icon">S</div>
-              <h3>Sinistre Santé</h3>
-              <p>Hospitalisation, soins, prise en charge et remboursements.</p>
-              <button class="card-link" type="button">Déclarer un sinistre santé →</button>
-            </div>
-          </article>
-
-          <article class="claim-type-card fade-up delay-2" (click)="goToClaimHabitation('HABITATION')">
-            <div class="card-media">
-              <img src="assets/images/home-insurance.jpg" alt="Sinistre habitation" />
-            </div>
-
-            <div class="card-body">
-              <div class="card-icon">H</div>
-              <h3>Sinistre Habitation</h3>
-              <p>Incendie, dégâts des eaux, vol, vandalisme et autres dommages.</p>
-              <button class="card-link" type="button">Déclarer un sinistre habitation →</button>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section class="bottom-banner">
-        <div class="bottom-banner-content">
-          <div>
-            <p class="eyebrow eyebrow-light">Suivi des dossiers</p>
-            <h2>Consultez vos sinistres en cours et restez informé à chaque étape.</h2>
-          </div>
-
-          <button class="btn btn-light" type="button" (click)="goToClaims()">
-            Accéder à mes dossiers
-          </button>
-        </div>
-      </section>
-    </div>
-  </main>
+    </main>
 </div>

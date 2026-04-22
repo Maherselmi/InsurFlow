@@ -4,6 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ClaimService, ClaimData, Policy } from '../../../claim.service';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface SupportTip {
+  title: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-claim-step1-habitation',
   standalone: true,
@@ -13,11 +23,11 @@ import { ClaimService, ClaimData, Policy } from '../../../claim.service';
   host: { ngSkipHydration: 'true' }
 })
 export class ClaimStep1HabitationComponent implements OnInit {
-  navItems = [
+  navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/documents' }
+    { label: 'Mes dossiers', route: '/Consulter' }
   ];
 
   habitationClaimTypes = [
@@ -30,6 +40,21 @@ export class ClaimStep1HabitationComponent implements OnInit {
     { value: 'BRIS_GLACE', label: 'Bris de glace' }
   ];
 
+  supportTips: SupportTip[] = [
+    {
+      title: 'Décrivez les dégâts',
+      text: 'Indiquez les pièces concernées, les éléments touchés et l’étendue des dommages.'
+    },
+    {
+      title: 'Choisissez la bonne police',
+      text: 'Votre contrat habitation est vérifié avant de passer à l’étape suivante.'
+    },
+    {
+      title: 'Lancez rapidement le dossier',
+      text: 'Une saisie claire au départ facilite le traitement du sinistre.'
+    }
+  ];
+
   claim: ClaimData = {
     policyId: null,
     clientId: null,
@@ -40,6 +65,8 @@ export class ClaimStep1HabitationComponent implements OnInit {
 
   policies: Policy[] = [];
   selectedPolicy: Policy | null = null;
+
+  loadingPolicies = false;
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -54,8 +81,23 @@ export class ClaimStep1HabitationComponent implements OnInit {
     this.loadPolicies();
   }
 
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+        currentUrl.startsWith('/Claim_Home') ||
+        currentUrl.startsWith('/claim') ||
+        currentUrl.startsWith('/Habitation') ||
+        currentUrl.startsWith('/Sante')
+      );
+    }
+
+    return currentUrl === route;
+  }
+
   loadPolicies(): void {
-    this.loading = true;
+    this.loadingPolicies = true;
     this.errorMessage = '';
 
     this.claimService.getPolicies().subscribe({
@@ -66,10 +108,10 @@ export class ClaimStep1HabitationComponent implements OnInit {
           (p) => this.normalizeType(p.type) === 'HABITATION'
         );
 
-        this.loading = false;
+        this.loadingPolicies = false;
       },
       error: (err) => {
-        this.loading = false;
+        this.loadingPolicies = false;
         this.errorMessage = 'Erreur lors du chargement des polices habitation.';
         console.error('Erreur chargement polices habitation:', err);
       }
@@ -88,7 +130,7 @@ export class ClaimStep1HabitationComponent implements OnInit {
       return;
     }
 
-    if (this.selectedPolicy?.client?.id) {
+    if (this.selectedPolicy.client?.id) {
       this.claim.clientId = this.selectedPolicy.client.id;
     } else {
       this.claim.clientId = null;
@@ -106,7 +148,6 @@ export class ClaimStep1HabitationComponent implements OnInit {
 
     if (!this.isPolicyActive(this.selectedPolicy)) {
       this.errorMessage = 'Cette police habitation est expirée ou inactive.';
-      return;
     }
   }
 
@@ -152,13 +193,21 @@ export class ClaimStep1HabitationComponent implements OnInit {
       return false;
     }
 
-    if (this.selectedPolicy.startDate && incidentDate < new Date(this.selectedPolicy.startDate)) {
-      this.errorMessage = 'La date du sinistre est antérieure au début de validité de la police.';
+    if (
+      this.selectedPolicy.startDate &&
+      incidentDate < new Date(this.selectedPolicy.startDate)
+    ) {
+      this.errorMessage =
+        'La date du sinistre est antérieure au début de validité de la police.';
       return false;
     }
 
-    if (this.selectedPolicy.endDate && incidentDate > new Date(this.selectedPolicy.endDate)) {
-      this.errorMessage = 'La date du sinistre dépasse la fin de validité de la police.';
+    if (
+      this.selectedPolicy.endDate &&
+      incidentDate > new Date(this.selectedPolicy.endDate)
+    ) {
+      this.errorMessage =
+        'La date du sinistre dépasse la fin de validité de la police.';
       return false;
     }
 
@@ -224,6 +273,14 @@ export class ClaimStep1HabitationComponent implements OnInit {
     return `${this.formatDate(this.selectedPolicy.startDate)} → ${this.formatDate(this.selectedPolicy.endDate)}`;
   }
 
+  getSelectedPolicyStatus(): string {
+    if (!this.selectedPolicy) {
+      return '-';
+    }
+
+    return this.isPolicyActive(this.selectedPolicy) ? 'Active' : 'Inactive';
+  }
+
   formatDate(date: string): string {
     const d = new Date(date);
     if (isNaN(d.getTime())) return date;
@@ -233,6 +290,10 @@ export class ClaimStep1HabitationComponent implements OnInit {
       month: 'short',
       year: 'numeric'
     });
+  }
+
+  goToClaimsHome(): void {
+    this.router.navigate(['/Claim_Home']);
   }
 
   goToHome(): void {

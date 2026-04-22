@@ -1,4 +1,7 @@
 <div class="claim-page">
+  <div class="bg-orb orb-left"></div>
+  <div class="bg-orb orb-right"></div>
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
@@ -9,7 +12,7 @@
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
-          [class.active]="item.label === 'Sinistres'"
+          [class.active]="isActiveNav(item.route)"
         >
           {{ item.label }}
         </a>
@@ -113,7 +116,10 @@
           <div class="sidebar-card support-card">
             <div class="support-icon">H</div>
             <h3>Expertise habitation InSurFlow</h3>
-            <p>Votre dossier suit maintenant le circuit d’analyse de votre sinistre habitation.</p>
+            <p>
+              Votre dossier suit maintenant le circuit d’analyse de votre sinistre
+              habitation avec un suivi centralisé dans votre espace client.
+            </p>
 
             <ul class="support-list">
               <li>Analyse des dégâts déclarés</li>
@@ -173,27 +179,11 @@
               <h3>Prochaines étapes</h3>
 
               <div class="steps-grid">
-                <div class="step-card">
-                  <span class="step-card-icon">1</span>
+                <div class="step-card" *ngFor="let step of nextSteps">
+                  <span class="step-card-icon">{{ step.id }}</span>
                   <div>
-                    <strong>Expertise des dégâts</strong>
-                    <p>Analyse des dommages et des éléments transmis.</p>
-                  </div>
-                </div>
-
-                <div class="step-card">
-                  <span class="step-card-icon">2</span>
-                  <div>
-                    <strong>Devis réparation</strong>
-                    <p>Étude des réparations ou travaux nécessaires.</p>
-                  </div>
-                </div>
-
-                <div class="step-card">
-                  <span class="step-card-icon">3</span>
-                  <div>
-                    <strong>Indemnisation</strong>
-                    <p>Suivi du traitement depuis votre espace InSurFlow.</p>
+                    <strong>{{ step.title }}</strong>
+                    <p>{{ step.text }}</p>
                   </div>
                 </div>
               </div>
@@ -207,11 +197,11 @@
             </div>
 
             <div class="actions-row">
-              <button class="btn-secondary" type="button" (click)="goToSinistre()">
+              <button class="btn-secondary" type="button" (click)="goToClaimsHome()">
                 Retour aux sinistres
               </button>
 
-              <button class="btn-light" type="button" (click)="goToDecisions()">
+              <button class="btn-light" type="button" (click)="goToMyFiles()">
                 Voir mes dossiers
               </button>
 

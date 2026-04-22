@@ -15,7 +15,7 @@ export class ClaimStep3SanteComponent implements OnInit {
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/documents' }
+    { label: 'Documents', route: '/Consulter' }
   ];
 
   reference = '';

@@ -1,4 +1,7 @@
 <div class="claim-page">
+  <div class="bg-orb orb-left"></div>
+  <div class="bg-orb orb-right"></div>
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
@@ -9,7 +12,7 @@
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
-          [class.active]="item.label === 'Sinistres'"
+          [class.active]="isActiveNav(item.route)"
         >
           {{ item.label }}
         </a>
@@ -26,7 +29,7 @@
     <div class="container">
       <section class="hero-card">
         <div class="hero-copy">
-          <p class="eyebrow">Justificatifs habitation</p>
+          <div class="hero-badge">Justificatifs habitation</div>
 
           <h1>
             Ajoutez vos documents habitation
@@ -37,6 +40,17 @@
             Déposez vos photos des dégâts, devis, constats et documents utiles
             afin de finaliser votre déclaration habitation dans InSurFlow.
           </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-secondary" type="button" (click)="back()">
+              Retour
+            </button>
+
+            <button class="btn btn-primary" type="button" (click)="upload()" [disabled]="!canUpload">
+              <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
+              <span *ngIf="!loading">Soumettre les justificatifs</span>
+            </button>
+          </div>
 
           <div class="hero-points">
             <div class="hero-point">
@@ -119,8 +133,8 @@
               <li>Devis de réparation</li>
               <li>Factures d’équipements endommagés</li>
               <li>Constat de dégât des eaux</li>
-              <li>Rapport de police si nécessaire</li>
-              <li>Diagnostic immobilier</li>
+              <li>Rapport utile ou justificatif complémentaire</li>
+              <li>Diagnostic ou document d’expertise</li>
             </ul>
           </div>
         </aside>
@@ -174,35 +188,11 @@
               </div>
 
               <div class="tips-grid">
-                <div class="tip-card">
-                  <span class="tip-icon">P</span>
+                <div class="tip-card" *ngFor="let tip of uploadTips">
+                  <span class="tip-icon">{{ tip.icon }}</span>
                   <div>
-                    <strong>Pièce touchée</strong>
-                    <p>Ajoutez une vue d’ensemble de la pièce ou zone concernée.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">D</span>
-                  <div>
-                    <strong>Dégâts détaillés</strong>
-                    <p>Ajoutez un gros plan des dommages visibles.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">E</span>
-                  <div>
-                    <strong>Eaux / source</strong>
-                    <p>Ajoutez la source du dégât si elle est visible.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">R</span>
-                  <div>
-                    <strong>Réparation</strong>
-                    <p>Ajoutez devis, factures ou documents utiles au dossier.</p>
+                    <strong>{{ tip.title }}</strong>
+                    <p>{{ tip.text }}</p>
                   </div>
                 </div>
               </div>
@@ -264,7 +254,7 @@
                 type="button"
                 class="btn-primary"
                 (click)="upload()"
-                [disabled]="loading || files.length === 0"
+                [disabled]="!canUpload"
               >
                 <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
                 <span *ngIf="!loading">Soumettre mon dossier habitation</span>

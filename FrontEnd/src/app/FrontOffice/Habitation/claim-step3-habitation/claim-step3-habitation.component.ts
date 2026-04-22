@@ -2,6 +2,17 @@ import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface NextStepItem {
+  id: string;
+  title: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-claim-step3-habitation',
   standalone: true,
@@ -11,11 +22,29 @@ import { Router, RouterModule } from '@angular/router';
   host: { ngSkipHydration: 'true' }
 })
 export class ClaimStep3HabitationComponent implements OnInit {
-  navItems = [
+  navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/documents' }
+    { label: 'Mes dossiers', route: '/Consulter' }
+  ];
+
+  nextSteps: NextStepItem[] = [
+    {
+      id: '1',
+      title: 'Analyse des dégâts',
+      text: 'Étude des informations et des pièces transmises pour qualifier le sinistre.'
+    },
+    {
+      id: '2',
+      title: 'Évaluation habitation',
+      text: 'Estimation des réparations et du niveau de prise en charge.'
+    },
+    {
+      id: '3',
+      title: 'Suivi du dossier',
+      text: 'Retrouvez l’avancement complet depuis votre espace InSurFlow.'
+    }
   ];
 
   reference = '';
@@ -27,6 +56,21 @@ export class ClaimStep3HabitationComponent implements OnInit {
 
   ngOnInit(): void {
     this.reference = this.generateReference();
+  }
+
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+        currentUrl.startsWith('/Claim_Home') ||
+        currentUrl.startsWith('/claim') ||
+        currentUrl.startsWith('/Habitation') ||
+        currentUrl.startsWith('/Sante')
+      );
+    }
+
+    return currentUrl === route;
   }
 
   generateReference(): string {
@@ -45,11 +89,11 @@ export class ClaimStep3HabitationComponent implements OnInit {
     this.router.navigate(['/claim/habitation/step1']);
   }
 
-  goToSinistre(): void {
-    this.router.navigate(['/sinistres-home']);
+  goToClaimsHome(): void {
+    this.router.navigate(['/Claim_Home']);
   }
 
-  goToDecisions(): void {
+  goToMyFiles(): void {
     this.router.navigate(['/Consulter']);
   }
 

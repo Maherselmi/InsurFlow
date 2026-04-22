@@ -32,6 +32,25 @@ interface AdvantageItem {
   icon: 'user' | 'clock' | 'pin' | 'shield';
 }
 
+interface ContactMethod {
+  title: string;
+  text: string;
+  action: string;
+  href: string;
+  icon: 'phone' | 'mail' | 'chat';
+}
+
+interface HomeSolution {
+  title: string;
+  text: string;
+  icon: 'pilot' | 'claim' | 'safe';
+}
+
+interface ProductCard {
+  title: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-insurance-home',
   standalone: true,
@@ -42,16 +61,17 @@ interface AdvantageItem {
 export class InsuranceHomeComponent {
   navItems: NavItem[] = [
     { label: 'Nos offres', href: '#offres' },
+    { label: 'Plateforme', href: '#plateforme' },
     { label: 'Sinistres', href: '#sinistres' },
     { label: 'Pourquoi InSurFlow', href: '#pourquoi' },
     { label: 'Contact', href: '#contact' }
   ];
 
   stats: StatItem[] = [
-    { value: '98%', label: 'SINISTRES TRAITÉS SOUS 7 JOURS' },
-    { value: '24/7', label: "ASSISTANCE D'URGENCE" },
-    { value: '180k', label: 'ASSURÉS EN FRANCE' },
-    { value: '1962', label: 'ANNÉE DE FONDATION' }
+    { value: '98%', label: 'Sinistres traités sous 7 jours' },
+    { value: '24/7', label: "Assistance d'urgence" },
+    { value: '180k', label: 'Assurés en France' },
+    { value: '1962', label: 'Année de fondation' }
   ];
 
   offers: OfferItem[] = [
@@ -59,29 +79,62 @@ export class InsuranceHomeComponent {
       id: '01',
       title: 'Auto',
       description: 'Tous risques, intermédiaire ou tiers. Assistance 24/7 et véhicule de remplacement.',
-      cta: 'Demander un devis',
+      cta: 'Découvrir l’offre',
       image: 'assets/images/auto-insurance.jpg'
     },
     {
       id: '02',
       title: 'Habitation',
       description: 'Résidence principale, secondaire ou locative. Couverture multirisque sur mesure.',
-      cta: 'Demander un devis',
+      cta: 'Découvrir l’offre',
       image: 'assets/images/home-insurance.jpg'
     },
     {
       id: '03',
       title: 'Santé',
       description: 'Complémentaires individuelles et familiales. Tiers payant généralisé.',
-      cta: 'Demander un devis',
+      cta: 'Découvrir l’offre',
       image: 'assets/images/health-insurance.jpg'
     },
     {
       id: '04',
       title: 'Vie & Prévoyance',
       description: 'Épargne, transmission, garantie décès. Conseillers patrimoniaux dédiés.',
-      cta: 'Demander un devis',
+      cta: 'Découvrir l’offre',
       image: 'assets/images/Vie.png'
+    }
+  ];
+
+  solutions: HomeSolution[] = [
+    {
+      title: 'Expérience assurée centralisée',
+      text: 'Une seule interface pour les contrats, les documents, les échanges et le suivi global.',
+      icon: 'pilot'
+    },
+    {
+      title: 'Gestion des sinistres plus fluide',
+      text: 'Déclaration, dépôt de justificatifs et suivi du dossier dans un parcours beaucoup plus clair.',
+      icon: 'claim'
+    },
+    {
+      title: 'Environnement sécurisé',
+      text: 'Protection des données, accès contrôlé et documents sensibles accessibles dans un espace fiable.',
+      icon: 'safe'
+    }
+  ];
+
+  productCards: ProductCard[] = [
+    {
+      title: 'Client Space',
+      text: 'Un espace moderne pour consulter les contrats, suivre les dossiers et retrouver tous les documents.'
+    },
+    {
+      title: 'ClaimFlow',
+      text: 'Un parcours de sinistre plus lisible et plus rassurant, pensé pour réduire la friction.'
+    },
+    {
+      title: 'DocFlow',
+      text: 'Une organisation claire des justificatifs, rapports et pièces importantes du dossier.'
     }
   ];
 
@@ -126,6 +179,30 @@ export class InsuranceHomeComponent {
       title: 'Documents sécurisés',
       text: 'Coffre-fort numérique chiffré, accessible à vie.',
       icon: 'shield'
+    }
+  ];
+
+  contactMethods: ContactMethod[] = [
+    {
+      title: 'Par téléphone',
+      text: 'Parlez à un conseiller pour un besoin immédiat ou une situation urgente.',
+      action: 'Nous appeler',
+      href: 'tel:+33100000000',
+      icon: 'phone'
+    },
+    {
+      title: 'Par email',
+      text: 'Recevez une réponse claire et centralisée sur vos contrats et vos démarches.',
+      action: 'Nous écrire',
+      href: 'mailto:contact@insurflow.com',
+      icon: 'mail'
+    },
+    {
+      title: 'Depuis votre espace',
+      text: 'Retrouvez vos documents, votre suivi et vos échanges au même endroit.',
+      action: 'Accéder à mon espace',
+      href: '/login',
+      icon: 'chat'
     }
   ];
 }

@@ -1,23 +1,57 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import {AuthService} from "../../services/auth.service";
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+
+interface LoginTrustItem {
+  value: string;
+  label: string;
+}
+
+interface LoginFeatureItem {
+  title: string;
+  text: string;
+  icon: 'shield' | 'folder' | 'clock';
+}
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-
   email = '';
   password = '';
   loading = false;
   errorMessage = '';
   showPassword = false;
+
+  trustItems: LoginTrustItem[] = [
+    { value: '24/7', label: 'Accès continu à votre espace' },
+    { value: '100%', label: 'Données centralisées et sécurisées' },
+    { value: '1', label: 'Plateforme unique pour tous vos suivis' }
+  ];
+
+  featureItems: LoginFeatureItem[] = [
+    {
+      title: 'Connexion sécurisée',
+      text: 'Accès protégé à vos informations personnelles et à vos contrats.',
+      icon: 'shield'
+    },
+    {
+      title: 'Documents organisés',
+      text: 'Retrouvez vos pièces, justificatifs et dossiers au même endroit.',
+      icon: 'folder'
+    },
+    {
+      title: 'Suivi instantané',
+      text: 'Consultez l’état de vos démarches et sinistres en temps réel.',
+      icon: 'clock'
+    }
+  ];
 
   constructor(
     private authService: AuthService,

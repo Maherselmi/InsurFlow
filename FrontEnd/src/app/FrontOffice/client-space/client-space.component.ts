@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import {Client, ClientService} from "../../services/client.service";
-import {Policy} from "../../claim.service";
-import {AuthService} from "../../services/auth.service";
-import {PolicyService} from "../../services/policy.service";
-
+import { Client, ClientService } from '../../services/client.service';
+import { Policy } from '../../claim.service';
+import { AuthService } from '../../services/auth.service';
+import { PolicyService } from '../../services/policy.service';
 
 interface NavItem {
   label: string;
@@ -20,6 +19,13 @@ interface ClaimItem {
   message: string;
 }
 
+interface QuickAction {
+  title: string;
+  text: string;
+  route: string;
+  icon: 'contracts' | 'claims' | 'documents';
+}
+
 @Component({
   selector: 'app-client-space',
   standalone: true,
@@ -32,7 +38,28 @@ export class ClientSpaceComponent implements OnInit {
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/documents' }
+    { label: 'Mes dossiers', route: '/Consulter' }
+  ];
+
+  quickActions: QuickAction[] = [
+    {
+      title: 'Mes contrats',
+      text: 'Consultez vos polices et leurs échéances.',
+      route: '/contrats',
+      icon: 'contracts'
+    },
+    {
+      title: 'Déclarer un sinistre',
+      text: 'Lancez une nouvelle démarche en quelques étapes.',
+      route: '/Claim_Home',
+      icon: 'claims'
+    },
+    {
+      title: 'Mes dossiers',
+      text: 'Suivez vos décisions et rapports détaillés.',
+      route: '/Consulter',
+      icon: 'documents'
+    }
   ];
 
   client: Client | null = null;
@@ -62,10 +89,10 @@ export class ClientSpaceComponent implements OnInit {
   ];
 
   constructor(
-    private authService: AuthService,
-    private clientService: ClientService,
-    private policyService: PolicyService,
-    private router: Router
+      private authService: AuthService,
+      private clientService: ClientService,
+      private policyService: PolicyService,
+      private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -92,7 +119,7 @@ export class ClientSpaceComponent implements OnInit {
     this.clientService.getAllClients().subscribe({
       next: (clients) => {
         const found = clients.find(
-          (c) => c.email?.toLowerCase() === email.toLowerCase()
+            (c) => c.email?.toLowerCase() === email.toLowerCase()
         );
 
         this.client = found ?? null;
@@ -113,7 +140,7 @@ export class ClientSpaceComponent implements OnInit {
     this.policyService.getAllPolicies().subscribe({
       next: (policies) => {
         this.policies = policies.filter(
-          (policy) => policy.client?.email?.toLowerCase() === email.toLowerCase()
+            (policy) => policy.client?.email?.toLowerCase() === email.toLowerCase()
         );
         this.loadingPolicies = false;
       },
@@ -126,6 +153,10 @@ export class ClientSpaceComponent implements OnInit {
 
   getStoredEmail(): string | null {
     return localStorage.getItem('email');
+  }
+
+  isActiveNav(route: string): boolean {
+    return this.router.url === route;
   }
 
   get fullName(): string {
@@ -141,7 +172,11 @@ export class ClientSpaceComponent implements OnInit {
   }
 
   get activeContractsCount(): number {
-    return this.policies.length;
+    return this.policies.filter((policy) => this.getPolicyStatus(policy) === 'ACTIF').length;
+  }
+
+  get expiredContractsCount(): number {
+    return this.policies.filter((policy) => this.getPolicyStatus(policy) === 'EXPIRÉ').length;
   }
 
   get activeClaimsCount(): number {

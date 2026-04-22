@@ -692,25 +692,3 @@ a {
     font-size: 24px;
   }
 }
-
-.badge-expired {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-}
-
-.empty-card {
-  padding: 22px;
-  border: 1px solid rgba(207, 217, 229, 0.9);
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--shadow-sm);
-  font-size: 15px;
-  color: var(--text-soft);
-}
-
-.empty-card.error {
-  color: #b91c1c;
-  border-color: #fecaca;
-  background: #fff7f7;
-}

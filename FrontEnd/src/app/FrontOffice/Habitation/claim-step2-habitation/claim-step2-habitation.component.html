@@ -1,0 +1,278 @@
+<div class="claim-page">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" routerLink="/">
+        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+      </a>
+
+      <nav class="main-nav">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="item.route"
+          [class.active]="item.label === 'Sinistres'"
+        >
+          {{ item.label }}
+        </a>
+      </nav>
+
+      <div class="header-chip">
+        <span class="chip-label">Déclaration</span>
+        <strong>Étape 2 / 3</strong>
+      </div>
+    </div>
+  </header>
+
+  <main class="claim-main">
+    <div class="container">
+      <section class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">Justificatifs habitation</p>
+
+          <h1>
+            Ajoutez vos documents habitation
+            <span>pour compléter votre dossier sinistre.</span>
+          </h1>
+
+          <p class="hero-text">
+            Déposez vos photos des dégâts, devis, constats et documents utiles
+            afin de finaliser votre déclaration habitation dans InSurFlow.
+          </p>
+
+          <div class="hero-points">
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Photos JPG / PNG</span>
+            </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Justificatifs PDF</span>
+            </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>10 Mo maximum par fichier</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="hero-panel-badge">Documents habitation</div>
+
+          <div class="hero-panel-top">
+            <article class="mini-stat">
+              <strong>{{ totalFiles }}</strong>
+              <span>Fichier(s) sélectionné(s)</span>
+            </article>
+
+            <article class="mini-stat">
+              <strong>{{ totalSize }}</strong>
+              <span>Taille totale</span>
+            </article>
+          </div>
+
+          <div class="hero-image">
+            <img src="assets/images/home-insurance.jpg" alt="Documents habitation" />
+          </div>
+        </div>
+      </section>
+
+      <section class="claim-layout">
+        <aside class="process-sidebar">
+          <div class="sidebar-card">
+            <p class="sidebar-title">Processus</p>
+
+            <div class="step-list">
+              <div class="step-item done">
+                <div class="step-num">✓</div>
+                <div>
+                  <div class="step-label">Informations</div>
+                  <div class="step-sublabel">Détails du sinistre</div>
+                </div>
+              </div>
+
+              <div class="step-item active">
+                <div class="step-num">2</div>
+                <div>
+                  <div class="step-label">Justificatifs</div>
+                  <div class="step-sublabel">Photos & documents</div>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-num">3</div>
+                <div>
+                  <div class="step-label">Confirmation</div>
+                  <div class="step-sublabel">Récapitulatif final</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-card support-card">
+            <div class="support-icon">H</div>
+            <h3>Documents habitation acceptés</h3>
+            <p>Ajoutez les pièces les plus utiles pour accélérer le traitement du dossier habitation.</p>
+
+            <ul class="support-list">
+              <li>Photos des dégâts</li>
+              <li>Devis de réparation</li>
+              <li>Factures d’équipements endommagés</li>
+              <li>Constat de dégât des eaux</li>
+              <li>Rapport de police si nécessaire</li>
+              <li>Diagnostic immobilier</li>
+            </ul>
+          </div>
+        </aside>
+
+        <section class="form-section">
+          <div class="alert alert-error" *ngIf="errorMessage">
+            <span>⚠</span>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <div class="alert alert-success" *ngIf="successMessage">
+            <span>✓</span>
+            <span>{{ successMessage }}</span>
+          </div>
+
+          <div class="form-card">
+            <div class="card-header">
+              <div class="card-icon">H</div>
+              <div>
+                <h2>Justificatifs des dégâts matériels</h2>
+                <p>Ajoutez les documents nécessaires pour finaliser votre dossier habitation.</p>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div
+                class="drop-zone"
+                (dragover)="onDragOver($event)"
+                (drop)="onDrop($event)"
+                (click)="fileInput.click()"
+              >
+                <input
+                  #fileInput
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf"
+                  (change)="onFileSelected($event)"
+                  hidden
+                />
+
+                <div class="drop-icon">↑</div>
+                <h3>Glissez vos documents habitation ici</h3>
+                <p>ou cliquez pour parcourir vos dossiers</p>
+
+                <div class="drop-types">
+                  <span class="type-chip">PDF</span>
+                  <span class="type-chip">JPG / PNG</span>
+                  <span class="type-chip">Max 10 Mo</span>
+                  <span class="type-chip">Photos dégâts</span>
+                </div>
+              </div>
+
+              <div class="tips-grid">
+                <div class="tip-card">
+                  <span class="tip-icon">P</span>
+                  <div>
+                    <strong>Pièce touchée</strong>
+                    <p>Ajoutez une vue d’ensemble de la pièce ou zone concernée.</p>
+                  </div>
+                </div>
+
+                <div class="tip-card">
+                  <span class="tip-icon">D</span>
+                  <div>
+                    <strong>Dégâts détaillés</strong>
+                    <p>Ajoutez un gros plan des dommages visibles.</p>
+                  </div>
+                </div>
+
+                <div class="tip-card">
+                  <span class="tip-icon">E</span>
+                  <div>
+                    <strong>Eaux / source</strong>
+                    <p>Ajoutez la source du dégât si elle est visible.</p>
+                  </div>
+                </div>
+
+                <div class="tip-card">
+                  <span class="tip-icon">R</span>
+                  <div>
+                    <strong>Réparation</strong>
+                    <p>Ajoutez devis, factures ou documents utiles au dossier.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="file-list" *ngIf="files.length > 0">
+                <div class="file-list-header">
+                  <span>{{ files.length }} document(s) habitation sélectionné(s)</span>
+                  <button
+                    class="btn-clear"
+                    type="button"
+                    (click)="clearFiles(fileInput)"
+                  >
+                    Tout supprimer
+                  </button>
+                </div>
+
+                <div class="file-row" *ngFor="let file of files; let i = index">
+                  <div
+                    class="file-type-icon"
+                    [class.pdf]="isPdf(file)"
+                    [class.img]="isImage(file)"
+                  >
+                    {{ isPdf(file) ? 'PDF' : 'IMG' }}
+                  </div>
+
+                  <div class="file-meta">
+                    <div class="file-name">{{ file.name }}</div>
+                    <div class="file-size">{{ formatSize(file.size) }}</div>
+                  </div>
+
+                  <div class="file-status">Prêt</div>
+
+                  <button
+                    class="file-remove"
+                    type="button"
+                    (click)="removeFile(i)"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+
+              <div class="progress-wrap" *ngIf="loading">
+                <div class="progress-track">
+                  <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+                </div>
+                <div class="progress-text">
+                  Upload documents habitation — {{ uploadProgress }}%
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <button type="button" class="btn-secondary" (click)="back()">
+                Retour
+              </button>
+
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="upload()"
+                [disabled]="loading || files.length === 0"
+              >
+                <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
+                <span *ngIf="!loading">Soumettre mon dossier habitation</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+</div>

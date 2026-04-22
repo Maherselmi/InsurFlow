@@ -1,25 +1,13 @@
 import { Routes } from '@angular/router';
-import { ClaimStep1Component } from './claim/claim-step1/claim-step1.component';
-import { ClaimStep2Component } from './claim/claim-step2/claim-step2.component';
-import { ClaimStep3Component } from './claim/claim-step3/claim-step3.component';
+
 import { DashboardComponent } from "./dashboard/dashboard.component";
 import {DossierSinistreComponent} from "./admin/dossier-sinistre/dossier-sinistre.component";
 import {ClientListComponent} from "./admin/client-list/client-list.component";
 import {PolicyListComponent} from "./admin/policy-list/policy-list.component";
 import {AgentResultListComponent} from "./admin/agent-result-list/agent-result-list.component";
 import {HomeComponent} from "./pages/home/home.component";
-import {ClaimStep1SanteComponent} from "./claim/Sante/claim-step1-sante/claim-step1-sante.component";
-import {ClaimStep2SanteComponent} from "./claim/Sante/claim-step2-sante/claim-step2-sante.component";
-import {ClaimStep3SanteComponent} from "./claim/Sante/claim-step3-sante/claim-step3-sante.component";
-import {
-  ClaimStep1HabitationComponent
-} from "./claim/Habitation/claim-step1-habitation/claim-step1-habitation.component";
-import {
-  ClaimStep2HabitationComponent
-} from "./claim/Habitation/claim-step2-habitation/claim-step2-habitation.component";
-import {
-  ClaimStep3HabitationComponent
-} from "./claim/Habitation/claim-step3-habitation/claim-step3-habitation.component";
+
+
 import {ConsultationDecisionsComponent} from "./client/consultation-decisions/consultation-decisions.component";
 import {ClaimValidationComponent} from "./claim/claim-validation/claim-validation.component";
 import {InsuranceHomeComponent} from "./FrontOffice/insurance-home/insurance-home.component";
@@ -27,6 +15,21 @@ import {LoginComponent} from "./FrontOffice/login/login.component";
 import {PolicesComponent} from "./client/polices/polices.component";
 import {ClientSpaceComponent} from "./FrontOffice/client-space/client-space.component";
 import {ClaimsHomeComponent} from "./FrontOffice/claims-home/claims-home.component";
+import {ClaimStep3SanteComponent} from "./FrontOffice/Sante/claim-step3-sante/claim-step3-sante.component";
+import {ClaimStep2SanteComponent} from "./FrontOffice/Sante/claim-step2-sante/claim-step2-sante.component";
+import {ClaimStep1SanteComponent} from "./FrontOffice/Sante/claim-step1-sante/claim-step1-sante.component";
+import {
+  ClaimStep3HabitationComponent
+} from "./FrontOffice/Habitation/claim-step3-habitation/claim-step3-habitation.component";
+import {
+  ClaimStep2HabitationComponent
+} from "./FrontOffice/Habitation/claim-step2-habitation/claim-step2-habitation.component";
+import {
+  ClaimStep1HabitationComponent
+} from "./FrontOffice/Habitation/claim-step1-habitation/claim-step1-habitation.component";
+import {ClaimStep1Component} from "./FrontOffice/Auto/claim-step1/claim-step1.component";
+import {ClaimStep2Component} from "./FrontOffice/Auto/claim-step2/claim-step2.component";
+import {ClaimStep3Component} from "./FrontOffice/Auto/claim-step3/claim-step3.component";
 
 export const routes: Routes = [
   { path: 'PolicesList', component: PolicesComponent },

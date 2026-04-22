@@ -1,0 +1,249 @@
+<div class="claim-page">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" routerLink="/">
+        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+      </a>
+
+      <nav class="main-nav">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="item.route"
+          [class.active]="item.label === 'Sinistres'"
+        >
+          {{ item.label }}
+        </a>
+      </nav>
+
+      <div class="header-chip">
+        <span class="chip-label">Déclaration</span>
+        <strong>Étape 1 / 3</strong>
+      </div>
+    </div>
+  </header>
+
+  <main class="claim-main">
+    <div class="container">
+      <section class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">Sinistre automobile</p>
+
+          <h1>
+            Déclarez votre sinistre auto
+            <span>dans un parcours simple et guidé.</span>
+          </h1>
+
+          <p class="hero-text">
+            Renseignez les informations essentielles de l’accident pour démarrer
+            l’analyse de votre dossier. Votre police auto est vérifiée avant la
+            suite du processus.
+          </p>
+
+          <div class="hero-points">
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Parcours en 3 étapes</span>
+            </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Validation de police automatique</span>
+            </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Traitement prioritaire du dossier</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="hero-panel-badge">Traitement auto</div>
+
+          <div class="hero-panel-top">
+            <article class="mini-stat">
+              <strong>24/7</strong>
+              <span>Déclaration disponible</span>
+            </article>
+
+            <article class="mini-stat">
+              <strong>3</strong>
+              <span>Étapes guidées</span>
+            </article>
+          </div>
+
+          <div class="hero-image">
+            <img src="assets/images/auto-insurance.jpg" alt="Sinistre automobile" />
+          </div>
+        </div>
+      </section>
+
+      <section class="claim-layout">
+        <aside class="process-sidebar">
+          <div class="sidebar-card">
+            <p class="sidebar-title">Processus</p>
+
+            <div class="step-list">
+              <div class="step-item active">
+                <div class="step-num">1</div>
+                <div>
+                  <div class="step-label">Informations sinistre</div>
+                  <div class="step-sublabel">Détails de l’accident</div>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-num">2</div>
+                <div>
+                  <div class="step-label">Justificatifs</div>
+                  <div class="step-sublabel">Photos & documents</div>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-num">3</div>
+                <div>
+                  <div class="step-label">Confirmation</div>
+                  <div class="step-sublabel">Récapitulatif final</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sidebar-card support-card">
+            <div class="support-icon">A</div>
+            <h3>Assistance auto dédiée</h3>
+            <p>Un parcours pensé pour les sinistres automobiles et leur traitement rapide.</p>
+
+            <ul class="support-list">
+              <li>Analyse structurée du dossier</li>
+              <li>Vérification de la police active</li>
+              <li>Passage rapide à l’étape justificatifs</li>
+              <li>Suivi unifié dans InSurFlow</li>
+            </ul>
+          </div>
+        </aside>
+
+        <section class="form-section">
+          <div class="alert alert-error" *ngIf="errorMessage">
+            <span>⚠</span>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+          <div class="alert alert-success" *ngIf="successMessage">
+            <span>✓</span>
+            <span>{{ successMessage }}</span>
+          </div>
+
+          <div class="form-card">
+            <div class="card-header">
+              <div class="card-icon">A</div>
+              <div>
+                <h2>Détails du sinistre automobile</h2>
+                <p>Renseignez les informations nécessaires pour lancer votre dossier.</p>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group full">
+                  <label class="form-label">Police d’assurance auto</label>
+
+                  <div class="select-wrap">
+                    <select
+                      class="form-select"
+                      [(ngModel)]="claim.policyId"
+                      name="policyId"
+                      (change)="onPolicyChange()"
+                    >
+                      <option [ngValue]="null">Sélectionnez votre police auto</option>
+                      <option *ngFor="let p of policies" [ngValue]="p.id">
+                        {{ p.policyNumber }} — {{ p.type }}
+                      </option>
+                    </select>
+                    <span class="select-arrow">▼</span>
+                  </div>
+
+                  <div class="selected-policy" *ngIf="selectedPolicy">
+                    <div class="policy-chip">
+                      <span class="chip-dot"></span>
+                      <span>{{ selectedPolicy.policyNumber }}</span>
+                    </div>
+
+                    <div class="policy-details">
+                      <div class="policy-detail">
+                        <span class="detail-label">Type</span>
+                        <strong>{{ selectedPolicy.type }}</strong>
+                      </div>
+
+                      <div class="policy-detail">
+                        <span class="detail-label">Période</span>
+                        <strong>{{ getSelectedPolicyPeriod() }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Date de l’accident</label>
+                  <input
+                    type="date"
+                    class="form-input"
+                    [(ngModel)]="claim.incidentDate"
+                    name="incidentDate"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Type de sinistre auto</label>
+
+                  <div class="select-wrap">
+                    <select
+                      class="form-select"
+                      [(ngModel)]="claim.type"
+                      name="type"
+                    >
+                      <option [ngValue]="null">Sélectionnez le type</option>
+                      <option *ngFor="let t of autoClaimTypes" [value]="t.value">
+                        {{ t.label }}
+                      </option>
+                    </select>
+                    <span class="select-arrow">▼</span>
+                  </div>
+                </div>
+
+                <div class="form-group full">
+                  <label class="form-label">Description détaillée</label>
+                  <textarea
+                    class="form-textarea"
+                    [(ngModel)]="claim.description"
+                    name="description"
+                    rows="5"
+                    placeholder="Décrivez les circonstances, le lieu, les dommages constatés et les éléments importants du sinistre."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <div class="footer-note">
+                <span class="footer-bullet"></span>
+                <span>Étape 1 sur 3 — Informations sinistre auto</span>
+              </div>
+
+              <button
+                type="button"
+                class="btn-primary"
+                (click)="next()"
+                [disabled]="loading"
+              >
+                <span *ngIf="loading">Traitement en cours...</span>
+                <span *ngIf="!loading">Continuer vers les justificatifs</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+</div>

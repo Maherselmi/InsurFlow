@@ -73,9 +73,7 @@ public class AgentRouteur {
         );
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Prompt
-    // ─────────────────────────────────────────────────────────────
+
 
     private String buildPrompt(String description) {
         return """

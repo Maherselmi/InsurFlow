@@ -1,0 +1,164 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Assurance Pro</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="claim-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <p class="sidebar-title">📋 PROCESSUS</p>
+      <div class="step-nav">
+        <div class="step-item done">
+          <div class="step-num">✓</div>
+          <div>
+            <div class="step-label">Informations</div>
+            <div class="step-sublabel">Détails du sinistre</div>
+          </div>
+        </div>
+
+        <div class="step-item done">
+          <div class="step-num">✓</div>
+          <div>
+            <div class="step-label">Justificatifs</div>
+            <div class="step-sublabel">Photos & documents</div>
+          </div>
+        </div>
+
+        <div class="step-item active">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-label">Confirmation</div>
+            <div class="step-sublabel">Récapitulatif</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO CARD -->
+    <div class="info-card">
+      <div class="info-card-icon">
+        🏥
+      </div>
+      <h3>Prise en charge santé</h3>
+      <p>Votre dossier médical sera traité par notre équipe dédiée</p>
+      <ul class="info-card-list">
+        <li>✅ Validation sous 24h</li>
+        <li>💊 Prise en charge rapide</li>
+        <li>🩺 Remboursement sous 48h</li>
+        <li>🏥 Réseau de soins partenaires</li>
+        <li>📱 Suivi en ligne</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-heading">
+      <h1>🏥 Confirmation sinistre santé</h1>
+      <p>Votre déclaration médicale est complète - Suivi en temps réel</p>
+    </div>
+
+    <!-- SUCCESS CARD -->
+    <div class="card success-card">
+
+      <div class="success-content">
+
+        <!-- ICON -->
+        <div class="success-icon">
+          🏥
+        </div>
+
+        <!-- TITLE -->
+        <h2>Dossier médical soumis avec succès !</h2>
+
+        <!-- TEXT -->
+        <p class="success-text">
+          Votre demande de prise en charge santé a été transmise à notre service médical.
+          Un conseiller analysera vos documents sous 24h.
+        </p>
+
+        <!-- REFERENCE -->
+        <div class="success-ref">
+          <span class="ref-label">🔖 Réference dossier santé :</span>
+          <strong class="ref-value">{{ reference }}</strong>
+        </div>
+
+        <!-- TIMELINE -->
+        <div class="timeline">
+          <div class="timeline-step completed">
+            <div class="timeline-icon">✓</div>
+            <div class="timeline-text">Informations</div>
+          </div>
+          <div class="timeline-line"></div>
+          <div class="timeline-step completed">
+            <div class="timeline-icon">✓</div>
+            <div class="timeline-text">Documents</div>
+          </div>
+          <div class="timeline-line"></div>
+          <div class="timeline-step active">
+            <div class="timeline-icon">⏳</div>
+            <div class="timeline-text">Validation</div>
+          </div>
+        </div>
+
+        <!-- NEXT STEPS -->
+        <div class="next-steps">
+          <h4>📋 Prochaines étapes médicales</h4>
+          <div class="steps-grid">
+            <div class="step-card">
+              <span class="step-icon">🩺</span>
+              <span>Validation médicale</span>
+            </div>
+            <div class="step-card">
+              <span class="step-icon">💊</span>
+              <span>Prise en charge</span>
+            </div>
+            <div class="step-card">
+              <span class="step-icon">💰</span>
+              <span>Remboursement</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BUTTON -->
+        <button class="btn-primary" (click)="newClaim()">
+          🏥 Déclarer un nouveau sinistre santé
+        </button>
+
+        <!-- CONTACT INFO -->
+        <div class="contact-info">
+          <p>📞 Une question sur votre prise en charge ? Contactez votre conseiller santé au <strong>0 800 123 457</strong></p>
+          <p class="small">Service disponible du lundi au vendredi, 8h-20h</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>

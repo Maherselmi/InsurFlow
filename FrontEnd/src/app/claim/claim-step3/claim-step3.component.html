@@ -1,0 +1,164 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Assurance Pro</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="claim-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <p class="sidebar-title">📋 PROCESSUS</p>
+      <div class="step-nav">
+        <div class="step-item done">
+          <div class="step-num">✓</div>
+          <div>
+            <div class="step-label">Informations</div>
+            <div class="step-sublabel">Détails du sinistre</div>
+          </div>
+        </div>
+
+        <div class="step-item done">
+          <div class="step-num">✓</div>
+          <div>
+            <div class="step-label">Justificatifs</div>
+            <div class="step-sublabel">Photos & documents</div>
+          </div>
+        </div>
+
+        <div class="step-item active">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-label">Confirmation</div>
+            <div class="step-sublabel">Récapitulatif</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO CARD -->
+    <div class="info-card">
+      <div class="info-card-icon">
+        🚗
+      </div>
+      <h3>Expertise auto IA</h3>
+      <p>Votre dossier sinistre auto sera analysé par notre système expert</p>
+      <ul class="info-card-list">
+        <li>🔍 Analyse automatique des photos dégâts</li>
+        <li>📊 Estimation des réparations</li>
+        <li>🚘 Proposition véhicule de prêt</li>
+        <li>⚡ Indemnisation sous 72h</li>
+        <li>👨‍🔧 Validation expert humain</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-heading">
+      <h1>🚗 Confirmation sinistre auto</h1>
+      <p>Votre déclaration est complète - Suivi en temps réel</p>
+    </div>
+
+    <!-- SUCCESS CARD -->
+    <div class="card success-card">
+
+      <div class="success-content">
+
+        <!-- ICON -->
+        <div class="success-icon">
+          🚘
+        </div>
+
+        <!-- TITLE -->
+        <h2>Dossier soumis avec succès !</h2>
+
+        <!-- TEXT -->
+        <p class="success-text">
+          Votre sinistre automobile a été transmis à notre service expertise.
+          Un expert analysera les photos de votre véhicule sous 24h.
+        </p>
+
+        <!-- REFERENCE -->
+        <div class="success-ref">
+          <span class="ref-label">🔖 Réference dossier auto :</span>
+          <strong class="ref-value">{{ reference }}</strong>
+        </div>
+
+        <!-- TIMELINE -->
+        <div class="timeline">
+          <div class="timeline-step completed">
+            <div class="timeline-icon">✓</div>
+            <div class="timeline-text">Informations</div>
+          </div>
+          <div class="timeline-line"></div>
+          <div class="timeline-step completed">
+            <div class="timeline-icon">✓</div>
+            <div class="timeline-text">Documents</div>
+          </div>
+          <div class="timeline-line"></div>
+          <div class="timeline-step active">
+            <div class="timeline-icon">⏳</div>
+            <div class="timeline-text">Expertise</div>
+          </div>
+        </div>
+
+        <!-- NEXT STEPS -->
+        <div class="next-steps">
+          <h4>📋 Prochaines étapes</h4>
+          <div class="steps-grid">
+            <div class="step-card">
+              <span class="step-icon">📸</span>
+              <span>Analyse photos IA</span>
+            </div>
+            <div class="step-card">
+              <span class="step-icon">🔧</span>
+              <span>Devis réparation</span>
+            </div>
+            <div class="step-card">
+              <span class="step-icon">💶</span>
+              <span>Indemnisation</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BUTTON -->
+        <button class="btn-primary" (click)="newClaim()">
+          🚙 Déclarer un nouveau sinistre auto
+        </button>
+
+        <!-- CONTACT INFO -->
+        <div class="contact-info">
+          <p>📞 Une question ? Contactez votre gestionnaire sinistre auto au <strong>0 800 123 456</strong></p>
+          <p class="small">Service disponible 24h/24 - 7j/7</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+</div>

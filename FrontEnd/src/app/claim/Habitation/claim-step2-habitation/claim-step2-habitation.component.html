@@ -1,0 +1,216 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Assurance Pro</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="claim-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <p class="sidebar-title">📋 PROCESSUS</p>
+      <div class="step-nav">
+        <div class="step-item done">
+          <div class="step-num">✓</div>
+          <div>
+            <div class="step-label">Informations</div>
+            <div class="step-sublabel">Détails du sinistre</div>
+          </div>
+        </div>
+
+        <div class="step-item active">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-label">Justificatifs</div>
+            <div class="step-sublabel">Photos & documents</div>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-label">Confirmation</div>
+            <div class="step-sublabel">Récapitulatif</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-icon">
+        🏠
+      </div>
+      <h3>Documents habitation acceptés</h3>
+      <p>Ajoutez tous les justificatifs liés à vos dégâts matériels</p>
+      <ul class="info-card-list">
+        <li>📸 Photos des dégâts (JPG, PNG)</li>
+        <li>📄 Devis de réparation (PDF)</li>
+        <li>🧾 Factures d'équipements endommagés</li>
+        <li>📋 Constat de dégât des eaux</li>
+        <li>👮 Rapport de police (vol/vandalisme)</li>
+        <li>🏠 Diagnostic immobilier</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-heading">
+      <h1>🏠 Pièces justificatives habitation</h1>
+      <p>Ajoutez vos photos des dégâts et documents relatifs au sinistre</p>
+    </div>
+
+    <!-- Habitation Tips Gallery -->
+    <div class="habitation-tips">
+      <div class="tip-card">
+        <span class="tip-emoji">📸</span>
+        <div class="tip-text">Photo全景 pièce</div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">🔍</span>
+        <div class="tip-text">Dégâts en gros plan</div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">💧</span>
+        <div class="tip-text">Source dégât eaux</div>
+      </div>
+      <div class="tip-card">
+        <span class="tip-emoji">📋</span>
+        <div class="tip-text">Devis réparation</div>
+      </div>
+    </div>
+
+    <!-- ALERT ERREUR -->
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <span>⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- ALERT SUCCES -->
+    <div class="alert alert-success" *ngIf="successMessage">
+      <span>✅</span>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <div class="card">
+
+      <!-- CARD HEADER -->
+      <div class="card-header">
+        <div class="card-header-icon">
+          🏠
+        </div>
+        <div>
+          <h2>Justificatifs des dégâts matériels</h2>
+          <p>Glissez vos photos du sinistre ou vos documents de réparation</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- DROP ZONE -->
+        <div class="drop-zone"
+             (dragover)="onDragOver($event)"
+             (drop)="onDrop($event)"
+             (click)="fileInput.click()">
+
+          <input #fileInput
+                 type="file"
+                 multiple
+                 accept="image/*,.pdf"
+                 (change)="onFileSelected($event)"
+                 style="display:none"/>
+
+          <div class="drop-icon-wrap">
+            🏠
+          </div>
+          <h4>Glissez vos documents habitation ici</h4>
+          <p>ou <span class="drop-link">parcourez vos dossiers</span></p>
+          <div class="drop-types">
+            <span class="type-chip">📸 JPG / PNG</span>
+            <span class="type-chip">📄 PDF</span>
+            <span class="type-chip">⚡ Max 10 Mo</span>
+            <span class="type-chip">🏠 Photos dégâts</span>
+          </div>
+        </div>
+
+        <!-- FILE LIST -->
+        <div class="file-list" *ngIf="files.length > 0">
+          <div class="file-list-header">
+            <span>🏠 {{ files.length }} document(s) habitation sélectionné(s)</span>
+            <button class="btn-clear" type="button" (click)="files = []">
+              🗑️ Tout supprimer
+            </button>
+          </div>
+
+          <div class="file-row" *ngFor="let file of files; let i = index">
+            <div class="file-type-icon"
+                 [class.pdf]="isPdf(file)"
+                 [class.img]="isImage(file)">
+              {{ isPdf(file) ? '📄' : '📸' }}
+            </div>
+            <div class="file-meta">
+              <div class="file-name">{{ file.name }}</div>
+              <div class="file-size">{{ formatSize(file.size) }}</div>
+            </div>
+            <div class="file-status">
+              ✓ Prêt
+            </div>
+            <button class="file-remove" type="button" (click)="removeFile(i)">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- PROGRESS BAR -->
+        <div class="progress-wrap" *ngIf="loading">
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+          </div>
+          <div class="progress-text">
+            🏠 Upload documents habitation {{ uploadProgress }}%
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CARD FOOTER -->
+      <div class="card-footer">
+        <button type="button" class="btn-secondary" (click)="back()">
+          ← Retour
+        </button>
+
+        <button type="button"
+                class="btn-primary"
+                (click)="upload()"
+                [disabled]="loading || files.length === 0">
+          <span *ngIf="loading">⏳</span>
+          <span *ngIf="!loading">🚀</span>
+          {{ loading ? 'Envoi ' + uploadProgress + '%...' : 'Soumettre mon sinistre habitation' }}
+        </button>
+      </div>
+
+    </div>
+  </main>
+</div>

@@ -1,0 +1,166 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Insurflow</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+  <div class="container">
+    <div class="page-header fade-up">
+      <div class="header-chip">Suivi intelligent des dossiers</div>
+      <h2 class="page-title">
+        Consultation des <span>sinistres</span>
+      </h2>
+      <p class="page-subtitle">
+        Consultez l’état de vos dossiers, visualisez les décisions prises
+        et ouvrez le rapport détaillé associé à chaque sinistre.
+      </p>
+    </div>
+
+    @if (loading) {
+      <div class="loading-wrapper fade-up">
+        <div class="spinner-ring">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <p>Chargement des sinistres...</p>
+      </div>
+    }
+
+    @if (!loading && claims.length > 0) {
+      <div class="cards">
+        @for (claim of claims; track claim.id; let i = $index) {
+          <div class="card fade-in-up" [style.animationDelay.ms]="i * 90">
+            <div class="card-glow"></div>
+            <div class="card-top-line"></div>
+
+            <div class="header">
+              <div class="card-title-wrap">
+                <div class="card-mini-icon">📄</div>
+                <div>
+                  <h4>Sinistre #{{ claim.id }}</h4>
+                  <div class="card-ref">Référence dossier client</div>
+                </div>
+              </div>
+
+              <span class="badge"
+                    [class.approved]="claim.status === 'APPROVED'"
+                    [class.pending]="claim.status === 'PENDING_VALIDATION' || claim.status === 'IN_ANALYSIS'"
+                    [class.rejected]="claim.status === 'REJECTED'">
+                {{ formatStatus(claim.status) }}
+              </span>
+            </div>
+
+            <div class="card-body">
+              <div class="info-row">
+                <span class="info-label">Description</span>
+                <p>{{ claim.description }}</p>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Client</span>
+                  <p>
+                    {{ claim.policy?.client?.firstName }}
+                    {{ claim.policy?.client?.lastName }}
+                  </p>
+                </div>
+
+                <div class="info-item">
+                  <span class="info-label">Date</span>
+                  <p>{{ claim.incidentDate | date:'dd/MM/yyyy' }}</p>
+                </div>
+
+                <div class="info-item">
+                  <span class="info-label">Police</span>
+                  <p>{{ claim.policy?.policyNumber }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button class="report-btn" (click)="openReport(claim)">
+                <span>Consulter le rapport</span>
+                <span class="btn-arrow">→</span>
+              </button>
+            </div>
+
+            <div class="card-decoration"></div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (claims.length === 0 && !loading) {
+      <div class="empty-state fade-up">
+        <div class="empty-illustration">📭</div>
+        <h3>Aucun sinistre disponible</h3>
+        <p>Les dossiers apparaîtront ici dès qu’ils seront créés ou traités.</p>
+      </div>
+    }
+  </div>
+
+  @if (showReportModal && selectedClaim) {
+    <div class="report-overlay" (click)="closeReport()">
+      <div class="report-modal" (click)="$event.stopPropagation()">
+        <div class="report-header">
+          <div>
+            <div class="modal-chip">Rapport détaillé</div>
+            <h3>Rapport du dossier #{{ selectedClaim.id }}</h3>
+            <span class="report-status"
+                  [class.approved]="selectedClaim.status === 'APPROVED'"
+                  [class.pending]="selectedClaim.status === 'PENDING_VALIDATION' || selectedClaim.status === 'IN_ANALYSIS'"
+                  [class.rejected]="selectedClaim.status === 'REJECTED'">
+              {{ formatStatus(selectedClaim.status) }}
+            </span>
+          </div>
+
+          <button class="close-btn" (click)="closeReport()">✕</button>
+        </div>
+
+        <div class="report-content">
+          <div class="report-block">
+            <h4>Résumé du dossier</h4>
+            <p><strong>Description :</strong> {{ selectedClaim.description }}</p>
+            <p><strong>Date du sinistre :</strong> {{ selectedClaim.incidentDate | date:'dd/MM/yyyy' }}</p>
+            <p><strong>Police :</strong> {{ selectedClaim.policy?.policyNumber }}</p>
+          </div>
+
+          <div class="report-block">
+            <h4>Rapport client</h4>
+
+            @if (selectedClaim.clientReport) {
+              <div class="report-text">
+                {{ selectedClaim.clientReport }}
+              </div>
+            } @else {
+              <div class="report-empty">
+                Le rapport client n’est pas encore disponible pour ce dossier.
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }

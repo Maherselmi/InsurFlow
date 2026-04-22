@@ -1,0 +1,260 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Insurflow</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="polices-page">
+  <div class="hero-shell">
+    <div class="hero-section">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span>✨</span>
+          <span>Espace client sécurisé</span>
+        </div>
+
+        <h1>Mes polices d’assurance</h1>
+        <p>
+          Consultez vos contrats actifs, suivez leur validité et retrouvez en un coup d’œil
+          vos garanties essentielles.
+        </p>
+
+        <div class="hero-mini-stats" *ngIf="!loading">
+          <div class="mini-stat">
+            <span class="mini-stat-icon">📄</span>
+            <div>
+              <strong>{{ policies.length }}</strong>
+              <span>Total</span>
+            </div>
+          </div>
+
+          <div class="mini-stat">
+            <span class="mini-stat-icon">✅</span>
+            <div>
+              <strong>{{ getActiveCount() }}</strong>
+              <span>Actives</span>
+            </div>
+          </div>
+
+          <div class="mini-stat">
+            <span class="mini-stat-icon">⏳</span>
+            <div>
+              <strong>{{ getExpiredCount() }}</strong>
+              <span>Expirées</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="orb orb-one"></div>
+        <div class="orb orb-two"></div>
+        <div class="orb orb-three"></div>
+
+        <div class="hero-card hero-card-main">
+          <div class="hero-card-icon">🛡️</div>
+          <div>
+            <div class="hero-card-title">Protection intelligente</div>
+            <div class="hero-card-sub">Vos contrats centralisés</div>
+          </div>
+        </div>
+
+        <div class="hero-card hero-card-secondary">
+          <div class="hero-card-icon">📘</div>
+          <div>
+            <div class="hero-card-title">Suivi simplifié</div>
+            <div class="hero-card-sub">Consultation rapide</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row" *ngIf="!loading">
+    <div class="stat-card glass glass-hover">
+      <div class="stat-icon-wrap blue">
+        <span class="stat-icon">📚</span>
+      </div>
+      <div>
+        <div class="stat-value">{{ policies.length }}</div>
+        <div class="stat-label">Total polices</div>
+      </div>
+    </div>
+
+    <div class="stat-card glass glass-hover">
+      <div class="stat-icon-wrap green">
+        <span class="stat-icon">✅</span>
+      </div>
+      <div>
+        <div class="stat-value">{{ getActiveCount() }}</div>
+        <div class="stat-label">Polices actives</div>
+      </div>
+    </div>
+
+    <div class="stat-card glass glass-hover">
+      <div class="stat-icon-wrap red">
+        <span class="stat-icon">⌛</span>
+      </div>
+      <div>
+        <div class="stat-value">{{ getExpiredCount() }}</div>
+        <div class="stat-label">Polices expirées</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar glass">
+    <div class="search-box premium-search">
+      <span class="search-icon">🔎</span>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        placeholder="Rechercher par numéro, type, formule ou produit..."
+      />
+    </div>
+
+    <div class="filters">
+      <button
+        type="button"
+        class="filter-btn"
+        [class.active]="selectedType === 'TOUS'"
+        (click)="onTypeChange('TOUS')">
+        Tous
+      </button>
+
+      <button
+        type="button"
+        class="filter-btn"
+        [class.active]="selectedType === 'AUTO'"
+        (click)="onTypeChange('AUTO')">
+        🚗 Auto
+      </button>
+
+      <button
+        type="button"
+        class="filter-btn"
+        [class.active]="selectedType === 'SANTE'"
+        (click)="onTypeChange('SANTE')">
+        🏥 Santé
+      </button>
+
+      <button
+        type="button"
+        class="filter-btn"
+        [class.active]="selectedType === 'HABITATION'"
+        (click)="onTypeChange('HABITATION')">
+        🏠 Habitation
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-state glass" *ngIf="loading">
+    <div class="loader-ring"></div>
+    <p>Chargement de vos polices...</p>
+  </div>
+
+  <div class="error-box" *ngIf="!loading && errorMessage">
+    <span>⚠️</span>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <div class="empty-state glass" *ngIf="!loading && !errorMessage && filteredPolicies.length === 0">
+    <div class="empty-icon">📭</div>
+    <h3>Aucune police trouvée</h3>
+    <p>Essayez de modifier votre recherche ou vos filtres.</p>
+  </div>
+
+  <div class="policy-grid" *ngIf="!loading && !errorMessage && filteredPolicies.length > 0">
+    <div
+      class="policy-card glass glass-hover"
+      *ngFor="let policy of filteredPolicies; let i = index"
+      [style.animationDelay.ms]="i * 90">
+
+      <div class="card-glow"></div>
+
+      <div class="policy-card-top">
+        <div class="policy-type-badge" [ngClass]="getTypeClass(policy.type)">
+          <span>{{ getTypeIcon(policy.type) }}</span>
+          <span>{{ policy.type }}</span>
+        </div>
+
+        <div class="policy-status" [class.active]="isActive(policy)" [class.expired]="!isActive(policy)">
+          {{ isActive(policy) ? 'Active' : 'Expirée' }}
+        </div>
+      </div>
+
+      <div class="policy-main">
+        <h3>{{ policy.policyNumber }}</h3>
+        <p class="policy-holder">{{ getPolicyHolder(policy) }}</p>
+      </div>
+
+      <div class="policy-divider"></div>
+
+      <div class="policy-meta">
+        <div class="meta-item">
+          <span class="meta-label">Formule</span>
+          <span class="meta-value">{{ policy.formule || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Produit</span>
+          <span class="meta-value">{{ policy.productCode || '—' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Début</span>
+          <span class="meta-value">{{ policy.startDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+
+        <div class="meta-item">
+          <span class="meta-label">Fin</span>
+          <span class="meta-value">{{ policy.endDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="policy-highlight" *ngIf="isActive(policy)">
+        <span>🗓️</span>
+        <span>{{ getRemainingDays(policy) >= 0 ? getRemainingDays(policy) : 0 }} jours restants</span>
+      </div>
+
+      <button class="details-btn" type="button" (click)="toggleDetails(policy.id)">
+        <span>{{ isExpanded(policy.id) ? 'Masquer les détails' : 'Voir les détails' }}</span>
+        <span class="arrow" [class.open]="isExpanded(policy.id)">›</span>
+      </button>
+
+      <div class="policy-details" *ngIf="isExpanded(policy.id)">
+        <div class="details-block">
+          <div class="details-title">Détails de couverture</div>
+          <p>{{ policy.coverageDetails || 'Aucun détail disponible.' }}</p>
+        </div>
+
+        <div class="details-block" *ngIf="policy.client">
+          <div class="details-title">Informations client</div>
+          <p><strong>Nom :</strong> {{ policy.client.firstName }} {{ policy.client.lastName }}</p>
+          <p><strong>Email :</strong> {{ policy.client.email || '—' }}</p>
+          <p><strong>Téléphone :</strong> {{ policy.client.phone || '—' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

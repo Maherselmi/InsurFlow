@@ -1,0 +1,80 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Assurance Pro</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers </span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="home-container">
+
+
+  <div class="home-content">
+
+    <!-- HERO -->
+    <div class="hero">
+
+      <div class="hero-text">
+        <h1>Gérez vos sinistres intelligemment</h1>
+        <p>Déclarez, suivez et gérez vos dossiers en toute simplicité</p>
+
+        <button class="primary-btn" (click)="goToClaims()">
+          Commencer maintenant
+        </button>
+      </div>
+
+      <div class="hero-image">
+        <img src="assets/insurance.png" alt="insurance">
+      </div>
+
+    </div>
+
+    <!-- TYPES -->
+    <div class="section">
+
+      <h2>Choisissez le type de sinistre</h2>
+
+      <div class="cards">
+
+        <div class="card" (click)="goToClaim('AUTO')">
+          <img src="assets/auto.png" />
+          <h3>Sinistre Auto</h3>
+          <p>Accidents, collisions, dommages</p>
+        </div>
+
+        <div class="card" (click)="goToClaimSante('SANTE')">
+          <img src="assets/health.png" />
+          <h3>Sinistre Santé</h3>
+          <p>Hospitalisation et soins</p>
+        </div>
+
+        <div class="card" (click)="goToClaimHabitation('HABITATION')">
+          <img src="assets/home.png" />
+          <h3>Sinistre Habitation</h3>
+          <p>Incendie, dégâts des eaux</p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>

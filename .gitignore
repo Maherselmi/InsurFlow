@@ -1,0 +1,34 @@
+# ===== FRONTEND / ANGULAR =====
+FrontEnd/node_modules/
+FrontEnd/dist/
+FrontEnd/.angular/
+FrontEnd/coverage/
+FrontEnd/.idea/
+FrontEnd/.vscode/
+FrontEnd/volumes/
+
+# ===== BACKEND / SPRING BOOT =====
+BackEnd/target/
+BackEnd/.idea/
+BackEnd/.settings/
+BackEnd/.classpath
+BackEnd/.project
+BackEnd/uploads/
+BackEnd/*.iml
+
+# ===== LOGS =====
+*.log
+logs/
+
+# ===== OS FILES =====
+.DS_Store
+Thumbs.db
+
+# ===== ENV / SECRETS =====
+.env
+application-local.properties
+application-secret.properties
+
+# ===== OPTIONAL: backend secrets =====
+# Décommente cette ligne si application.properties contient des mots de passe / clés
+# BackEnd/src/main/resources/application.properties

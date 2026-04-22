@@ -1,0 +1,213 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Assurance Pro</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="claim-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <p class="sidebar-title">📋 PROCESSUS</p>
+      <div class="step-nav">
+        <div class="step-item active">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-label">Informations</div>
+            <div class="step-sublabel">Détails du sinistre</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-label">Justificatifs</div>
+            <div class="step-sublabel">Photos & documents</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-label">Confirmation</div>
+            <div class="step-sublabel">Récapitulatif</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-icon">
+        🏠
+      </div>
+      <h3>Protection Habitation</h3>
+      <p>Prise en charge rapide de vos dégâts matériels</p>
+      <ul class="info-card-list">
+        <li>✅ Dégât des eaux prioritaire</li>
+        <li>🔥 Incendie / Explosion</li>
+        <li>💨 Dégâts climatiques</li>
+        <li>🔒 Vol & vandalisme</li>
+        <li>🛠️ Assistance 24/7</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-heading">
+      <h1>🏠 Déclaration Sinistre Habitation</h1>
+      <p>Renseignez les informations concernant les dégâts matériels</p>
+    </div>
+
+    <!-- Habitation Gallery -->
+    <div class="habitation-showcase">
+      <div class="habitation-card">
+        <span class="habitation-emoji">💧</span>
+        <div class="habitation-label">Dégât des eaux</div>
+      </div>
+      <div class="habitation-card">
+        <span class="habitation-emoji">🔥</span>
+        <div class="habitation-label">Incendie</div>
+      </div>
+      <div class="habitation-card">
+        <span class="habitation-emoji">🌊</span>
+        <div class="habitation-label">Inondation</div>
+      </div>
+      <div class="habitation-card">
+        <span class="habitation-emoji">🔒</span>
+        <div class="habitation-label">Vol / Vandalisme</div>
+      </div>
+    </div>
+
+    <!-- ALERT ERREUR -->
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <span>⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- ALERT SUCCES -->
+    <div class="alert alert-success" *ngIf="successMessage">
+      <span>✅</span>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- CARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          🏠
+        </div>
+        <div>
+          <h2>Informations du sinistre habitation</h2>
+          <p>Décrivez précisément les dégâts matériels constatés</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="form-grid">
+          <!-- POLICE -->
+          <div class="form-group full">
+            <label class="form-label">
+              <span>📄</span> Police d'assurance habitation
+            </label>
+            <div class="select-wrap">
+              <select class="form-select"
+                      [(ngModel)]="claim.policyId"
+                      name="policyId"
+                      (change)="onPolicyChange()">
+                <option [ngValue]="null">Sélectionnez votre police habitation</option>
+                <option *ngFor="let p of policies" [ngValue]="p.id">
+                  🏠 {{ p.policyNumber }} — {{ p.type }}
+                  ({{ p.client?.firstName }} {{ p.client?.lastName }})
+                </option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+            <span class="policy-badge" *ngIf="selectedPolicy">
+                            🏠 {{ selectedPolicy.policyNumber }} · {{ selectedPolicy.type }} · Actif
+                        </span>
+          </div>
+
+          <!-- DATE -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>📅</span> Date du sinistre
+            </label>
+            <input type="date"
+                   class="form-input"
+                   [(ngModel)]="claim.incidentDate"
+                   name="incidentDate"/>
+          </div>
+
+          <!-- TYPE SINISTRE HABITATION -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>🏠</span> Type de sinistre
+            </label>
+            <div class="select-wrap">
+              <select class="form-select"
+                      [(ngModel)]="claim.type"
+                      name="type">
+                <option [ngValue]="null">Sélectionnez le type de sinistre</option>
+                <option value="DEGAT_EAUX">💧 Dégât des eaux</option>
+                <option value="INCENDIE">🔥 Incendie / Explosion</option>
+                <option value="INONDATION">🌊 Inondation / Catastrophe naturelle</option>
+                <option value="VOL">🔒 Vol / Cambriolage</option>
+                <option value="VANDALISME">🎨 Vandalisme / Dégradations</option>
+                <option value="TEMPETE">💨 Tempête / Grêle / Neige</option>
+                <option value="BRIS_GLACE">🪟 Bris de glace</option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="form-group full">
+            <label class="form-label">
+              <span>📝</span> Description détaillée des dégâts
+            </label>
+            <textarea class="form-textarea"
+                      [(ngModel)]="claim.description"
+                      name="description"
+                      rows="4"
+                      placeholder="Décrivez les circonstances, les pièces touchées, l'étendue des dégâts, les meubles/équipements endommagés..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+                <span class="step-hint">
+                    <span>🏠</span> Étape 1 sur 3 - Sinistre habitation
+                </span>
+        <button type="button"
+                class="btn-primary"
+                (click)="next()"
+                [disabled]="loading">
+          <span *ngIf="loading">⏳</span>
+          <span *ngIf="!loading">➡️</span>
+          <span>{{ loading ? 'Traitement en cours...' : 'Continuer & Déclarer mon sinistre' }}</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

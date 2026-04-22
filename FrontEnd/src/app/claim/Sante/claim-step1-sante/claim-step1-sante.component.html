@@ -1,0 +1,212 @@
+<div class="app-bar">
+  <div class="app-bar-content">
+    <div class="app-bar-logo">
+      <span class="logo-icon">🛡️</span>
+      <span class="logo-text">Assurance Pro</span>
+    </div>
+    <div class="app-bar-actions">
+      <button class="app-bar-btn home" (click)="goToHome()">
+        <span>🏠</span>
+        <span>Accueil</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToDecisions()">
+        <span>📋</span>
+        <span>Mes Dossiers</span>
+      </button>
+      <button class="app-bar-btn decisions" (click)="goToPolice()">
+        <span>🛡️</span>
+        <span>Mes Polices</span>
+      </button>
+      <button class="app-bar-btn logout" (click)="logout()">
+        <span>🚪</span>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="claim-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <p class="sidebar-title">📋 PROCESSUS</p>
+      <div class="step-nav">
+        <div class="step-item active">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-label">Informations</div>
+            <div class="step-sublabel">Détails du sinistre</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-label">Justificatifs</div>
+            <div class="step-sublabel">Photos & documents</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-label">Confirmation</div>
+            <div class="step-sublabel">Récapitulatif</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-icon">
+        🏥
+      </div>
+      <h3>Traitement Santé Prioritaire</h3>
+      <p>Prise en charge rapide de vos soins médicaux</p>
+      <ul class="info-card-list">
+        <li>✅ Prise en charge à 100%</li>
+        <li>🩺 Tiers payant généralisé</li>
+        <li>💊 Médicaments remboursés</li>
+        <li>🏥 Réseau de soins partenaires</li>
+        <li>📱 Téléconsultation incluse</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="page-heading">
+      <h1>🏥 Déclaration Sinistre Santé</h1>
+      <p>Renseignez les informations médicales pour votre prise en charge</p>
+    </div>
+
+    <!-- Health Gallery -->
+    <div class="health-showcase">
+      <div class="health-card">
+        <span class="health-emoji">🩺</span>
+        <div class="health-label">Consultation</div>
+      </div>
+      <div class="health-card">
+        <span class="health-emoji">💊</span>
+        <div class="health-label">Médicaments</div>
+      </div>
+      <div class="health-card">
+        <span class="health-emoji">🏥</span>
+        <div class="health-label">Hospitalisation</div>
+      </div>
+      <div class="health-card">
+        <span class="health-emoji">🦷</span>
+        <div class="health-label">Soins dentaires</div>
+      </div>
+    </div>
+
+    <!-- ALERT ERREUR -->
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <span>⚠️</span>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- ALERT SUCCES -->
+    <div class="alert alert-success" *ngIf="successMessage">
+      <span>✅</span>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <!-- CARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon">
+          🏥
+        </div>
+        <div>
+          <h2>Informations médicales du sinistre</h2>
+          <p>Décrivez précisément les soins nécessaires</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="form-grid">
+          <!-- POLICE -->
+          <div class="form-group full">
+            <label class="form-label">
+              <span>📄</span> Mutuelle / Assurance santé
+            </label>
+            <div class="select-wrap">
+              <select class="form-select"
+                      [(ngModel)]="claim.policyId"
+                      name="policyId"
+                      (change)="onPolicyChange()">
+                <option [ngValue]="null">Sélectionnez votre mutuelle</option>
+                <option *ngFor="let p of policies" [ngValue]="p.id">
+                  🏥 {{ p.policyNumber }} — {{ p.type }}
+                </option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+            <span class="policy-badge" *ngIf="selectedPolicy">
+                            🏥 {{ selectedPolicy.policyNumber }} · {{ selectedPolicy.type }} · Actif
+                        </span>
+          </div>
+
+          <!-- DATE -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>📅</span> Date des soins
+            </label>
+            <input type="date"
+                   class="form-input"
+                   [(ngModel)]="claim.incidentDate"
+                   name="incidentDate"/>
+          </div>
+
+          <!-- TYPE SINISTRE SANTE -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>🩺</span> Type de soins
+            </label>
+            <div class="select-wrap">
+              <select class="form-select"
+                      [(ngModel)]="claim.type"
+                      name="type">
+                <option [ngValue]="null">Sélectionnez le type de soins</option>
+                <option value="CONSULTATION">🩺 Consultation médicale</option>
+                <option value="HOSPITALISATION">🏥 Hospitalisation</option>
+                <option value="DENTAIRE">🦷 Soins dentaires</option>
+                <option value="OPTIQUE">👓 Optique / Lunettes</option>
+                <option value="MEDICAMENTS">💊 Médicaments</option>
+                <option value="URGENCE">🚑 Urgence médicale</option>
+                <option value="MATERNITE">🤰 Maternité</option>
+              </select>
+              <span class="select-arrow">▼</span>
+            </div>
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="form-group full">
+            <label class="form-label">
+              <span>📝</span> Description détaillée des soins
+            </label>
+            <textarea class="form-textarea"
+                      [(ngModel)]="claim.description"
+                      name="description"
+                      rows="4"
+                      placeholder="Décrivez la nature des soins, les symptômes, les traitements prescrits, le nom du médecin traitant..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+                <span class="step-hint">
+                    <span>🏥</span> Étape 1 sur 3 - Sinistre santé
+                </span>
+        <button type="button"
+                class="btn-primary"
+                (click)="next()"
+                [disabled]="loading">
+          <span *ngIf="loading">⏳</span>
+          <span *ngIf="!loading">➡️</span>
+          <span>{{ loading ? 'Traitement en cours...' : 'Continuer & Valider les soins' }}</span>
+        </button>
+      </div>
+    </div>
+  </main>
+</div>

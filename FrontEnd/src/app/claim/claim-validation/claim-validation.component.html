@@ -1,0 +1,253 @@
+<div class="page">
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="title-wrap">
+        <span class="eyebrow">Validation humaine</span>
+        <h1>Dossiers en attente</h1>
+        <p>Consulte les pièces du dossier et prends une décision finale.</p>
+      </div>
+
+      <div class="counter-card">
+        <span class="counter-label">Dossiers</span>
+        <span class="counter-value">{{ pendingClaims.length }}</span>
+      </div>
+    </div>
+
+    <button class="refresh-btn" (click)="loadPendingClaims()" [disabled]="loading">
+      <span class="refresh-icon" [class.spinning]="loading">↻</span>
+      <span>Actualiser</span>
+    </button>
+  </header>
+
+  <!-- Loading cards -->
+  <div class="claims-grid" *ngIf="loading">
+    <div class="claim-card skeleton-card" *ngFor="let _ of [1,2,3,4,5,6]">
+      <div class="skeleton-line w-45"></div>
+      <div class="skeleton-line w-80"></div>
+      <div class="skeleton-line w-60"></div>
+      <div class="skeleton-line w-30"></div>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <section *ngIf="!loading && pendingClaims.length === 0" class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>Aucun dossier en attente</h3>
+    <p>Tous les dossiers ont été traités.</p>
+    <button class="secondary-btn" (click)="loadPendingClaims()">Recharger</button>
+  </section>
+
+  <!-- Claims list -->
+  <section *ngIf="!loading && pendingClaims.length > 0">
+    <div class="section-header">
+      <h2>Liste des dossiers</h2>
+      <p>Sélectionne un dossier pour afficher les détails.</p>
+    </div>
+
+    <div class="claims-grid">
+      <article
+        class="claim-card"
+        *ngFor="let claim of pendingClaims"
+        (click)="selectClaim(claim)"
+        [class.active]="selectedClaim?.id === claim.id"
+      >
+        <div class="claim-card-header">
+          <div class="claim-badge">
+            <span class="claim-badge-icon">📄</span>
+            <span>#{{ claim.id }}</span>
+          </div>
+
+          <span class="status-chip pending">
+            <span class="status-dot"></span>
+            En attente
+          </span>
+        </div>
+
+        <div class="claim-main-info">
+          <h3>Dossier sinistre</h3>
+          <p>{{ claim.description || 'Aucune description' }}</p>
+        </div>
+
+        <div class="claim-footer">
+          <span class="claim-date">🕒 {{ claim.createdAt | date:'dd MMM yyyy' }}</span>
+          <span class="claim-link">Voir détail →</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Side panel -->
+  <div class="overlay detail-overlay" *ngIf="selectedClaim" (click)="closePanel($event)">
+    <aside class="side-panel" (click)="$event.stopPropagation()">
+
+      <div class="panel-header">
+        <div>
+          <span class="panel-kicker">Dossier sélectionné</span>
+          <h2>Dossier <span class="text-accent">#{{ selectedClaim.id }}</span></h2>
+        </div>
+
+        <button class="icon-btn" (click)="selectedClaim = null" aria-label="Fermer">
+          ✕
+        </button>
+      </div>
+
+      <div class="panel-status">
+        <span class="status-chip pending large">
+          <span class="status-dot"></span>
+          En attente de validation
+        </span>
+      </div>
+
+      <!-- Skeleton panel -->
+      <div *ngIf="reviewLoading" class="panel-loading">
+        <div class="panel-block skeleton-card">
+          <div class="skeleton-line w-40"></div>
+          <div class="skeleton-line w-75"></div>
+        </div>
+        <div class="panel-block skeleton-card">
+          <div class="skeleton-line w-35"></div>
+          <div class="skeleton-line w-90"></div>
+          <div class="skeleton-line w-65"></div>
+        </div>
+        <div class="panel-block skeleton-card">
+          <div class="skeleton-line w-50"></div>
+          <div class="skeleton-line w-85"></div>
+        </div>
+      </div>
+
+      <!-- Real content -->
+      <div *ngIf="!reviewLoading && reviewData as data" class="panel-content">
+
+        <section class="info-grid">
+          <div class="info-card">
+            <div class="info-card-title">
+              <span>📅</span>
+              <strong>Date de l'incident</strong>
+            </div>
+            <div class="info-card-content">
+              {{ data.incidentDate | date:'dd MMMM yyyy' }}
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-card-title">
+              <span>📝</span>
+              <strong>Description</strong>
+            </div>
+            <div class="info-card-content text-block">
+              {{ data.description }}
+            </div>
+          </div>
+        </section>
+
+        <section class="ai-box">
+          <div class="ai-box-header">
+            <div class="ai-icon">🤖</div>
+            <div>
+              <h4>Analyse IA</h4>
+              <p>Résumé automatique généré pour assister la décision.</p>
+            </div>
+          </div>
+
+          <div class="ai-box-body">
+            {{ data.aiReport }}
+          </div>
+        </section>
+
+        <!-- Documents -->
+        <section class="docs-box" *ngIf="claimDetails?.documents?.length">
+          <div class="box-title">
+            <span>📎</span>
+            <h4>Documents du dossier</h4>
+          </div>
+
+          <!-- Images -->
+          <div class="docs-group" *ngIf="imageDocuments.length">
+            <h5>Images du sinistre</h5>
+
+            <div class="docs-grid">
+              <div class="doc-card" *ngFor="let doc of imageDocuments">
+                <div class="doc-preview image-preview">
+                  <img [src]="buildFileUrl(doc.filePath)" [alt]="doc.fileName" />
+                </div>
+
+                <div class="doc-body">
+                  <strong>{{ doc.fileName }}</strong>
+                  <small>{{ doc.fileType }}</small>
+                </div>
+
+                <div class="doc-actions">
+                  <a [href]="buildFileUrl(doc.filePath)" target="_blank" rel="noopener noreferrer" class="doc-link">
+                    Ouvrir
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PDF -->
+          <div class="docs-group" *ngIf="pdfDocuments.length">
+            <h5>Documents PDF</h5>
+
+            <div class="docs-grid">
+              <div class="doc-card" *ngFor="let doc of pdfDocuments">
+                <div class="doc-preview pdf-preview">
+                  <iframe [src]="getSafePdfUrl(doc.filePath)" title="PDF du dossier"></iframe>
+                </div>
+
+                <div class="doc-body">
+                  <strong>{{ doc.fileName }}</strong>
+                  <small>{{ doc.fileType }}</small>
+                </div>
+
+                <div class="doc-actions">
+                  <a [href]="buildFileUrl(doc.filePath)" target="_blank" rel="noopener noreferrer" class="doc-link">
+                    Ouvrir PDF
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="comment-box">
+          <div class="box-title">
+            <span>✏️</span>
+            <h4>Commentaire interne</h4>
+          </div>
+
+          <textarea
+            id="comment"
+            [(ngModel)]="gestionnairComment"
+            placeholder="Ajouter une remarque pour la validation ou le rejet..."
+          ></textarea>
+        </section>
+
+        <div class="action-row">
+          <button class="btn btn-reject" (click)="rejectClaim()" [disabled]="actionLoading">
+            <span>✖</span>
+            <span *ngIf="actionLoading && actionType === 'reject'">Rejet en cours...</span>
+            <span *ngIf="!actionLoading || actionType !== 'reject'">Rejeter</span>
+          </button>
+
+          <button class="btn btn-approve" (click)="approveClaim()" [disabled]="actionLoading">
+            <span>✓</span>
+            <span *ngIf="actionLoading && actionType === 'approve'">Approbation...</span>
+            <span *ngIf="!actionLoading || actionType !== 'approve'">Approuver</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" [class.show]="toast.visible" [class.error]="toast.type === 'error'">
+    <span class="toast-icon">{{ toast.type === 'success' ? '✅' : '❌' }}</span>
+    <div class="toast-text">
+      <strong>{{ toast.type === 'success' ? 'Succès' : 'Erreur' }}</strong>
+      <span>{{ toast.message }}</span>
+    </div>
+  </div>
+
+</div>

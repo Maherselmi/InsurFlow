@@ -1,0 +1,210 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+    </a>
+
+    <nav class="main-nav">
+      <a *ngFor="let item of navItems" [href]="item.href">{{ item.label }}</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="btn btn-ghost" href="/login">Connexion</a>
+    </div>
+  </div>
+</header>
+
+<main class="page-shell">
+  <section class="hero section">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Assurance personnelle &amp; patrimoniale</p>
+
+        <h1>
+          Une assurance plus claire
+        </h1>
+        <h3>
+        <span>plus humaine, mieux organisée.</span>
+        </h3>
+        <p class="hero-text">
+          Auto, habitation, santé et prévoyance réunis dans un espace simple à
+          comprendre. Vos documents, vos sinistres et votre accompagnement
+          restent accessibles au même endroit.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/espace-client">Accéder à mon espace</a>
+          <a class="btn btn-secondary" href="#offres">Découvrir nos offres</a>
+        </div>
+
+        <div class="hero-points">
+          <div class="hero-point">
+            <span class="hero-point-bullet"></span>
+            <span>Suivi des contrats en temps réel</span>
+          </div>
+          <div class="hero-point">
+            <span class="hero-point-bullet"></span>
+            <span>Gestion des sinistres simplifiée</span>
+          </div>
+          <div class="hero-point">
+            <span class="hero-point-bullet"></span>
+            <span>Conseiller dédié et documents centralisés</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-panel-head">
+          <span class="panel-badge">Espace client InSurFlow</span>
+          <h2>Un seul espace pour tout gérer.</h2>
+          <p>
+            Consultez vos contrats, suivez vos démarches et retrouvez vos
+            documents dans une interface pensée pour aller à l’essentiel.
+          </p>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card" *ngFor="let stat of stats">
+            <h3>{{ stat.value }}</h3>
+            <p>{{ stat.label }}</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="offres" class="section offers">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">Nos offres</p>
+          <h2>Quatre univers de protection pour accompagner chaque étape de vie.</h2>
+        </div>
+        <span class="section-count">04 domaines</span>
+      </div>
+
+      <div class="offers-grid">
+        <article class="offer-card" *ngFor="let offer of offers">
+          <div class="offer-media">
+            <img [src]="offer.image" [alt]="offer.title" />
+            <span class="offer-index">{{ offer.id }}</span>
+          </div>
+
+          <div class="offer-body">
+            <h3>{{ offer.title }}</h3>
+            <p>{{ offer.description }}</p>
+            <a class="offer-link" href="#">
+              <span>{{ offer.cta }}</span>
+              <span class="offer-arrow">→</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="sinistres" class="section claims">
+    <div class="container claims-grid">
+      <div class="claims-copy">
+        <p class="section-kicker">Gestion des sinistres</p>
+        <h2>En cas de sinistre, nous prenons le relais rapidement.</h2>
+        <p class="claims-text">
+          Déclarez en quelques minutes, suivez chaque étape depuis votre espace
+          et bénéficiez d’un traitement clair, cadré et réactif. L’objectif :
+          vous faire gagner du temps quand vous en avez le plus besoin.
+        </p>
+
+        <div class="steps-card">
+          <div class="step" *ngFor="let step of claimSteps">
+            <div class="step-icon-wrap">
+              <div class="step-icon" [ngSwitch]="step.icon">
+                <svg *ngSwitchCase="'edit'" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                </svg>
+
+                <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M20 21a8 8 0 0 0-16 0"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+
+                <svg *ngSwitchCase="'check'" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="m9 12 2 2 4-4"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="step-content">
+              <div class="step-top">
+                <span class="step-number">{{ step.id }}</span>
+                <h3>{{ step.title }}</h3>
+              </div>
+              <p>{{ step.text }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="claims-visual">
+        <div class="claims-badge">Déclaration 24/7</div>
+        <img src="../../../assets/images/sinistre.png" alt="Gestion des sinistres" />
+      </div>
+    </div>
+  </section>
+
+  <section id="pourquoi" class="section why">
+    <div class="container why-grid">
+      <div class="why-copy">
+        <p class="section-kicker">Pourquoi InSurFlow</p>
+        <h2>Une relation durable, pas une assurance impersonnelle.</h2>
+        <p>
+          Chaque assuré bénéficie d’un accompagnement plus lisible, avec un
+          interlocuteur identifié, des réponses rapides et une expérience pensée
+          pour rester simple au quotidien.
+        </p>
+      </div>
+
+      <div class="advantages-grid">
+        <article class="adv-card" *ngFor="let item of advantages">
+          <div class="adv-icon" [ngSwitch]="item.icon">
+            <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 21a8 8 0 0 0-16 0"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+
+            <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 7v5l3 2"/>
+            </svg>
+
+            <svg *ngSwitchCase="'pin'" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"/>
+              <circle cx="12" cy="10" r="2.5"/>
+            </svg>
+
+            <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"/>
+            </svg>
+          </div>
+
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.text }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="container cta-band-inner">
+      <div class="cta-copy">
+        <p class="eyebrow eyebrow-light">Espace assuré</p>
+        <h2>Tous vos contrats accessibles dans un espace unique, simple et sécurisé.</h2>
+      </div>
+
+      <div class="cta-actions">
+        <a class="btn btn-light-solid" href="/login">Connexion à mon espace</a>
+      </div>
+    </div>
+  </section>
+</main>

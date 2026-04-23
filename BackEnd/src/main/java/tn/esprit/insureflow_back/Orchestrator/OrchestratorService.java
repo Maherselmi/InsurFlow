@@ -1,4 +1,4 @@
-package tn.esprit.insureflow_back.Service;
+package tn.esprit.insureflow_back.Orchestrator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +12,9 @@ import tn.esprit.insureflow_back.Domain.Entities.AgentResult;
 import tn.esprit.insureflow_back.Domain.Entities.Claim;
 import tn.esprit.insureflow_back.Repository.AgentResultRepository;
 import tn.esprit.insureflow_back.Repository.ClaimRepository;
+import tn.esprit.insureflow_back.Service.ClaimPdfExtractorService;
+import tn.esprit.insureflow_back.Service.RapportClientService;
+import tn.esprit.insureflow_back.Service.RapportService;
 
 import java.util.Locale;
 

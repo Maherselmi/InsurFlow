@@ -7,7 +7,7 @@ import tn.esprit.insureflow_back.Domain.Entities.Claim;
 import tn.esprit.insureflow_back.Domain.Entities.ClaimDocument;
 import tn.esprit.insureflow_back.Repository.ClaimRepository;
 import tn.esprit.insureflow_back.Service.ClaimDocumentService;
-import tn.esprit.insureflow_back.Service.OrchestratorService;
+import tn.esprit.insureflow_back.Orchestrator.OrchestratorService;
 
 import java.io.IOException;
 @CrossOrigin(origins = "http://localhost:4200")

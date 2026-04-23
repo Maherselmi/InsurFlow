@@ -21,7 +21,7 @@ public class RapportService {
         String statut = claim.getStatus().name();
         String prompt = buildPrompt(claim, routeResult, validationResult, estimationResult, statut);
 
-        log.info("📝 Génération rapport IA — claim #{} statut: {}", claim.getId(), statut);
+        log.info(" Génération rapport IA — claim #{} statut: {}", claim.getId(), statut);
 
         String raw = llmService.genererReponse(prompt);
         return cleanReport(raw);

@@ -40,7 +40,7 @@ public class ContratVectorService {
             Embedding embedding = embeddingModel.embed(segment).content();
             embeddingStore.add(embedding, segment);
 
-            log.info("✅ Chunk enregistré | file={} | typeContrat={} | page={}",
+            log.info(" Chunk enregistré | file={} | typeContrat={} | page={}",
                     doc.getFileName(), doc.getTypeContrat(), doc.getPageNumber());
         }
 

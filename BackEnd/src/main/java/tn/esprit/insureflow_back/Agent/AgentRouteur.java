@@ -3,8 +3,11 @@ package tn.esprit.insureflow_back.Agent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import tn.esprit.insureflow_back.Domain.ENUMS.AgentName;
 import tn.esprit.insureflow_back.Domain.Entities.AgentResult;
 import tn.esprit.insureflow_back.Domain.Entities.Claim;
+import tn.esprit.insureflow_back.Service.AgentLearningMemoryService;
+import tn.esprit.insureflow_back.Service.AiAgentConfigService;
 import tn.esprit.insureflow_back.Service.LLMService;
 
 import java.util.Locale;
@@ -18,9 +21,12 @@ import java.util.regex.Pattern;
 public class AgentRouteur {
 
     private final LLMService llmService;
+    private final AiAgentConfigService aiAgentConfigService;
+    private final AgentLearningMemoryService learningMemoryService;
 
     private static final String AGENT_NAME = "AgentRouteur";
-    private static final double HUMAN_REVIEW_THRESHOLD = 0.70;
+    private static final String CONFIG_KEY = "AGENT_ROUTEUR";
+
     private static final double DEFAULT_CONFIDENCE = 0.50;
     private static final String DEFAULT_TYPE = "INCONNU";
 
@@ -42,26 +48,51 @@ public class AgentRouteur {
             throw new IllegalArgumentException("Le claim ne doit pas être null");
         }
 
-        log.info("🔄 {} — classification du dossier #{}", AGENT_NAME, claim.getId());
+        log.info("{} - classification du dossier #{}", AGENT_NAME, claim.getId());
 
         String description = safeText(claim.getDescription());
         if (description.isBlank()) {
-            log.warn("⚠️ Description vide pour le dossier #{}", claim.getId());
-            return buildResult(claim, DEFAULT_TYPE, DEFAULT_CONFIDENCE,
-                    true, "Description vide ou absente", null);
+            log.warn("Description vide pour le dossier #{}", claim.getId());
+            return buildResult(
+                    claim,
+                    DEFAULT_TYPE,
+                    DEFAULT_CONFIDENCE,
+                    true,
+                    "Description vide ou absente",
+                    null
+            );
         }
 
-        String prompt = buildPrompt(description);
+        double humanReviewThreshold = aiAgentConfigService.getThreshold(CONFIG_KEY);
+        log.info("Seuil de confiance dynamique pour {} = {}", CONFIG_KEY, humanReviewThreshold);
+
+        String learningExamples =
+                learningMemoryService.buildMemoryBlock(AgentName.AGENT_ROUTEUR, claim.getId());
+
+        if (learningExamples == null || learningExamples.isBlank()) {
+            log.info("Aucun exemple learning disponible pour {}", AGENT_NAME);
+            learningExamples = "";
+        } else {
+            log.info("Exemples learning chargés pour {}", AGENT_NAME);
+        }
+
+        String prompt = buildPrompt(description, learningExamples);
         String rawResponse = callLlmSafely(prompt);
 
         ParsedClassification parsed = parseResponse(rawResponse);
 
         boolean needsHumanReview =
                 parsed.type().equals(DEFAULT_TYPE) ||
-                        parsed.confidence() < HUMAN_REVIEW_THRESHOLD;
+                        parsed.confidence() < humanReviewThreshold;
 
-        log.info("✅ Résultat classification dossier #{} | type={} | confidence={} | humanReview={}",
-                claim.getId(), parsed.type(), parsed.confidence(), needsHumanReview);
+        log.info(
+                "Résultat classification dossier #{} | type={} | confidence={} | threshold={} | humanReview={}",
+                claim.getId(),
+                parsed.type(),
+                parsed.confidence(),
+                humanReviewThreshold,
+                needsHumanReview
+        );
 
         return buildResult(
                 claim,
@@ -73,9 +104,11 @@ public class AgentRouteur {
         );
     }
 
+    private String buildPrompt(String description, String learningExamples) {
+        String memorySection = learningExamples == null || learningExamples.isBlank()
+                ? "Aucun exemple historique validé disponible."
+                : learningExamples;
 
-
-    private String buildPrompt(String description) {
         return """
         Tu es un agent expert en classification de sinistres d’assurance.
 
@@ -96,12 +129,16 @@ public class AgentRouteur {
         - VOYAGE : annulation voyage, perte de bagages, assistance à l’étranger,
                    incident pendant déplacement
 
+        EXEMPLES HISTORIQUES VALIDES PAR EXPERT
+        %s
+
         Règles obligatoires :
         - Retourne uniquement un JSON valide
         - N’ajoute aucun texte avant ou après le JSON
         - Le champ "type" doit être exactement l’un des 4 types autorisés
         - Le champ "confidence" doit être un nombre entre 0.0 et 1.0
         - Le champ "justification" doit être court
+        - Inspire-toi des exemples validés, sans copier mécaniquement
 
         Description du sinistre :
         "%s"
@@ -112,31 +149,23 @@ public class AgentRouteur {
           "confidence": 0.0,
           "justification": "..."
         }
-        """.formatted(escapeForPrompt(description));
+        """.formatted(memorySection, escapeForPrompt(description));
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // LLM
-    // ─────────────────────────────────────────────────────────────
 
     private String callLlmSafely(String prompt) {
         try {
             String response = llmService.genererReponse(prompt);
-            log.info("📥 Réponse brute LLM: {}", response);
+            log.info("Réponse brute LLM: {}", response);
             return response == null ? "" : response.trim();
         } catch (Exception e) {
-            log.error("❌ Erreur lors de l'appel au LLM", e);
+            log.error("Erreur lors de l'appel au LLM", e);
             return "";
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Parsing
-    // ─────────────────────────────────────────────────────────────
-
     private ParsedClassification parseResponse(String rawResponse) {
         if (rawResponse == null || rawResponse.isBlank()) {
-            log.warn("⚠️ Réponse LLM vide");
+            log.warn("Réponse LLM vide");
             return fallbackClassification("", "Réponse LLM vide");
         }
 
@@ -179,7 +208,7 @@ public class AgentRouteur {
                 }
             }
         } catch (Exception e) {
-            log.warn("⚠️ Erreur parsing type", e);
+            log.warn("Erreur parsing type", e);
         }
 
         return DEFAULT_TYPE;
@@ -193,7 +222,7 @@ public class AgentRouteur {
                 return clamp(value, 0.0, 1.0);
             }
         } catch (Exception e) {
-            log.warn("⚠️ Erreur parsing confidence", e);
+            log.warn("Erreur parsing confidence", e);
         }
 
         return DEFAULT_CONFIDENCE;
@@ -208,42 +237,34 @@ public class AgentRouteur {
                 return matcher.group(1).trim();
             }
         } catch (Exception e) {
-            log.warn("⚠️ Erreur parsing justification", e);
+            log.warn("Erreur parsing justification", e);
         }
 
         return "Justification indisponible";
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Fallback métier
-    // ─────────────────────────────────────────────────────────────
-
     private ParsedClassification fallbackClassification(String text, String reason) {
         String lower = normalize(text);
 
         if (containsAny(lower, "voiture", "vehicule", "véhicule", "collision", "carrosserie", "bris de glace", "accident", "auto")) {
-            return new ParsedClassification("AUTO", 0.55, reason + " — fallback mots-clés AUTO");
+            return new ParsedClassification("AUTO", 0.55, reason + " - fallback mots-clés AUTO");
         }
 
         if (containsAny(lower, "maison", "habitation", "incendie", "degat des eaux", "dégât des eaux", "fuite", "canalisation", "cambriolage", "logement")) {
-            return new ParsedClassification("HABITATION", 0.55, reason + " — fallback mots-clés HABITATION");
+            return new ParsedClassification("HABITATION", 0.55, reason + " - fallback mots-clés HABITATION");
         }
 
         if (containsAny(lower, "hopital", "hôpital", "hospitalisation", "maladie", "medecin", "médecin", "fracture", "operation", "opération", "frais medicaux", "frais médicaux", "sante", "santé")) {
-            return new ParsedClassification("SANTE", 0.55, reason + " — fallback mots-clés SANTE");
+            return new ParsedClassification("SANTE", 0.55, reason + " - fallback mots-clés SANTE");
         }
 
         if (containsAny(lower, "voyage", "bagage", "bagages", "annulation", "etranger", "étranger", "deplacement", "déplacement")) {
-            return new ParsedClassification("VOYAGE", 0.55, reason + " — fallback mots-clés VOYAGE");
+            return new ParsedClassification("VOYAGE", 0.55, reason + " - fallback mots-clés VOYAGE");
         }
 
-        log.warn("⚠️ Aucun type fiable détecté via JSON ou fallback");
-        return new ParsedClassification(DEFAULT_TYPE, DEFAULT_CONFIDENCE, reason + " — aucun type fiable détecté");
+        log.warn("Aucun type fiable détecté via JSON ou fallback");
+        return new ParsedClassification(DEFAULT_TYPE, DEFAULT_CONFIDENCE, reason + " - aucun type fiable détecté");
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Construction résultat
-    // ─────────────────────────────────────────────────────────────
 
     private AgentResult buildResult(
             Claim claim,
@@ -266,10 +287,6 @@ public class AgentRouteur {
     private String buildConclusion(String type, String justification) {
         return "Type de sinistre classifié : " + type + " | Justification : " + justification;
     }
-
-    // ─────────────────────────────────────────────────────────────
-    // Utils
-    // ─────────────────────────────────────────────────────────────
 
     private String safeText(String value) {
         return value == null ? "" : value.trim();

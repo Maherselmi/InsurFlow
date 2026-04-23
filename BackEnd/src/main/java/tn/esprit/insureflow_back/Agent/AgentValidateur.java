@@ -12,9 +12,12 @@ import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import tn.esprit.insureflow_back.Domain.ENUMS.AgentName;
 import tn.esprit.insureflow_back.Domain.Entities.AgentResult;
 import tn.esprit.insureflow_back.Domain.Entities.Claim;
 import tn.esprit.insureflow_back.Domain.Entities.Policy;
+import tn.esprit.insureflow_back.Service.AgentLearningMemoryService;
+import tn.esprit.insureflow_back.Service.AiAgentConfigService;
 import tn.esprit.insureflow_back.Service.LLMService;
 
 import java.time.LocalDate;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 public class AgentValidateur {
 
     private static final String AGENT_NAME = "AgentValidateur";
+    private static final String CONFIG_KEY = "AGENT_VALIDATION";
 
     private static final int MAX_PDF_SNIPPET_LENGTH = 2000;
     private static final int MAX_RAG_MATCHES = 4;
@@ -53,19 +57,21 @@ public class AgentValidateur {
     private final EmbeddingModel embeddingModel;
     private final LLMService llmService;
     private final ObjectMapper objectMapper;
+    private final AiAgentConfigService aiAgentConfigService;
+    private final AgentLearningMemoryService learningMemoryService;
 
     public AgentResult validate(Claim claim, String claimPdfText, String routedType) {
         if (claim == null) {
             throw new IllegalArgumentException("Le claim ne doit pas être null");
         }
 
-        log.info("🔍 {} — validation du sinistre #{}", AGENT_NAME, claim.getId());
+        log.info("{} - validation du sinistre #{}", AGENT_NAME, claim.getId());
 
         String description = safe(claim.getDescription());
         String pdfText = safe(claimPdfText);
 
         if (description.isBlank() && pdfText.isBlank()) {
-            log.warn("⚠️ Dossier #{} sans description ni contenu PDF exploitable", claim.getId());
+            log.warn("Dossier #{} sans description ni contenu PDF exploitable", claim.getId());
             return buildResult(
                     claim,
                     DECISION_INCONNU,
@@ -78,7 +84,7 @@ public class AgentValidateur {
 
         PolicyCheckResult preCheck = preCheckPolicy(claim, routedType);
         if (preCheck != null) {
-            log.warn("⚠️ Pré-contrôle police pour claim #{} => {}", claim.getId(), preCheck.justification());
+            log.warn("Pré-contrôle police pour claim #{} => {}", claim.getId(), preCheck.justification());
             return buildResult(
                     claim,
                     preCheck.decision(),
@@ -92,16 +98,16 @@ public class AgentValidateur {
         String typeContrat = resolveTypeContrat(claim, pdfText, routedType);
         String policyContext = buildPolicyContext(claim);
 
-        log.info("🧭 Type contrat retenu pour claim #{} : {} (routeur={})",
+        log.info("Type contrat retenu pour claim #{} : {} (routeur={})",
                 claim.getId(), typeContrat, safe(routedType));
 
         String searchQuery = buildSearchQuery(claim, pdfText, typeContrat);
-        log.info("🔎 Requête RAG : {}", searchQuery);
+        log.info("Requête RAG : {}", searchQuery);
 
         List<EmbeddingMatch<TextSegment>> matches = searchRelevantClauses(searchQuery, claim, typeContrat);
 
         if (matches.isEmpty()) {
-            log.warn("⚠️ Aucune clause pertinente trouvée pour claim #{} | type={}", claim.getId(), typeContrat);
+            log.warn("Aucune clause pertinente trouvée pour claim #{} | type={}", claim.getId(), typeContrat);
             return buildResult(
                     claim,
                     DECISION_INCONNU,
@@ -112,14 +118,32 @@ public class AgentValidateur {
             );
         }
 
-        log.info("📋 {} clauses pertinentes filtrées trouvées", matches.size());
+        log.info("{} clauses pertinentes filtrées trouvées", matches.size());
 
         String contractContext = buildContractContext(matches);
-        String prompt = buildPrompt(claim, pdfText, contractContext, typeContrat, policyContext);
 
-        log.info("📤 Envoi du prompt au LLM...");
+        String learningExamples =
+                learningMemoryService.buildMemoryBlock(AgentName.AGENT_VALIDATION, claim.getId());
+
+        if (learningExamples == null || learningExamples.isBlank()) {
+            log.info("Aucun exemple learning disponible pour {}", AGENT_NAME);
+            learningExamples = "";
+        } else {
+            log.info("Exemples learning chargés pour {}", AGENT_NAME);
+        }
+
+        String prompt = buildPrompt(
+                claim,
+                pdfText,
+                contractContext,
+                typeContrat,
+                policyContext,
+                learningExamples
+        );
+
+        log.info("Envoi du prompt au LLM...");
         String rawResponse = callLlmSafely(prompt);
-        log.info("📥 Réponse brute LLM : {}", rawResponse);
+        log.info("Réponse brute LLM : {}", rawResponse);
 
         return parseResponse(rawResponse, claim);
     }
@@ -177,7 +201,7 @@ public class AgentValidateur {
     private List<EmbeddingMatch<TextSegment>> searchRelevantClauses(String searchQuery, Claim claim, String expectedTypeContrat) {
         for (int attempt = 1; attempt <= MAX_RAG_RETRIES; attempt++) {
             try {
-                log.info("🔁 Recherche RAG tentative {}/{} pour claim #{} | type={}",
+                log.info("Recherche RAG tentative {}/{} pour claim #{} | type={}",
                         attempt, MAX_RAG_RETRIES, claim.getId(), expectedTypeContrat);
 
                 Embedding queryEmbedding = embeddingModel.embed(searchQuery).content();
@@ -187,7 +211,7 @@ public class AgentValidateur {
 
                 List<EmbeddingMatch<TextSegment>> filtered = filterByContractType(candidates, expectedTypeContrat);
 
-                log.info("✅ Recherche RAG réussie pour claim #{} à la tentative {} | candidats={} | filtrés={}",
+                log.info("Recherche RAG réussie pour claim #{} à la tentative {} | candidats={} | filtrés={}",
                         claim.getId(), attempt, candidates.size(), filtered.size());
 
                 return filtered.stream()
@@ -196,11 +220,11 @@ public class AgentValidateur {
                         .collect(Collectors.toList());
 
             } catch (StatusRuntimeException e) {
-                log.warn("⚠️ Erreur gRPC Milvus tentative {}/{} pour claim #{} : {}",
+                log.warn("Erreur gRPC Milvus tentative {}/{} pour claim #{} : {}",
                         attempt, MAX_RAG_RETRIES, claim.getId(), e.getMessage());
 
             } catch (Exception e) {
-                log.warn("⚠️ Erreur RAG tentative {}/{} pour claim #{} : {}",
+                log.warn("Erreur RAG tentative {}/{} pour claim #{} : {}",
                         attempt, MAX_RAG_RETRIES, claim.getId(), e.getMessage());
             }
 
@@ -209,13 +233,13 @@ public class AgentValidateur {
                     Thread.sleep(RETRY_DELAY_MS);
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
-                    log.error("❌ Thread interrompu pendant le retry RAG pour claim #{}", claim.getId(), ie);
+                    log.error("Thread interrompu pendant le retry RAG pour claim #{}", claim.getId(), ie);
                     return List.of();
                 }
             }
         }
 
-        log.error("❌ Toutes les tentatives Milvus ont échoué pour claim #{}", claim.getId());
+        log.error("Toutes les tentatives Milvus ont échoué pour claim #{}", claim.getId());
         return List.of();
     }
 
@@ -338,10 +362,19 @@ public class AgentValidateur {
         );
     }
 
-    private String buildPrompt(Claim claim, String claimPdfText, String contractContext, String typeContrat, String policyContext) {
+    private String buildPrompt(Claim claim,
+                               String claimPdfText,
+                               String contractContext,
+                               String typeContrat,
+                               String policyContext,
+                               String learningExamples) {
         String description = safe(claim.getDescription());
         String incidentDate = claim.getIncidentDate() != null ? claim.getIncidentDate().toString() : "Non précisée";
         String pdfSnippet = truncate(claimPdfText, MAX_PDF_SNIPPET_LENGTH);
+
+        String memorySection = learningExamples == null || learningExamples.isBlank()
+                ? "Aucun exemple historique validé disponible."
+                : learningExamples;
 
         return """
                 Tu es un expert juriste en assurance %s.
@@ -353,6 +386,7 @@ public class AgentValidateur {
                 2. la déclaration du sinistre
                 3. le contenu du document fourni
                 4. les clauses contractuelles récupérées par RAG
+                5. les anciens cas validés par expert
 
                 POLICE SOUSCRITE
                 %s
@@ -367,6 +401,9 @@ public class AgentValidateur {
                 CLAUSES CONTRACTUELLES PERTINENTES
                 %s
 
+                EXEMPLES HISTORIQUES VALIDÉS PAR EXPERT
+                %s
+
                 Règles de décision :
                 - Réponds COUVERT uniquement si la police et les clauses montrent clairement que le sinistre est pris en charge
                 - Réponds EXCLU uniquement si la police ou les clauses montrent clairement qu’il n’est pas couvert
@@ -378,17 +415,18 @@ public class AgentValidateur {
                 - "confidence" doit être entre 0.0 et 1.0
                 - "justification" doit être concise et mentionner la logique contractuelle
                 - "needsHumanReview" doit être true pour toute décision INCONNU
+                - Inspire-toi des exemples validés, sans les recopier mécaniquement
 
                 FORMAT JSON STRICT
                 {
-                  "decision": "COUVERT | EXCLU",
-                  "confidence": 0.0-1.0,
+                  "decision": "COUVERT | EXCLU | INCONNU",
+                  "confidence": 0.0,
                   "justification": "La police souscrite et la clause X couvrent explicitement ce sinistre.",
                   "needsHumanReview": false
                 }
 
                 Réponds uniquement avec le JSON, sans markdown, sans explication supplémentaire.
-                """.formatted(typeContrat, policyContext, description, incidentDate, pdfSnippet, contractContext);
+                """.formatted(typeContrat, policyContext, description, incidentDate, pdfSnippet, contractContext, memorySection);
     }
 
     private String callLlmSafely(String prompt) {
@@ -396,14 +434,14 @@ public class AgentValidateur {
             String response = llmService.genererReponse(prompt);
             return response == null ? "" : response.trim();
         } catch (Exception e) {
-            log.error("❌ Erreur lors de l'appel au LLM", e);
+            log.error("Erreur lors de l'appel au LLM", e);
             return "";
         }
     }
 
     private AgentResult parseResponse(String raw, Claim claim) {
         if (raw == null || raw.isBlank()) {
-            log.warn("⚠️ Réponse LLM vide");
+            log.warn("Réponse LLM vide");
             return buildResult(
                     claim,
                     DECISION_INCONNU,
@@ -414,9 +452,12 @@ public class AgentValidateur {
             );
         }
 
+        double humanReviewThreshold = aiAgentConfigService.getThreshold(CONFIG_KEY);
+        log.info("Seuil de confiance dynamique pour {} = {}", CONFIG_KEY, humanReviewThreshold);
+
         try {
             String cleanJson = extractJson(raw);
-            log.info("📋 JSON extrait : {}", cleanJson);
+            log.info("JSON extrait : {}", cleanJson);
 
             JsonNode node = objectMapper.readTree(cleanJson);
 
@@ -426,7 +467,7 @@ public class AgentValidateur {
             boolean needsHumanReview = node.path("needsHumanReview").asBoolean(false);
 
             if (!ALLOWED_DECISIONS.contains(decision)) {
-                log.warn("⚠️ Décision invalide reçue : {}", decision);
+                log.warn("Décision invalide reçue : {}", decision);
                 return fallbackFromText(raw, claim, "Décision invalide renvoyée par le LLM");
             }
 
@@ -434,7 +475,7 @@ public class AgentValidateur {
                 needsHumanReview = true;
             }
 
-            if (confidence < 0.60) {
+            if (confidence < humanReviewThreshold) {
                 needsHumanReview = true;
             }
 
@@ -443,8 +484,8 @@ public class AgentValidateur {
                 needsHumanReview = true;
             }
 
-            log.info("✅ Décision finale : {} | confiance : {} | review humain : {}",
-                    decision, confidence, needsHumanReview);
+            log.info("Décision finale : {} | confiance : {} | seuil={} | review humain : {}",
+                    decision, confidence, humanReviewThreshold, needsHumanReview);
 
             return buildResult(
                     claim,
@@ -456,7 +497,7 @@ public class AgentValidateur {
             );
 
         } catch (Exception e) {
-            log.error("❌ Erreur parsing LLM", e);
+            log.error("Erreur parsing LLM", e);
             return fallbackFromText(raw, claim, "Erreur technique lors du parsing JSON");
         }
     }
@@ -496,7 +537,7 @@ public class AgentValidateur {
                 claim,
                 decision,
                 0.40,
-                reason + " — décision déduite via fallback sécurisé",
+                reason + " - décision déduite via fallback sécurisé",
                 needsHumanReview,
                 raw
         );

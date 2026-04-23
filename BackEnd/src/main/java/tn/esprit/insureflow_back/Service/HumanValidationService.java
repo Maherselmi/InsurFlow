@@ -22,7 +22,7 @@ public class HumanValidationService {
 
         claim.setStatus(ClaimStatus.APPROVED);
 
-        // ✅ Ajout de la décision humaine au rapport existant
+        // Ajout de la décision humaine au rapport existant
         String ancienRapport = claim.getAiReport() != null ? claim.getAiReport() : "";
         claim.setAiReport(ancienRapport + "\n\n" +
                 "=== DÉCISION HUMAINE ===\n" +
@@ -30,7 +30,7 @@ public class HumanValidationService {
                 "Commentaire: " + commentaire);
 
         claimRepository.save(claim);
-        log.info("✅ Claim #{} APPROUVÉ par gestionnaire", claimId);
+        log.info(" Claim #{} APPROUVÉ par gestionnaire", claimId);
         return claim;
     }
 
@@ -42,7 +42,7 @@ public class HumanValidationService {
 
         claim.setStatus(ClaimStatus.REJECTED);
 
-        // ✅ Ajout de la décision humaine au rapport existant
+        //  Ajout de la décision humaine au rapport existant
         String ancienRapport = claim.getAiReport() != null ? claim.getAiReport() : "";
         claim.setAiReport(ancienRapport + "\n\n" +
                 "=== DÉCISION HUMAINE ===\n" +
@@ -50,7 +50,7 @@ public class HumanValidationService {
                 "Raison     : " + commentaire);
 
         claimRepository.save(claim);
-        log.info("❌ Claim #{} REJETÉ par gestionnaire", claimId);
+        log.info(" Claim #{} REJETÉ par gestionnaire", claimId);
         return claim;
     }
 

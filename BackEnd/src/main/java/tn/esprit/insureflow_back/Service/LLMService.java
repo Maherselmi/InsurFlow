@@ -14,15 +14,15 @@ public class LLMService {
 
     public String genererReponse(String promptText) {
         try {
-            log.info("📤 Envoi prompt au LLM ({} chars)", promptText.length());
+            log.info(" Envoi prompt au LLM ({} chars)", promptText.length());
 
             String response = chatLanguageModel.generate(promptText);
 
-            log.info("✅ Réponse LLM reçue ({} chars)", response.length());
+            log.info(" Réponse LLM reçue ({} chars)", response.length());
             return response;
 
         } catch (Exception e) {
-            log.error("❌ Erreur LLM: {}", e.getMessage());
+            log.error(" Erreur LLM: {}", e.getMessage());
             throw new RuntimeException("Erreur communication LLM: " + e.getMessage());
         }
     }

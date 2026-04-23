@@ -44,14 +44,14 @@ public class ClaimController {
 
     // ─── NOUVEAUX endpoints validation humaine ────────────────────────────
 
-    // ✅ Liste tous les claims en attente de validation humaine
+    //  Liste tous les claims en attente de validation humaine
     @GetMapping("/pending-validation")
     public ResponseEntity<List<Claim>> getPendingValidation() {
         List<Claim> pending = claimRepository.findByStatus(ClaimStatus.PENDING_VALIDATION);
         return ResponseEntity.ok(pending);
     }
 
-    // ✅ Détail d'un claim + rapport IA pour le gestionnaire
+    // Détail d'un claim + rapport IA pour le gestionnaire
     @GetMapping("/{id}/review")
     public ResponseEntity<Map<String, Object>> getClaimForReview(@PathVariable Long id) {
         Claim claim = claimRepository.findById(id)

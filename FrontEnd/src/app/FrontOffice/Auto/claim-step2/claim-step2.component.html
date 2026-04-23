@@ -1,11 +1,20 @@
 <div class="claim-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
@@ -19,7 +28,7 @@
       </nav>
 
       <div class="header-chip">
-        <span class="chip-label">Déclaration</span>
+        <span class="chip-label">Déclaration auto</span>
         <strong>Étape 2 / 3</strong>
       </div>
     </div>
@@ -27,9 +36,9 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
-          <div class="hero-badge">Pièces justificatives auto</div>
+          <div class="hero-badge">Justificatifs automobile</div>
 
           <h1>
             Ajoutez vos documents
@@ -37,13 +46,14 @@
           </h1>
 
           <p class="hero-text">
-            Déposez les photos du véhicule, le constat amiable et les documents utiles
-            pour accélérer l’analyse de votre sinistre automobile.
+            Déposez les photos du véhicule, le constat amiable et les pièces utiles
+            pour accélérer l’analyse de votre sinistre automobile dans un parcours
+            plus clair et plus rassurant.
           </p>
 
           <div class="hero-actions">
             <button class="btn btn-secondary" type="button" (click)="back()">
-              Retour
+              Retour à l’étape 1
             </button>
 
             <button class="btn btn-primary" type="button" (click)="upload()" [disabled]="!canUpload">
@@ -55,80 +65,82 @@
           <div class="hero-points">
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Photos JPG / PNG</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Justificatifs PDF</span>
+              <span>JPG / PNG / PDF</span>
             </div>
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
               <span>10 Mo maximum par fichier</span>
             </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Analyse déclenchée après envoi</span>
+            </div>
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Justificatifs</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Résumé des pièces</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>{{ totalFiles }}</strong>
-              <span>Fichier(s) sélectionné(s)</span>
-            </article>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>{{ totalFiles }}</strong>
+                <span>Fichier(s)</span>
+              </article>
 
-            <article class="mini-stat">
-              <strong>{{ totalSize }}</strong>
-              <span>Taille totale</span>
-            </article>
-          </div>
+              <article class="hero-mini-card">
+                <strong>{{ totalSize }}</strong>
+                <span>Taille totale</span>
+              </article>
+            </div>
 
-          <div class="hero-image">
-            <img src="assets/images/demarche-auto.jpg" alt="Documents sinistre auto" />
+            <div class="hero-visual">
+              <img src="assets/images/demarche-auto.jpg" alt="Documents sinistre automobile" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="claim-layout">
-        <aside class="process-sidebar">
-          <div class="sidebar-card">
-            <p class="sidebar-title">Progression</p>
+      <section class="workspace-grid">
+        <aside class="left-column">
+          <div class="panel progress-panel">
+            <p class="panel-kicker">Progression</p>
 
             <div class="step-list">
-              <div class="step-item done">
-                <div class="step-num">✓</div>
+              <div class="step-card done">
+                <div class="step-number">✓</div>
                 <div>
-                  <div class="step-label">Informations</div>
-                  <div class="step-sublabel">Détails du sinistre</div>
+                  <h3>Informations</h3>
+                  <p>Détails du sinistre saisis</p>
                 </div>
               </div>
 
-              <div class="step-item active">
-                <div class="step-num">2</div>
+              <div class="step-card active">
+                <div class="step-number">2</div>
                 <div>
-                  <div class="step-label">Justificatifs</div>
-                  <div class="step-sublabel">Photos & documents</div>
+                  <h3>Justificatifs</h3>
+                  <p>Photos et documents</p>
                 </div>
               </div>
 
-              <div class="step-item">
-                <div class="step-num">3</div>
+              <div class="step-card">
+                <div class="step-number">3</div>
                 <div>
-                  <div class="step-label">Confirmation</div>
-                  <div class="step-sublabel">Récapitulatif final</div>
+                  <h3>Confirmation</h3>
+                  <p>Validation finale</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="sidebar-card support-card">
+          <div class="panel support-panel">
             <div class="support-icon">D</div>
-            <h3>Documents auto acceptés</h3>
+            <h2>Documents auto acceptés</h2>
             <p>
-              Ajoutez les pièces les plus utiles pour accélérer le traitement du dossier
-              automobile.
+              Ajoutez les pièces les plus utiles pour accélérer le traitement
+              du dossier automobile.
             </p>
 
             <ul class="support-list">
@@ -136,12 +148,38 @@
               <li>Constat amiable en PDF</li>
               <li>Factures ou devis de réparation</li>
               <li>Rapport de police si nécessaire</li>
-              <li>Carte grise ou documents utiles</li>
+              <li>Carte grise ou documents complémentaires</li>
             </ul>
+          </div>
+
+          <div class="panel summary-panel">
+            <p class="panel-kicker">Résumé</p>
+
+            <div class="summary-grid">
+              <article class="summary-card">
+                <span>ID dossier</span>
+                <strong>{{ claimId || '-' }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Fichiers</span>
+                <strong>{{ totalFiles }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Taille</span>
+                <strong>{{ totalSize }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Étape</span>
+                <strong>2 / 3</strong>
+              </article>
+            </div>
           </div>
         </aside>
 
-        <section class="form-section">
+        <section class="right-column">
           <div class="alert alert-error" *ngIf="errorMessage">
             <span>⚠</span>
             <span>{{ errorMessage }}</span>
@@ -152,31 +190,31 @@
             <span>{{ successMessage }}</span>
           </div>
 
-          <div class="form-card">
-            <div class="card-header">
-              <div class="card-icon">D</div>
+          <div class="panel upload-panel">
+            <div class="form-head">
+              <div class="form-head-icon">D</div>
               <div>
                 <h2>Photos & documents justificatifs</h2>
                 <p>Déposez les éléments nécessaires pour finaliser votre déclaration auto.</p>
               </div>
             </div>
 
-            <div class="card-body">
+            <div class="form-body">
+              <input
+                #fileInput
+                type="file"
+                multiple
+                accept="image/*,.pdf"
+                (change)="onFileSelected($event)"
+                hidden
+              />
+
               <div
                 class="drop-zone"
                 (dragover)="onDragOver($event)"
                 (drop)="onDrop($event)"
                 (click)="fileInput.click()"
               >
-                <input
-                  #fileInput
-                  type="file"
-                  multiple
-                  accept="image/*,.pdf"
-                  (change)="onFileSelected($event)"
-                  hidden
-                />
-
                 <div class="drop-icon">↑</div>
                 <h3>Glissez vos fichiers ici</h3>
                 <p>ou cliquez pour parcourir vos dossiers</p>
@@ -202,6 +240,7 @@
               <div class="file-list" *ngIf="files.length > 0">
                 <div class="file-list-header">
                   <span>{{ files.length }} fichier(s) sélectionné(s)</span>
+
                   <button
                     class="btn-clear"
                     type="button"
@@ -245,7 +284,7 @@
               </div>
             </div>
 
-            <div class="card-footer">
+            <div class="form-footer">
               <div class="footer-note">
                 <span class="footer-bullet"></span>
                 <span>Étape 2 sur 3 — Ajout des justificatifs</span>
@@ -253,12 +292,12 @@
 
               <button
                 type="button"
-                class="btn-primary submit-btn"
+                class="submit-btn"
                 (click)="upload()"
                 [disabled]="!canUpload"
               >
                 <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
-                <span *ngIf="!loading">Soumettre mes justificatifs</span>
+                <span *ngIf="!loading">Continuer vers la confirmation</span>
               </button>
             </div>
           </div>

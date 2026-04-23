@@ -1,0 +1,213 @@
+<div class="dashboard-page">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-main">
+    <div class="dashboard-inner">
+      <app-topbar
+        [title]="'Résultats des agents IA'"
+        [subtitle]="'Analyse consolidée des réponses Routeur, Validateur et Estimateur par dossier'"
+        (newClaim)="onNewClaim()">
+      </app-topbar>
+
+      <section class="stats-row">
+        <article class="stat-card">
+          <span class="stat-label">Agent Routeur</span>
+          <strong>{{ getCountByAgent('AgentRouteur') }}</strong>
+          <p>Résultats de classification des sinistres.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Agent Validateur</span>
+          <strong>{{ getCountByAgent('AgentValidateur') }}</strong>
+          <p>Décisions de couverture ou d’exclusion.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Agent Estimateur</span>
+          <strong>{{ getCountByAgent('AgentEstimateur') }}</strong>
+          <p>Estimations financières générées par l’IA.</p>
+        </article>
+
+        <article class="stat-card stat-highlight">
+          <span class="stat-label">Révision humaine</span>
+          <strong>{{ getCountNeedsHuman() }}</strong>
+          <p>Résultats marqués pour validation experte.</p>
+        </article>
+      </section>
+
+      <section class="results-layout">
+        <div class="ins-card results-card">
+          <div class="card-head">
+            <div>
+              <p class="card-kicker">Monitoring</p>
+              <h3>Résultats par dossier</h3>
+            </div>
+
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+
+              <input
+                type="text"
+                placeholder="Rechercher un dossier..."
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()"
+              />
+            </div>
+          </div>
+
+          @if (loading) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <span>Chargement des résultats...</span>
+            </div>
+          }
+
+          @if (!loading && filteredGroups.length > 0) {
+            <div class="results-grid">
+              @for (group of filteredGroups; track group.claimId) {
+                <article
+                  class="result-item"
+                  (click)="selectGroup(group)"
+                  [class.result-item-active]="selectedGroup?.claimId === group.claimId"
+                >
+                  <div class="result-item-top">
+                    <div class="result-main">
+                      <div class="result-avatar">
+                        {{ group.clientInitials }}
+                      </div>
+
+                      <div class="result-copy">
+                        <h4>Dossier #{{ group.claimId }}</h4>
+                        <p>{{ group.clientName }}</p>
+                      </div>
+                    </div>
+
+                    <span class="status-pill" [class.status-review]="groupNeedsHuman(group)" [class.status-ok]="!groupNeedsHuman(group)">
+                      {{ groupNeedsHuman(group) ? 'Révision requise' : 'Stable' }}
+                    </span>
+                  </div>
+
+                  <div class="result-description">
+                    {{ group.claimDescription }}
+                  </div>
+
+                  <div class="agent-summary-grid">
+                    <div class="agent-summary-card" *ngIf="getAgentFromGroup(group, 'AgentRouteur') as routeur">
+                      <div class="agent-summary-head">
+                        <span class="badge badge-routeur">Routeur</span>
+                        <strong>{{ formatConfidence(routeur.confidenceScore) }}</strong>
+                      </div>
+                      <span class="result-badge" [class]="getConclusionClass(routeur.conclusion)">
+                        {{ routeur.conclusion.length > 32 ? (routeur.conclusion | slice:0:32) + '...' : routeur.conclusion }}
+                      </span>
+                      <div class="conf-bar">
+                        <div
+                          class="conf-fill"
+                          [style.width]="getConfidenceWidth(routeur.confidenceScore)"
+                          [style.background]="getConfidenceColor(routeur.confidenceScore)">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="agent-summary-card" *ngIf="getAgentFromGroup(group, 'AgentValidateur') as validateur">
+                      <div class="agent-summary-head">
+                        <span class="badge badge-validateur">Validateur</span>
+                        <strong>{{ formatConfidence(validateur.confidenceScore) }}</strong>
+                      </div>
+                      <span class="result-badge" [class]="getConclusionClass(validateur.conclusion)">
+                        {{ validateur.conclusion.length > 32 ? (validateur.conclusion | slice:0:32) + '...' : validateur.conclusion }}
+                      </span>
+                      <div class="conf-bar">
+                        <div
+                          class="conf-fill"
+                          [style.width]="getConfidenceWidth(validateur.confidenceScore)"
+                          [style.background]="getConfidenceColor(validateur.confidenceScore)">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="agent-summary-card" *ngIf="getAgentFromGroup(group, 'AgentEstimateur') as estimateur">
+                      <div class="agent-summary-head">
+                        <span class="badge badge-estimateur">Estimateur</span>
+                        <strong>{{ formatConfidence(estimateur.confidenceScore) }}</strong>
+                      </div>
+                      <span class="result-badge badge-pending">
+                        {{ estimateur.conclusion.length > 32 ? (estimateur.conclusion | slice:0:32) + '...' : estimateur.conclusion }}
+                      </span>
+                      <div class="conf-bar">
+                        <div
+                          class="conf-fill"
+                          [style.width]="getConfidenceWidth(estimateur.confidenceScore)"
+                          [style.background]="getConfidenceColor(estimateur.confidenceScore)">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="result-footer">
+                    <span>{{ group.agents.length }} agent(s)</span>
+                    <span *ngIf="getLatestCreatedAt(group) as createdAt">
+                      {{ createdAt | date:'dd/MM/yyyy HH:mm' }}
+                    </span>
+                  </div>
+
+                  @if (selectedGroup?.claimId === group.claimId) {
+                    <div class="result-details">
+                      <div class="detail-cards">
+                        @for (agent of group.agents; track agent.id) {
+                          <div class="agent-detail-card">
+                            <div class="agent-detail-header">
+                              <span class="badge" [class]="getAgentBadgeClass(agent.agentName)">
+                                {{ agent.agentName }}
+                              </span>
+                              <span class="detail-date">
+                                {{ agent.createdAt | date:'dd/MM HH:mm' }}
+                              </span>
+                            </div>
+
+                            <div class="detail-grid">
+                              <div class="detail-item">
+                                <span class="detail-label">Conclusion</span>
+                                <span class="detail-value">{{ agent.conclusion }}</span>
+                              </div>
+
+                              <div class="detail-item">
+                                <span class="detail-label">Confiance</span>
+                                <span class="detail-value">{{ formatConfidence(agent.confidenceScore) }}</span>
+                              </div>
+
+                              <div class="detail-item">
+                                <span class="detail-label">Révision humaine</span>
+                                <span class="detail-value">{{ agent.needsHumanReview ? 'Oui' : 'Non' }}</span>
+                              </div>
+                            </div>
+
+                            <div class="llm-box">
+                              <span class="detail-label">Réponse LLM</span>
+                              <p class="llm-response">{{ agent.rawLlmResponse || 'Aucune réponse brute disponible.' }}</p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          }
+
+          @if (!loading && filteredGroups.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">🤖</div>
+              <h4>Aucun résultat trouvé</h4>
+              <p>Essaie avec une autre recherche ou recharge les données.</p>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

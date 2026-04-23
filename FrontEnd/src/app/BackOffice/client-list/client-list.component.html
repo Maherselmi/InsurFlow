@@ -1,0 +1,168 @@
+<div class="dashboard-page">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-main">
+    <div class="dashboard-inner">
+      <app-topbar
+        [title]="'Clients'"
+        [subtitle]="'Vue centralisée de la base clients et consultation rapide des informations'"
+        (newClaim)="onNewClaim()">
+      </app-topbar>
+
+
+
+      <section class="stats-row">
+        <article class="stat-card">
+          <span class="stat-label">Clients enregistrés</span>
+          <strong>{{ clients.length }}</strong>
+          <p>Total des profils présents dans la plateforme.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Résultats affichés</span>
+          <strong>{{ filtered.length }}</strong>
+          <p>Clients visibles après application de la recherche.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Emails disponibles</span>
+          <strong>{{ totalWithEmail }}</strong>
+          <p>Profils contenant une adresse email renseignée.</p>
+        </article>
+
+        <article class="stat-card stat-highlight">
+          <span class="stat-label">Téléphones disponibles</span>
+          <strong>{{ totalWithPhone }}</strong>
+          <p>Profils contenant un numéro de téléphone.</p>
+        </article>
+      </section>
+
+      <section class="clients-layout">
+        <div class="ins-card clients-card">
+          <div class="card-head">
+            <div>
+              <p class="card-kicker">Répertoire</p>
+              <h3>Liste des clients</h3>
+            </div>
+
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+
+              <input
+                type="text"
+                placeholder="Rechercher un client..."
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()"
+              />
+            </div>
+          </div>
+
+          @if (loading) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <span>Chargement des clients...</span>
+            </div>
+          }
+
+          @if (!loading && filtered.length > 0) {
+            <div class="clients-grid">
+              @for (client of filtered; track client.id) {
+                <article
+                  class="client-item"
+                  (click)="selectClient(client)"
+                  [class.client-item-active]="selectedClient?.id === client.id"
+                >
+                  <div class="client-item-top">
+                    <div class="client-main">
+                      <div
+                        class="client-avatar"
+                        [style.background]="getAvatarColor(client.id)"
+                        [style.color]="getTextColor(client.id)"
+                      >
+                        {{ getInitials(client) }}
+                      </div>
+
+                      <div class="client-copy">
+                        <h4>{{ client.firstName }} {{ client.lastName }}</h4>
+                        <p>{{ client.email || 'Email non renseigné' }}</p>
+                      </div>
+                    </div>
+
+                    <span class="client-id">#{{ client.id }}</span>
+                  </div>
+
+                  <div class="client-meta">
+                    <div class="meta-pill">
+                      <span>Téléphone</span>
+                      <strong>{{ client.phone || '—' }}</strong>
+                    </div>
+
+                    <div class="meta-pill">
+                      <span>Statut fiche</span>
+                      <strong>{{ client.email || client.phone ? 'Complète' : 'Partielle' }}</strong>
+                    </div>
+                  </div>
+
+                  <div class="client-expand">
+                    <span>{{ selectedClient?.id === client.id ? 'Réduire' : 'Voir détails' }}</span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      [style.transform]="selectedClient?.id === client.id ? 'rotate(90deg)' : 'rotate(0deg)'"
+                    >
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </div>
+
+                  @if (selectedClient?.id === client.id) {
+                    <div class="client-details">
+                      <div class="detail-grid">
+                        <div class="detail-item">
+                          <span class="detail-label">Prénom</span>
+                          <span class="detail-value">{{ client.firstName }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Nom</span>
+                          <span class="detail-value">{{ client.lastName }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Email</span>
+                          <span class="detail-value">{{ client.email || 'Non renseigné' }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Téléphone</span>
+                          <span class="detail-value">{{ client.phone || 'Non renseigné' }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Identifiant</span>
+                          <span class="detail-value">#{{ client.id }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          }
+
+          @if (!loading && filtered.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">👥</div>
+              <h4>Aucun client trouvé</h4>
+              <p>Essaie avec un autre mot-clé de recherche.</p>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

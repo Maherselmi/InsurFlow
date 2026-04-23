@@ -1,0 +1,85 @@
+<div class="admin-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="admin-main">
+    <app-topbar
+      [title]="'Paramètres IA'"
+      [subtitle]="'Configurez les seuils de confiance des agents intelligents InSurFlow.'">
+    </app-topbar>
+
+    <div class="admin-content">
+
+
+      <div class="alert success" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+
+      <div class="alert error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="loading-state" *ngIf="loading">
+        Chargement des paramètres IA...
+      </div>
+
+      <section class="config-grid" *ngIf="!loading">
+        <article class="config-card" *ngFor="let config of configs">
+          <div class="card-top">
+            <div class="agent-icon">{{ config.icon }}</div>
+
+            <div class="agent-copy">
+              <h2>{{ config.title }}</h2>
+              <p>{{ config.description }}</p>
+            </div>
+
+            <div class="threshold-badge">
+              {{ formatPercent(config.confidenceThreshold) }}
+            </div>
+          </div>
+
+          <div class="card-body">
+            <label class="field-label">Seuil de confiance</label>
+
+            <div class="range-row">
+              <input
+                class="range-input"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                [value]="config.confidenceThreshold"
+                (input)="onSliderChange(config, $event)"
+              />
+
+              <input
+                class="number-input"
+                type="number"
+                min="0"
+                max="1"
+                step="0.01"
+                [(ngModel)]="config.confidenceThreshold"
+              />
+            </div>
+
+            <div class="range-helper">
+              <span>Validation prudente</span>
+              <span>Validation stricte</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <button
+              class="save-btn"
+              type="button"
+              (click)="saveConfig(config)"
+              [disabled]="config.saving"
+            >
+              <span *ngIf="!config.saving">Enregistrer</span>
+              <span *ngIf="config.saving">Enregistrement...</span>
+            </button>
+          </div>
+        </article>
+      </section>
+    </div>
+  </div>
+</div>

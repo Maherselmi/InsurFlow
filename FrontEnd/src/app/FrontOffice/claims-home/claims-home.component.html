@@ -1,171 +1,217 @@
 <div class="claims-home-page">
-    <div class="bg-orb orb-left"></div>
-    <div class="bg-orb orb-right"></div>
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
-    <header class="site-header">
-        <div class="container header-inner">
-            <a class="brand" routerLink="/">
-                <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
-            </a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" routerLink="/">
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
 
-            <nav class="main-nav">
-                <a
-                        *ngFor="let item of navItems"
-                        [routerLink]="item.route"
-                        [class.active]="isActiveNav(item.route)"
-                >
-                    {{ item.label }}
-                </a>
-            </nav>
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
+      </a>
 
-            <div class="header-user" *ngIf="!loadingProfile && client">
-                <div class="header-user-text">
-                    <strong>{{ fullName }}</strong>
-                    <span>{{ client.email }}</span>
-                </div>
-                <div class="avatar">{{ initials }}</div>
+      <nav class="main-nav">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="item.route"
+          [class.active]="isActiveNav(item.route)"
+        >
+          {{ item.label }}
+        </a>
+      </nav>
+
+      <div class="header-user" *ngIf="!loadingProfile && client">
+        <div class="header-user-text">
+          <strong>{{ fullName }}</strong>
+          <span>{{ client.email }}</span>
+        </div>
+        <div class="avatar">{{ initials }}</div>
+      </div>
+
+      <div class="header-user" *ngIf="loadingProfile">
+        <div class="header-user-text">
+          <strong>Chargement...</strong>
+          <span>lecture du profil</span>
+        </div>
+        <div class="avatar">...</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="claims-main">
+    <div class="container">
+      <section class="hero-shell">
+        <div class="hero-copy">
+          <div class="hero-badge">Déclaration & suivi des sinistres</div>
+
+          <h1>
+            Gérez vos sinistres
+            <span>dans un espace plus fluide et plus premium.</span>
+          </h1>
+
+          <p class="hero-text">
+            Déclarez un nouveau sinistre, choisissez le bon parcours et suivez
+            vos dossiers dans une interface claire, lumineuse et cohérente avec
+            l’univers InSurFlow.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" type="button" (click)="goToClaims()">
+              Voir mes dossiers
+            </button>
+
+            <button class="btn btn-secondary" type="button" (click)="goToClaim('AUTO')">
+              Déclarer maintenant
+            </button>
+          </div>
+
+          <div class="hero-points">
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Déclaration rapide</span>
             </div>
 
-            <div class="header-user" *ngIf="loadingProfile">
-                <div class="header-user-text">
-                    <strong>Chargement...</strong>
-                    <span>lecture du profil</span>
-                </div>
-                <div class="avatar">...</div>
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Parcours guidé</span>
             </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Suivi centralisé</span>
+            </div>
+          </div>
         </div>
-    </header>
 
-    <main class="claims-main">
-        <div class="container">
-            <section class="hero-card">
-                <div class="hero-copy">
-                    <div class="hero-badge">Déclaration & suivi des sinistres</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Vue sinistre</div>
 
-                    <h1>
-                        Gérez vos sinistres
-                        <span>simplement, rapidement et clairement.</span>
-                    </h1>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>24/7</strong>
+                <span>Déclaration en ligne</span>
+              </article>
 
-                    <p class="hero-text">
-                        Déclarez un nouveau sinistre, suivez vos dossiers en cours et
-                        retrouvez toutes les étapes importantes dans un espace unique,
-                        moderne et pensé dans le style InSurFlow.
-                    </p>
+              <article class="hero-mini-card">
+                <strong>3</strong>
+                <span>Parcours disponibles</span>
+              </article>
+            </div>
 
-                    <div class="hero-actions">
-                        <button class="btn btn-primary" type="button" (click)="goToClaims()">
-                            Voir mes dossiers
-                        </button>
-
-                        <button class="btn btn-secondary" type="button" (click)="goToClaim('AUTO')">
-                            Déclarer maintenant
-                        </button>
-                    </div>
-
-                    <div class="hero-points">
-                        <div class="hero-point">
-                            <span class="hero-point-bullet"></span>
-                            <span>Déclaration rapide</span>
-                        </div>
-
-                        <div class="hero-point">
-                            <span class="hero-point-bullet"></span>
-                            <span>Suivi étape par étape</span>
-                        </div>
-
-                        <div class="hero-point">
-                            <span class="hero-point-bullet"></span>
-                            <span>Documents centralisés</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="hero-panel">
-                    <div class="hero-panel-badge">Espace sinistre</div>
-
-                    <div class="hero-panel-top">
-                        <article class="mini-stat">
-                            <strong>24/7</strong>
-                            <span>Déclaration en ligne</span>
-                        </article>
-
-                        <article class="mini-stat">
-                            <strong>3</strong>
-                            <span>Types de sinistres</span>
-                        </article>
-                    </div>
-
-                    <div class="hero-image">
-                        <img src="assets/images/Sinsitre_image.png" alt="Gestion des sinistres" />
-                    </div>
-                </div>
-            </section>
-
-            <section class="benefits-strip">
-                <article class="benefit-card" *ngFor="let item of benefits">
-                    <h3>{{ item.title }}</h3>
-                    <p>{{ item.text }}</p>
-                </article>
-            </section>
-
-            <section class="claims-types-section">
-                <div class="section-head">
-                    <div>
-                        <p class="section-kicker">Types de sinistres</p>
-                        <h2>Choisissez le type de sinistre à déclarer</h2>
-                    </div>
-
-                    <a class="section-link" routerLink="/dossiers">Voir mes dossiers →</a>
-                </div>
-
-                <div class="claims-cards">
-                    <article
-                            class="claim-type-card"
-                            *ngFor="let claimType of claimTypes; let i = index"
-                            [class.delay-1]="i === 1"
-                            [class.delay-2]="i === 2"
-                            (click)="handleClaim(claimType.code)"
-                    >
-                        <div class="card-media">
-                            <img [src]="claimType.image" [alt]="claimType.title" />
-                        </div>
-
-                        <div class="card-body">
-                            <div class="card-top">
-                                <div class="card-icon">{{ claimType.icon }}</div>
-                                <span class="card-subtitle">{{ claimType.subtitle }}</span>
-                            </div>
-
-                            <h3>{{ claimType.title }}</h3>
-                            <p>{{ claimType.description }}</p>
-
-                            <button class="card-link" type="button">
-                                {{ claimType.action }} →
-                            </button>
-                        </div>
-                    </article>
-                </div>
-            </section>
-
-            <section class="bottom-banner">
-                <div class="bottom-banner-content">
-                    <div>
-                        <p class="eyebrow eyebrow-light">Suivi des dossiers</p>
-                        <h2>Consultez vos sinistres en cours et restez informé à chaque étape.</h2>
-                    </div>
-
-                    <div class="bottom-banner-actions">
-                        <button class="btn btn-light" type="button" (click)="goToClaims()">
-                            Accéder à mes dossiers
-                        </button>
-
-                        <button class="btn btn-outline-light" type="button" (click)="logout()">
-                            Déconnexion
-                        </button>
-                    </div>
-                </div>
-            </section>
+            <div class="hero-visual">
+              <img src="assets/images/Sinsitre_image.png" alt="Gestion des sinistres InSurFlow" />
+            </div>
+          </div>
         </div>
-    </main>
+      </section>
+
+      <section class="benefits-row">
+        <article class="benefit-card" *ngFor="let item of benefits">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.text }}</p>
+        </article>
+      </section>
+
+      <section class="claims-types-section">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Types de sinistres</p>
+            <h2>Choisissez le type de sinistre à déclarer</h2>
+          </div>
+
+          <a class="section-link" routerLink="/dossiers">Voir mes dossiers →</a>
+        </div>
+
+        <div class="claims-cards">
+          <article
+            class="claim-type-card"
+            *ngFor="let claimType of claimTypes"
+            (click)="handleClaim(claimType.code)"
+          >
+            <div class="card-media">
+              <img [src]="claimType.image" [alt]="claimType.title" />
+            </div>
+
+            <div class="card-body">
+              <div class="card-top">
+                <div class="card-icon">{{ claimType.icon }}</div>
+                <span class="card-subtitle">{{ claimType.subtitle }}</span>
+              </div>
+
+              <h3>{{ claimType.title }}</h3>
+              <p>{{ claimType.description }}</p>
+
+              <button class="card-link" type="button">
+                {{ claimType.action }} →
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="process-section">
+        <div class="process-shell">
+          <div class="section-head centered">
+            <div>
+              <p class="section-kicker">Comment ça marche</p>
+              <h2>Un parcours simple, clair et rassurant à chaque étape</h2>
+            </div>
+          </div>
+
+          <div class="process-grid">
+            <article class="process-card" *ngFor="let step of processSteps">
+              <div class="process-icon" [ngSwitch]="step.icon">
+                <svg *ngSwitchCase="'edit'" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                </svg>
+
+                <svg *ngSwitchCase="'upload'" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 16V4"></path>
+                  <path d="m7 9 5-5 5 5"></path>
+                  <path d="M20 16.5v2a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-2"></path>
+                </svg>
+
+                <svg *ngSwitchCase="'follow'" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <path d="M12 7v5l3 2"></path>
+                </svg>
+              </div>
+
+              <span class="process-number">{{ step.id }}</span>
+              <h3>{{ step.title }}</h3>
+              <p>{{ step.text }}</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="bottom-banner">
+        <div class="bottom-banner-content">
+          <div>
+            <p class="eyebrow eyebrow-light">Suivi des dossiers</p>
+            <h2>Consultez vos sinistres en cours et restez informé à chaque étape.</h2>
+          </div>
+
+          <div class="bottom-banner-actions">
+            <button class="btn btn-light" type="button" (click)="goToClaims()">
+              Accéder à mes dossiers
+            </button>
+
+            <button class="btn btn-outline-light" type="button" (click)="logout()">
+              Déconnexion
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
 </div>

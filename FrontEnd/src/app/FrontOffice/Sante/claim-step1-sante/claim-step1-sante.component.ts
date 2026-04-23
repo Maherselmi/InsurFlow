@@ -4,6 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ClaimData, ClaimService, Policy } from '../../../claim.service';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface SupportTip {
+  title: string;
+  text: string;
+}
+
 @Component({
   selector: 'app-claim-step1-sante',
   standalone: true,
@@ -13,11 +23,11 @@ import { ClaimData, ClaimService, Policy } from '../../../claim.service';
   host: { ngSkipHydration: 'true' }
 })
 export class ClaimStep1SanteComponent implements OnInit {
-  navItems = [
+  navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/Consulter' }
+    { label: 'Mes dossiers', route: '/Consulter' }
   ];
 
   healthClaimTypes = [
@@ -30,6 +40,21 @@ export class ClaimStep1SanteComponent implements OnInit {
     { value: 'MATERNITE', label: 'Maternité' }
   ];
 
+  supportTips: SupportTip[] = [
+    {
+      title: 'Décrivez clairement les soins',
+      text: 'Précisez l’acte médical, les symptômes, le contexte et la prise en charge attendue.'
+    },
+    {
+      title: 'Mutuelle vérifiée',
+      text: 'Votre couverture santé est contrôlée avant le passage à l’étape suivante.'
+    },
+    {
+      title: 'Parcours plus fluide',
+      text: 'Une saisie claire dès le départ accélère le traitement du dossier santé.'
+    }
+  ];
+
   claim: ClaimData = {
     policyId: null,
     clientId: null,
@@ -40,6 +65,8 @@ export class ClaimStep1SanteComponent implements OnInit {
 
   policies: Policy[] = [];
   selectedPolicy: Policy | null = null;
+
+  loadingPolicies = false;
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -54,8 +81,23 @@ export class ClaimStep1SanteComponent implements OnInit {
     this.loadPolicies();
   }
 
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+        currentUrl.startsWith('/Claim_Home') ||
+        currentUrl.startsWith('/claim') ||
+        currentUrl.startsWith('/Sante') ||
+        currentUrl.startsWith('/Habitation')
+      );
+    }
+
+    return currentUrl === route;
+  }
+
   loadPolicies(): void {
-    this.loading = true;
+    this.loadingPolicies = true;
     this.errorMessage = '';
 
     this.claimService.getPolicies().subscribe({
@@ -66,10 +108,10 @@ export class ClaimStep1SanteComponent implements OnInit {
           (p) => this.normalizeType(p.type) === 'SANTE'
         );
 
-        this.loading = false;
+        this.loadingPolicies = false;
       },
       error: (err) => {
-        this.loading = false;
+        this.loadingPolicies = false;
         this.errorMessage = 'Erreur lors du chargement des polices santé.';
         console.error('Erreur chargement polices santé:', err);
       }
@@ -81,14 +123,14 @@ export class ClaimStep1SanteComponent implements OnInit {
     this.successMessage = '';
 
     this.selectedPolicy =
-      this.policies.find(p => p.id === Number(this.claim.policyId)) || null;
+      this.policies.find((p) => p.id === Number(this.claim.policyId)) || null;
 
     if (!this.selectedPolicy) {
       this.claim.clientId = null;
       return;
     }
 
-    if (this.selectedPolicy?.client?.id) {
+    if (this.selectedPolicy.client?.id) {
       this.claim.clientId = this.selectedPolicy.client.id;
     } else {
       this.claim.clientId = null;
@@ -106,7 +148,6 @@ export class ClaimStep1SanteComponent implements OnInit {
 
     if (!this.isPolicyActive(this.selectedPolicy)) {
       this.errorMessage = 'Cette police santé est expirée ou inactive.';
-      return;
     }
   }
 
@@ -232,6 +273,14 @@ export class ClaimStep1SanteComponent implements OnInit {
     return `${this.formatDate(this.selectedPolicy.startDate)} → ${this.formatDate(this.selectedPolicy.endDate)}`;
   }
 
+  getSelectedPolicyStatus(): string {
+    if (!this.selectedPolicy) {
+      return '-';
+    }
+
+    return this.isPolicyActive(this.selectedPolicy) ? 'Active' : 'Inactive';
+  }
+
   formatDate(date: string): string {
     const d = new Date(date);
     if (isNaN(d.getTime())) return date;
@@ -243,20 +292,8 @@ export class ClaimStep1SanteComponent implements OnInit {
     });
   }
 
-  goToHome(): void {
-    this.router.navigate(['/']);
-  }
-
-  goToDecisions(): void {
-    this.router.navigate(['/Consulter']);
-  }
-
-  goToPolice(): void {
-    this.router.navigate(['/PolicesList']);
-  }
-
-  logout(): void {
-    this.router.navigate(['/login']);
+  goToClaimsHome(): void {
+    this.router.navigate(['/Claim_Home']);
   }
 
   private normalizeType(type: string | undefined | null): string {

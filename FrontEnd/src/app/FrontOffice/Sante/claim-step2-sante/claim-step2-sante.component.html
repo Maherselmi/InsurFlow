@@ -1,22 +1,34 @@
 <div class="claim-page">
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
-          [class.active]="item.label === 'Sinistres'"
+          [class.active]="isActiveNav(item.route)"
         >
           {{ item.label }}
         </a>
       </nav>
 
       <div class="header-chip">
-        <span class="chip-label">Déclaration</span>
+        <span class="chip-label">Déclaration santé</span>
         <strong>Étape 2 / 3</strong>
       </div>
     </div>
@@ -24,9 +36,9 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
-          <p class="eyebrow">Justificatifs santé</p>
+          <div class="hero-badge">Justificatifs santé</div>
 
           <h1>
             Ajoutez vos documents médicaux
@@ -35,8 +47,20 @@
 
           <p class="hero-text">
             Déposez vos ordonnances, comptes-rendus, factures ou documents médicaux
-            afin de finaliser votre demande de prise en charge dans InSurFlow.
+            afin de finaliser votre demande de prise en charge dans une interface
+            plus claire, plus moderne et plus premium.
           </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-secondary" type="button" (click)="back()">
+              Retour
+            </button>
+
+            <button class="btn btn-primary" type="button" (click)="upload()" [disabled]="!canUpload">
+              <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
+              <span *ngIf="!loading">Soumettre les justificatifs</span>
+            </button>
+          </div>
 
           <div class="hero-points">
             <div class="hero-point">
@@ -56,63 +80,68 @@
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Documents santé</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Documents santé</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>{{ totalFiles }}</strong>
-              <span>Fichier(s) sélectionné(s)</span>
-            </article>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>{{ totalFiles }}</strong>
+                <span>Fichier(s)</span>
+              </article>
 
-            <article class="mini-stat">
-              <strong>{{ totalSize }}</strong>
-              <span>Taille totale</span>
-            </article>
-          </div>
+              <article class="hero-mini-card">
+                <strong>{{ totalSize }}</strong>
+                <span>Taille totale</span>
+              </article>
+            </div>
 
-          <div class="hero-image">
-            <img src="assets/images/health-insurance.jpg" alt="Documents médicaux" />
+            <div class="hero-visual">
+              <img src="assets/images/health-insurance.jpg" alt="Documents médicaux" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="claim-layout">
-        <aside class="process-sidebar">
-          <div class="sidebar-card">
-            <p class="sidebar-title">Processus</p>
+      <section class="workspace-grid">
+        <aside class="left-column">
+          <div class="panel progress-panel">
+            <p class="panel-kicker">Progression</p>
 
             <div class="step-list">
-              <div class="step-item done">
-                <div class="step-num">✓</div>
+              <div class="step-card done">
+                <div class="step-number">✓</div>
                 <div>
-                  <div class="step-label">Informations</div>
-                  <div class="step-sublabel">Détails du sinistre</div>
+                  <h3>Informations</h3>
+                  <p>Détails du dossier</p>
                 </div>
               </div>
 
-              <div class="step-item active">
-                <div class="step-num">2</div>
+              <div class="step-card active">
+                <div class="step-number">2</div>
                 <div>
-                  <div class="step-label">Justificatifs</div>
-                  <div class="step-sublabel">Ordonnances & documents</div>
+                  <h3>Justificatifs</h3>
+                  <p>Ordonnances & documents</p>
                 </div>
               </div>
 
-              <div class="step-item">
-                <div class="step-num">3</div>
+              <div class="step-card">
+                <div class="step-number">3</div>
                 <div>
-                  <div class="step-label">Confirmation</div>
-                  <div class="step-sublabel">Récapitulatif final</div>
+                  <h3>Confirmation</h3>
+                  <p>Récapitulatif final</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="sidebar-card support-card">
+          <div class="panel support-panel">
             <div class="support-icon">S</div>
-            <h3>Documents médicaux acceptés</h3>
-            <p>Ajoutez les pièces les plus utiles pour accélérer le traitement du dossier santé.</p>
+            <h2>Documents médicaux acceptés</h2>
+            <p>
+              Ajoutez les pièces les plus utiles pour accélérer le traitement
+              du dossier santé.
+            </p>
 
             <ul class="support-list">
               <li>Ordonnance médicale</li>
@@ -123,9 +152,35 @@
               <li>Feuille de soins</li>
             </ul>
           </div>
+
+          <div class="panel summary-panel">
+            <p class="panel-kicker">Résumé</p>
+
+            <div class="summary-grid">
+              <article class="summary-card">
+                <span>ID dossier</span>
+                <strong>{{ claimId || '-' }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Fichiers</span>
+                <strong>{{ totalFiles }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Taille</span>
+                <strong>{{ totalSize }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Étape</span>
+                <strong>2 / 3</strong>
+              </article>
+            </div>
+          </div>
         </aside>
 
-        <section class="form-section">
+        <section class="right-column">
           <div class="alert alert-error" *ngIf="errorMessage">
             <span>⚠</span>
             <span>{{ errorMessage }}</span>
@@ -136,31 +191,31 @@
             <span>{{ successMessage }}</span>
           </div>
 
-          <div class="form-card">
-            <div class="card-header">
-              <div class="card-icon">S</div>
+          <div class="panel upload-panel">
+            <div class="form-head">
+              <div class="form-head-icon">S</div>
               <div>
                 <h2>Justificatifs médicaux</h2>
                 <p>Ajoutez les documents nécessaires pour finaliser votre dossier santé.</p>
               </div>
             </div>
 
-            <div class="card-body">
+            <div class="form-body">
+              <input
+                #fileInput
+                type="file"
+                multiple
+                accept="image/*,.pdf"
+                (change)="onFileSelected($event)"
+                hidden
+              />
+
               <div
                 class="drop-zone"
                 (dragover)="onDragOver($event)"
                 (drop)="onDrop($event)"
                 (click)="fileInput.click()"
               >
-                <input
-                  #fileInput
-                  type="file"
-                  multiple
-                  accept="image/*,.pdf"
-                  (change)="onFileSelected($event)"
-                  hidden
-                />
-
                 <div class="drop-icon">↑</div>
                 <h3>Glissez vos documents médicaux ici</h3>
                 <p>ou cliquez pour parcourir vos dossiers</p>
@@ -174,35 +229,11 @@
               </div>
 
               <div class="tips-grid">
-                <div class="tip-card">
-                  <span class="tip-icon">O</span>
+                <div class="tip-card" *ngFor="let tip of uploadTips">
+                  <span class="tip-icon">{{ tip.icon }}</span>
                   <div>
-                    <strong>Ordonnance</strong>
-                    <p>Ajoutez l’ordonnance ou le document prescripteur.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">F</span>
-                  <div>
-                    <strong>Factures</strong>
-                    <p>Ajoutez les factures ou justificatifs de paiement.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">E</span>
-                  <div>
-                    <strong>Examens</strong>
-                    <p>Ajoutez les résultats ou comptes-rendus utiles.</p>
-                  </div>
-                </div>
-
-                <div class="tip-card">
-                  <span class="tip-icon">H</span>
-                  <div>
-                    <strong>Hospitalisation</strong>
-                    <p>Ajoutez le compte-rendu ou attestation si nécessaire.</p>
+                    <strong>{{ tip.title }}</strong>
+                    <p>{{ tip.text }}</p>
                   </div>
                 </div>
               </div>
@@ -210,6 +241,7 @@
               <div class="file-list" *ngIf="files.length > 0">
                 <div class="file-list-header">
                   <span>{{ files.length }} document(s) médical(aux) sélectionné(s)</span>
+
                   <button
                     class="btn-clear"
                     type="button"
@@ -255,19 +287,20 @@
               </div>
             </div>
 
-            <div class="card-footer">
-              <button type="button" class="btn-secondary" (click)="back()">
-                Retour
-              </button>
+            <div class="form-footer">
+              <div class="footer-note">
+                <span class="footer-bullet"></span>
+                <span>Étape 2 sur 3 — Ajout des justificatifs santé</span>
+              </div>
 
               <button
                 type="button"
-                class="btn-primary"
+                class="submit-btn"
                 (click)="upload()"
-                [disabled]="loading || files.length === 0"
+                [disabled]="!canUpload"
               >
                 <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
-                <span *ngIf="!loading">Soumettre mon dossier santé</span>
+                <span *ngIf="!loading">Continuer vers la confirmation</span>
               </button>
             </div>
           </div>

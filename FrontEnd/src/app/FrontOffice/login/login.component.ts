@@ -20,7 +20,7 @@ interface LoginFeatureItem {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   email = '';
@@ -83,7 +83,7 @@ export class LoginComponent {
             this.router.navigate(['/Validation']);
             break;
           case 'ROLE_CLIENT':
-            this.router.navigate(['Client_Space']);
+            this.router.navigate(['/Client_Space']);
             break;
           default:
             this.router.navigate(['/']);

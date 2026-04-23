@@ -1,11 +1,20 @@
 <div class="claim-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
@@ -19,7 +28,7 @@
       </nav>
 
       <div class="header-chip">
-        <span class="chip-label">Déclaration</span>
+        <span class="chip-label">Déclaration auto</span>
         <strong>Étape 1 / 3</strong>
       </div>
     </div>
@@ -27,19 +36,19 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
           <div class="hero-badge">Sinistre automobile</div>
 
           <h1>
             Déclarez votre sinistre auto
-            <span>dans un parcours plus clair et plus moderne.</span>
+            <span>dans un parcours plus fluide et plus premium.</span>
           </h1>
 
           <p class="hero-text">
-            Renseignez les informations essentielles de l’accident pour démarrer
-            l’analyse de votre dossier. Votre police auto est vérifiée avant la
-            suite du processus.
+            Renseignez les informations essentielles de l’accident pour lancer
+            votre dossier. Votre police automobile est vérifiée avant le passage
+            à l’étape suivante.
           </p>
 
           <div class="hero-actions">
@@ -57,7 +66,7 @@
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Validation automatique de la police</span>
+              <span>Contrat vérifié automatiquement</span>
             </div>
 
             <div class="hero-point">
@@ -67,77 +76,79 @@
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Traitement auto</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Traitement auto</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>24/7</strong>
-              <span>Déclaration disponible</span>
-            </article>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>24/7</strong>
+                <span>Déclaration disponible</span>
+              </article>
 
-            <article class="mini-stat">
-              <strong>3</strong>
-              <span>Étapes guidées</span>
-            </article>
-          </div>
+              <article class="hero-mini-card">
+                <strong>3</strong>
+                <span>Étapes guidées</span>
+              </article>
+            </div>
 
-          <div class="hero-image">
-            <img src="assets/images/auto-insurance.jpg" alt="Sinistre automobile" />
+            <div class="hero-visual">
+              <img src="assets/images/auto-insurance.jpg" alt="Sinistre auto InSurFlow" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="claim-layout">
-        <aside class="process-sidebar">
-          <div class="sidebar-card">
-            <p class="sidebar-title">Progression</p>
+      <section class="overview-grid">
+        <aside class="left-column">
+          <div class="panel progress-panel">
+            <p class="panel-kicker">Progression</p>
 
             <div class="step-list">
-              <div class="step-item active">
-                <div class="step-num">1</div>
+              <div class="step-card active">
+                <div class="step-number">1</div>
                 <div>
-                  <div class="step-label">Informations sinistre</div>
-                  <div class="step-sublabel">Détails de l’accident</div>
+                  <h3>Informations</h3>
+                  <p>Détails du sinistre automobile</p>
                 </div>
               </div>
 
-              <div class="step-item">
-                <div class="step-num">2</div>
+              <div class="step-card">
+                <div class="step-number">2</div>
                 <div>
-                  <div class="step-label">Justificatifs</div>
-                  <div class="step-sublabel">Photos & documents</div>
+                  <h3>Justificatifs</h3>
+                  <p>Photos et documents</p>
                 </div>
               </div>
 
-              <div class="step-item">
-                <div class="step-num">3</div>
+              <div class="step-card">
+                <div class="step-number">3</div>
                 <div>
-                  <div class="step-label">Confirmation</div>
-                  <div class="step-sublabel">Récapitulatif final</div>
+                  <h3>Confirmation</h3>
+                  <p>Récapitulatif final</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="sidebar-card support-card">
+          <div class="panel support-panel">
             <div class="support-icon">A</div>
-            <h3>Assistance auto dédiée</h3>
+            <h2>Assistance auto dédiée</h2>
             <p>
-              Un parcours pensé pour les sinistres automobiles avec une lecture plus simple
-              et une progression plus rassurante.
+              Un parcours automobile plus lisible, pensé pour vous guider de
+              manière claire et rassurante.
             </p>
 
-            <ul class="support-list">
-              <li *ngFor="let tip of stepTips">
-                <strong>{{ tip.title }}</strong><br />
-                <span>{{ tip.text }}</span>
-              </li>
-            </ul>
+            <div class="tips-list">
+              <article class="tip-card" *ngFor="let tip of stepTips">
+                <h3>{{ tip.title }}</h3>
+                <p>{{ tip.text }}</p>
+              </article>
+            </div>
           </div>
         </aside>
 
-        <section class="form-section">
+        <section class="right-column">
           <div class="alert alert-error" *ngIf="errorMessage">
             <span>⚠</span>
             <span>{{ errorMessage }}</span>
@@ -148,16 +159,16 @@
             <span>{{ successMessage }}</span>
           </div>
 
-          <div class="form-card">
-            <div class="card-header">
-              <div class="card-icon">A</div>
+          <div class="panel form-panel">
+            <div class="form-head">
+              <div class="form-head-icon">A</div>
               <div>
                 <h2>Détails du sinistre automobile</h2>
-                <p>Renseignez les informations nécessaires pour lancer votre dossier auto.</p>
+                <p>Complétez les informations nécessaires pour ouvrir votre dossier auto.</p>
               </div>
             </div>
 
-            <div class="card-body">
+            <div class="form-body">
               <div class="form-grid">
                 <div class="form-group full">
                   <label class="form-label">Police d’assurance auto</label>
@@ -252,21 +263,21 @@
                   ></textarea>
 
                   <div class="helper-text">
-                    Conseil : indiquez clairement le lieu, le contexte et les dégâts visibles pour accélérer le traitement.
+                    Conseil : mentionnez le lieu, le contexte, les dégâts visibles et tout élément utile pour accélérer l’analyse.
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="card-footer">
+            <div class="form-footer">
               <div class="footer-note">
                 <span class="footer-bullet"></span>
-                <span>Étape 1 sur 3 — Informations sinistre auto</span>
+                <span>Étape 1 sur 3 — Informations du sinistre automobile</span>
               </div>
 
               <button
                 type="button"
-                class="btn-primary submit-btn"
+                class="submit-btn"
                 (click)="next()"
                 [disabled]="loading || loadingPolicies"
               >

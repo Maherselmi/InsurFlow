@@ -59,10 +59,10 @@ export class ClaimStep3Component implements OnInit {
 
     if (route === '/Claim_Home') {
       return (
-          currentUrl.startsWith('/Claim_Home') ||
-          currentUrl.startsWith('/claim') ||
-          currentUrl.startsWith('/Sante') ||
-          currentUrl.startsWith('/Habitation')
+        currentUrl.startsWith('/Claim_Home') ||
+        currentUrl.startsWith('/claim') ||
+        currentUrl.startsWith('/Sante') ||
+        currentUrl.startsWith('/Habitation')
       );
     }
 
@@ -70,7 +70,8 @@ export class ClaimStep3Component implements OnInit {
   }
 
   generateReference(): string {
-    const storedClaimId = localStorage.getItem('claimId');
+    const storedClaimId =
+      typeof localStorage !== 'undefined' ? localStorage.getItem('claimId') : null;
 
     if (storedClaimId) {
       return `AUTO-${storedClaimId}-${new Date().getFullYear()}`;

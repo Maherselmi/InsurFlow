@@ -44,7 +44,7 @@ export class ClientSpaceComponent implements OnInit {
   quickActions: QuickAction[] = [
     {
       title: 'Mes contrats',
-      text: 'Consultez vos polices et leurs échéances.',
+      text: 'Consultez vos polices, garanties et échéances.',
       route: '/contrats',
       icon: 'contracts'
     },
@@ -56,7 +56,7 @@ export class ClientSpaceComponent implements OnInit {
     },
     {
       title: 'Mes dossiers',
-      text: 'Suivez vos décisions et rapports détaillés.',
+      text: 'Suivez vos décisions, rapports et validations.',
       route: '/Consulter',
       icon: 'documents'
     }
@@ -89,10 +89,10 @@ export class ClientSpaceComponent implements OnInit {
   ];
 
   constructor(
-      private authService: AuthService,
-      private clientService: ClientService,
-      private policyService: PolicyService,
-      private router: Router
+    private authService: AuthService,
+    private clientService: ClientService,
+    private policyService: PolicyService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -119,7 +119,7 @@ export class ClientSpaceComponent implements OnInit {
     this.clientService.getAllClients().subscribe({
       next: (clients) => {
         const found = clients.find(
-            (c) => c.email?.toLowerCase() === email.toLowerCase()
+          (c) => c.email?.toLowerCase() === email.toLowerCase()
         );
 
         this.client = found ?? null;
@@ -140,7 +140,7 @@ export class ClientSpaceComponent implements OnInit {
     this.policyService.getAllPolicies().subscribe({
       next: (policies) => {
         this.policies = policies.filter(
-            (policy) => policy.client?.email?.toLowerCase() === email.toLowerCase()
+          (policy) => policy.client?.email?.toLowerCase() === email.toLowerCase()
         );
         this.loadingPolicies = false;
       },
@@ -183,6 +183,45 @@ export class ClientSpaceComponent implements OnInit {
     return this.claims.length;
   }
 
+  get totalTypesCount(): number {
+    return new Set(
+      this.policies
+        .map((policy) => (policy.type || '').trim())
+        .filter((type) => !!type)
+    ).size;
+  }
+
+  get sortedPolicies(): Policy[] {
+    return [...this.policies].sort((a, b) => {
+      const aActive = this.isPolicyActive(a) ? 0 : 1;
+      const bActive = this.isPolicyActive(b) ? 0 : 1;
+
+      if (aActive !== bActive) {
+        return aActive - bActive;
+      }
+
+      const aEnd = new Date(a.endDate).getTime();
+      const bEnd = new Date(b.endDate).getTime();
+
+      if (isNaN(aEnd) && isNaN(bEnd)) return 0;
+      if (isNaN(aEnd)) return 1;
+      if (isNaN(bEnd)) return -1;
+
+      return aEnd - bEnd;
+    });
+  }
+
+  get nextRenewalLabel(): string {
+    const activePolicies = this.sortedPolicies.filter((policy) => this.isPolicyActive(policy));
+
+    if (!activePolicies.length) {
+      return 'Aucune échéance active disponible';
+    }
+
+    const nextPolicy = activePolicies[0];
+    return `${nextPolicy.policyNumber} · ${this.formatDate(nextPolicy.endDate)}`;
+  }
+
   formatDate(date: string | undefined): string {
     if (!date) return '-';
 
@@ -223,6 +262,25 @@ export class ClientSpaceComponent implements OnInit {
     }
 
     return 'ACTIF';
+  }
+
+  isPolicyActive(policy: Policy): boolean {
+    return this.getPolicyStatus(policy) === 'ACTIF';
+  }
+
+  getPolicyTone(policy: Policy): string {
+    const type = (policy.type || '').toUpperCase();
+
+    switch (type) {
+      case 'AUTO':
+        return 'tone-auto';
+      case 'SANTE':
+        return 'tone-health';
+      case 'HABITATION':
+        return 'tone-home';
+      default:
+        return 'tone-default';
+    }
   }
 
   logout(): void {

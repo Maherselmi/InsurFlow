@@ -3,6 +3,17 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { ClaimService } from '../../../claim.service';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
+interface UploadTip {
+  title: string;
+  text: string;
+  icon: string;
+}
+
 @Component({
   selector: 'app-claim-step2-sante',
   standalone: true,
@@ -12,11 +23,34 @@ import { ClaimService } from '../../../claim.service';
   host: { ngSkipHydration: 'true' }
 })
 export class ClaimStep2SanteComponent implements OnInit {
-  navItems = [
+  navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
     { label: 'Mes contrats', route: '/contrats' },
     { label: 'Sinistres', route: '/Claim_Home' },
-    { label: 'Documents', route: '/Consulter' }
+    { label: 'Mes dossiers', route: '/Consulter' }
+  ];
+
+  uploadTips: UploadTip[] = [
+    {
+      title: 'Ordonnance',
+      text: 'Ajoutez la prescription médicale ou le document prescripteur.',
+      icon: 'O'
+    },
+    {
+      title: 'Factures',
+      text: 'Ajoutez les justificatifs de paiement, tickets ou factures.',
+      icon: 'F'
+    },
+    {
+      title: 'Examens',
+      text: 'Ajoutez résultats, analyses ou comptes-rendus utiles.',
+      icon: 'E'
+    },
+    {
+      title: 'Hospitalisation',
+      text: 'Ajoutez un bulletin de sortie ou un compte-rendu si nécessaire.',
+      icon: 'H'
+    }
   ];
 
   files: File[] = [];
@@ -35,12 +69,28 @@ export class ClaimStep2SanteComponent implements OnInit {
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       const stored = localStorage.getItem('claimId');
+
       if (stored) {
         this.claimId = Number(stored);
       } else {
         this.errorMessage = 'Aucun dossier trouvé. Retournez à l’étape 1.';
       }
     }
+  }
+
+  isActiveNav(route: string): boolean {
+    const currentUrl = this.router.url;
+
+    if (route === '/Claim_Home') {
+      return (
+        currentUrl.startsWith('/Claim_Home') ||
+        currentUrl.startsWith('/claim') ||
+        currentUrl.startsWith('/Sante') ||
+        currentUrl.startsWith('/Habitation')
+      );
+    }
+
+    return currentUrl === route;
   }
 
   onFileSelected(event: Event): void {
@@ -66,7 +116,7 @@ export class ClaimStep2SanteComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    newFiles.forEach(file => {
+    newFiles.forEach((file) => {
       if (!allowed.includes(file.type)) {
         this.errorMessage = 'Seuls les fichiers JPG, PNG et PDF sont autorisés.';
         return;
@@ -78,7 +128,7 @@ export class ClaimStep2SanteComponent implements OnInit {
       }
 
       const alreadyExists = this.files.some(
-        f =>
+        (f) =>
           f.name === file.name &&
           f.size === file.size &&
           f.lastModified === file.lastModified
@@ -117,6 +167,7 @@ export class ClaimStep2SanteComponent implements OnInit {
     if (bytes < 1024 * 1024) {
       return (bytes / 1024).toFixed(1) + ' Ko';
     }
+
     return (bytes / (1024 * 1024)).toFixed(1) + ' Mo';
   }
 
@@ -127,6 +178,10 @@ export class ClaimStep2SanteComponent implements OnInit {
   get totalSize(): string {
     const total = this.files.reduce((sum, file) => sum + file.size, 0);
     return this.formatSize(total);
+  }
+
+  get canUpload(): boolean {
+    return !this.loading && this.files.length > 0 && !!this.claimId;
   }
 
   back(): void {
@@ -151,9 +206,9 @@ export class ClaimStep2SanteComponent implements OnInit {
 
     let completed = 0;
 
-    this.files.forEach(file => {
+    this.files.forEach((file) => {
       this.claimService.uploadDocument(this.claimId, file).subscribe({
-        next: (res) => {
+        next: () => {
           completed++;
           this.uploadProgress = Math.round((completed / this.files.length) * 100);
 
@@ -184,23 +239,7 @@ export class ClaimStep2SanteComponent implements OnInit {
     });
   }
 
-  goToSinistre(): void {
-    this.router.navigate(['/sinistre']);
-  }
-
-  goToDecisions(): void {
-    this.router.navigate(['/Consulter']);
-  }
-
-  goToPolice(): void {
-    this.router.navigate(['/PolicesList']);
-  }
-
-  goToHome(): void {
-    this.router.navigate(['/']);
-  }
-
-  logout(): void {
-    this.router.navigate(['/login']);
+  goToClaimsHome(): void {
+    this.router.navigate(['/Claim_Home']);
   }
 }

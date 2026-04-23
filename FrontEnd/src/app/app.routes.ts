@@ -1,18 +1,8 @@
 import { Routes } from '@angular/router';
 
-import { DashboardComponent } from "./dashboard/dashboard.component";
-import {DossierSinistreComponent} from "./admin/dossier-sinistre/dossier-sinistre.component";
-import {ClientListComponent} from "./admin/client-list/client-list.component";
-import {PolicyListComponent} from "./admin/policy-list/policy-list.component";
-import {AgentResultListComponent} from "./admin/agent-result-list/agent-result-list.component";
-import {HomeComponent} from "./pages/home/home.component";
-
-
 import {ConsultationDecisionsComponent} from "./FrontOffice/consultation-decisions/consultation-decisions.component";
-import {ClaimValidationComponent} from "./claim/claim-validation/claim-validation.component";
 import {InsuranceHomeComponent} from "./FrontOffice/insurance-home/insurance-home.component";
 import {LoginComponent} from "./FrontOffice/login/login.component";
-import {PolicesComponent} from "./client/polices/polices.component";
 import {ClientSpaceComponent} from "./FrontOffice/client-space/client-space.component";
 import {ClaimsHomeComponent} from "./FrontOffice/claims-home/claims-home.component";
 import {ClaimStep3SanteComponent} from "./FrontOffice/Sante/claim-step3-sante/claim-step3-sante.component";
@@ -31,13 +21,25 @@ import {ClaimStep1Component} from "./FrontOffice/Auto/claim-step1/claim-step1.co
 import {ClaimStep2Component} from "./FrontOffice/Auto/claim-step2/claim-step2.component";
 import {ClaimStep3Component} from "./FrontOffice/Auto/claim-step3/claim-step3.component";
 import {ClaimReportPageComponent} from "./FrontOffice/claim-report-page/claim-report-page.component";
+import {DossierSinistreComponent} from "./BackOffice/dossier-sinistre/dossier-sinistre.component";
+import {AgentResultListComponent} from "./BackOffice/agent-result-list/agent-result-list.component";
+import {PolicyListComponent} from "./BackOffice/policy-list/policy-list.component";
+import {ClientListComponent} from "./BackOffice/client-list/client-list.component";
+import {DashboardComponent} from "./BackOffice/dashboard/dashboard.component";
+import {PolicesComponent} from "./FrontOffice/polices/polices.component";
+import {ClaimValidationComponent} from "./BackOffice/claim-validation/claim-validation.component";
+import {ParametresIaComponent} from "./BackOffice/parametres-ia/parametres-ia.component";
+import {FeedbackClaimsListComponent} from "./feedback-claims-list/feedback-claims-list.component";
+import {ExpertFeedbackFormComponent} from "./expert-feedback-form/expert-feedback-form.component";
 
 export const routes: Routes = [
   { path: 'PolicesList', component: PolicesComponent },
   { path: 'Claim_Home', component: ClaimsHomeComponent },
 
+  { path: 'ia_param', component: ParametresIaComponent },
 
-
+  { path: 'feedback-claims', component: FeedbackClaimsListComponent },
+  { path: 'expert-feedback/:claimId', component: ExpertFeedbackFormComponent },
   { path: 'Client_Space', component: ClientSpaceComponent },
   {path: 'claim-report/:id', component: ClaimReportPageComponent},
 
@@ -58,7 +60,6 @@ export const routes: Routes = [
   { path: 'agents', component: AgentResultListComponent },
 
   { path: '', component: InsuranceHomeComponent },
-  { path: 'sinistre', component: HomeComponent },
 
   { path: 'dashboard', component: DashboardComponent },
   { path: 'dossiers', component: DossierSinistreComponent },

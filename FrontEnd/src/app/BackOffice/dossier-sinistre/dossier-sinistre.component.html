@@ -1,0 +1,131 @@
+<div class="dashboard-page">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-main">
+    <div class="dashboard-inner">
+      <app-topbar
+        [title]="'Dossiers sinistres'"
+        [subtitle]="'Suivi global des déclarations, états d’avancement et décisions métier'"
+        (newClaim)="onNewClaim()">
+      </app-topbar>
+
+
+      <section class="stats-row">
+        <article class="stat-card">
+          <span class="stat-label">Total dossiers</span>
+          <strong>{{ claims.length }}</strong>
+          <p>Nombre total de sinistres enregistrés sur la plateforme.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">En attente</span>
+          <strong>{{ pendingCount }}</strong>
+          <p>Dossiers nécessitant encore une validation humaine.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">En analyse</span>
+          <strong>{{ inAnalysisCount }}</strong>
+          <p>Dossiers actuellement en cours de traitement IA.</p>
+        </article>
+
+        <article class="stat-card stat-highlight">
+          <span class="stat-label">Approuvés / rejetés</span>
+          <strong>{{ approvedCount }}/{{ rejectedCount }}</strong>
+          <p>Décisions finales déjà traitées par le système ou un expert.</p>
+        </article>
+      </section>
+
+      <section class="claims-layout">
+        <div class="ins-card claims-card">
+          <div class="card-head">
+            <div>
+              <p class="card-kicker">Répertoire</p>
+              <h3>Liste des dossiers sinistres</h3>
+            </div>
+
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+
+              <input
+                type="text"
+                placeholder="Rechercher un dossier..."
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()"
+              />
+            </div>
+          </div>
+
+          @if (loading) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <span>Chargement des dossiers...</span>
+            </div>
+          }
+
+          @if (!loading && filteredClaims.length > 0) {
+            <div class="claims-grid">
+              @for (claim of filteredClaims; track claim.id) {
+                <article class="claim-item">
+                  <div class="claim-item-top">
+                    <div class="claim-main">
+                      <div class="claim-avatar">
+                        {{ getInitials(claim) }}
+                      </div>
+
+                      <div class="claim-copy">
+                        <h4>Dossier #{{ claim.id }}</h4>
+                        <p>{{ getClientFullName(claim) }}</p>
+                      </div>
+                    </div>
+
+                    <span class="status-pill" [ngClass]="getStatusClass(claim.status)">
+                      {{ formatStatus(claim.status) }}
+                    </span>
+                  </div>
+
+                  <div class="claim-description">
+                    {{ claim.description || 'Aucune description renseignée.' }}
+                  </div>
+
+                  <div class="claim-meta">
+                    <div class="meta-pill">
+                      <span>Type contrat</span>
+                      <strong>{{ claim.policy?.type || '—' }}</strong>
+                    </div>
+
+                    <div class="meta-pill">
+                      <span>Police</span>
+                      <strong>{{ claim.policy?.policyNumber || '—' }}</strong>
+                    </div>
+
+                    <div class="meta-pill">
+                      <span>Date incident</span>
+                      <strong>{{ claim.incidentDate | date:'dd/MM/yyyy' }}</strong>
+                    </div>
+
+                    <div class="meta-pill">
+                      <span>Créé le</span>
+                      <strong>{{ claim.createdAt | date:'dd/MM/yyyy' }}</strong>
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+
+          @if (!loading && filteredClaims.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">📂</div>
+              <h4>Aucun dossier trouvé</h4>
+              <p>Essaie avec une autre recherche ou recharge les données.</p>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

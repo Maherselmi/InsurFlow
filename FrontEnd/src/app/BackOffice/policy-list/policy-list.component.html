@@ -1,0 +1,198 @@
+<div class="dashboard-page">
+  <app-sidebar></app-sidebar>
+
+  <div class="dashboard-main">
+    <div class="dashboard-inner">
+      <app-topbar
+        [title]="'Polices d’assurance'"
+        [subtitle]="'Vue centralisée des contrats, garanties et échéances clients'"
+        (newClaim)="onNewClaim()">
+      </app-topbar>
+
+      <section class="stats-row">
+        <article class="stat-card">
+          <span class="stat-label">Total polices</span>
+          <strong>{{ policies.length }}</strong>
+          <p>Nombre total de contrats disponibles dans la plateforme.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">AUTO</span>
+          <strong>{{ getCountByType('AUTO') }}</strong>
+          <p>Contrats automobiles enregistrés.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">SANTÉ</span>
+          <strong>{{ getCountByType('SANTE') }}</strong>
+          <p>Contrats santé disponibles pour les clients.</p>
+        </article>
+
+        <article class="stat-card stat-highlight">
+          <span class="stat-label">Actives / expirées</span>
+          <strong>{{ activePoliciesCount }}/{{ expiredPoliciesCount }}</strong>
+          <p>Répartition des contrats encore valides et arrivés à échéance.</p>
+        </article>
+      </section>
+
+      <section class="policies-layout">
+        <div class="ins-card policies-card">
+          <div class="card-head">
+            <div>
+              <p class="card-kicker">Répertoire</p>
+              <h3>Liste des polices</h3>
+            </div>
+
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+
+              <input
+                type="text"
+                placeholder="Rechercher une police..."
+                [(ngModel)]="searchTerm"
+                (input)="onSearch()"
+              />
+            </div>
+          </div>
+
+          @if (loading) {
+            <div class="loading-state">
+              <div class="spinner"></div>
+              <span>Chargement des polices...</span>
+            </div>
+          }
+
+          @if (!loading && filtered.length > 0) {
+            <div class="policies-grid">
+              @for (policy of filtered; track policy.id) {
+                <article
+                  class="policy-item"
+                  (click)="selectPolicy(policy)"
+                  [class.policy-item-active]="selectedPolicy?.id === policy.id"
+                >
+                  <div class="policy-item-top">
+                    <div class="policy-main">
+                      <div class="policy-avatar">
+                        {{ getInitials(policy) }}
+                      </div>
+
+                      <div class="policy-copy">
+                        <h4>{{ policy.policyNumber }}</h4>
+                        <p>{{ getClientFullName(policy) }}</p>
+                      </div>
+                    </div>
+
+                    <span class="status-pill" [class.status-expired]="isExpired(policy.endDate)" [class.status-active]="!isExpired(policy.endDate)">
+                      {{ isExpired(policy.endDate) ? 'Expirée' : 'Active' }}
+                    </span>
+                  </div>
+
+                  <div class="policy-tags">
+                    <span class="type-pill" [ngClass]="getTypeBadgeClass(policy.type)">
+                      {{ policy.type || 'Type inconnu' }}
+                    </span>
+
+                    <span class="formula-pill">
+                      {{ policy.formule || 'Sans formule' }}
+                    </span>
+                  </div>
+
+                  <div class="policy-description">
+                    {{ getCoveragePreview(policy.coverageDetails) }}
+                  </div>
+
+                  <div class="policy-meta">
+                    <div class="meta-pill">
+                      <span>Produit</span>
+                      <strong>{{ policy.productCode || '—' }}</strong>
+                    </div>
+
+                    <div class="meta-pill">
+                      <span>Date début</span>
+                      <strong>{{ policy.startDate | date:'dd/MM/yyyy' }}</strong>
+                    </div>
+
+                    <div class="meta-pill">
+                      <span>Date fin</span>
+                      <strong>{{ policy.endDate | date:'dd/MM/yyyy' }}</strong>
+                    </div>
+
+                    <div class="meta-pill">
+                      <span>Email client</span>
+                      <strong>{{ policy.client?.email || '—' }}</strong>
+                    </div>
+                  </div>
+
+                  <div class="policy-expand">
+                    <span>{{ selectedPolicy?.id === policy.id ? 'Réduire' : 'Voir détails' }}</span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      [style.transform]="selectedPolicy?.id === policy.id ? 'rotate(90deg)' : 'rotate(0deg)'"
+                    >
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                  </div>
+
+                  @if (selectedPolicy?.id === policy.id) {
+                    <div class="policy-details">
+                      <div class="detail-grid">
+                        <div class="detail-item">
+                          <span class="detail-label">Numéro police</span>
+                          <span class="detail-value">{{ policy.policyNumber }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Type</span>
+                          <span class="detail-value">{{ policy.type || 'Non renseigné' }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Formule</span>
+                          <span class="detail-value">{{ policy.formule || 'Non renseignée' }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Product code</span>
+                          <span class="detail-value">{{ policy.productCode || 'Non renseigné' }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Client</span>
+                          <span class="detail-value">{{ getClientFullName(policy) }}</span>
+                        </div>
+
+                        <div class="detail-item">
+                          <span class="detail-label">Email</span>
+                          <span class="detail-value">{{ policy.client?.email || 'Non renseigné' }}</span>
+                        </div>
+                      </div>
+
+                      <div class="coverage-box">
+                        <span class="detail-label">Détails de couverture</span>
+                        <p>{{ policy.coverageDetails || 'Aucun détail disponible.' }}</p>
+                      </div>
+                    </div>
+                  }
+                </article>
+              }
+            </div>
+          }
+
+          @if (!loading && filtered.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">📜</div>
+              <h4>Aucune police trouvée</h4>
+              <p>Essaie avec une autre recherche ou recharge les données.</p>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Feedback expert sur les sinistres</h1>
+    <p>Sélectionnez un dossier existant pour remplir le QCM expert, ou traiter un dossier en attente de validation humaine.</p>
+  </div>
+
+  <div *ngIf="loading" class="state-card">Chargement des dossiers...</div>
+  <div *ngIf="errorMessage" class="state-card error">{{ errorMessage }}</div>
+
+  <div class="claims-grid" *ngIf="!loading && claims.length > 0">
+    <div class="claim-card" *ngFor="let claim of claims">
+      <div class="claim-top">
+        <div>
+          <h3>Dossier #{{ claim.id }}</h3>
+          <p>{{ claim.description }}</p>
+        </div>
+        <span class="status" [class.pending]="isPendingValidation(claim)">
+          {{ claim.status }}
+        </span>
+      </div>
+
+      <div class="claim-body">
+        <p><strong>Client :</strong> {{ getClientFullName(claim) }}</p>
+        <p><strong>Police :</strong> {{ claim.policy?.policyNumber || '-' }}</p>
+        <p><strong>Type :</strong> {{ claim.policy?.type || '-' }}</p>
+        <p><strong>Date incident :</strong> {{ claim.incidentDate | date:'dd/MM/yyyy' }}</p>
+      </div>
+
+      <div class="claim-actions">
+        <button (click)="openFeedback(claim.id)">
+          {{ isPendingValidation(claim) ? 'Traiter + feedback expert' : 'Remplir feedback expert' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && claims.length === 0" class="state-card">
+    Aucun dossier disponible.
+  </div>
+</div>

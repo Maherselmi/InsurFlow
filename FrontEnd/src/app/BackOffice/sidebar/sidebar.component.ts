@@ -33,7 +33,7 @@ export class SidebarComponent {
   ];
 
   configNavItems: NavItem[] = [
-    { label: 'Paramètres IA', icon: 'settings', route: '/parametres-ia' },
+    { label: 'Paramètres IA', icon: 'settings', route: '/ia_param' },
     { label: 'Déconnexion', icon: 'logout', route: '/logout' }
   ];
 

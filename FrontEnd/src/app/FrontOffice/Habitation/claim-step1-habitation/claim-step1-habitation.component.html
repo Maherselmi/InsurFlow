@@ -1,11 +1,20 @@
 <div class="claim-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
@@ -19,7 +28,7 @@
       </nav>
 
       <div class="header-chip">
-        <span class="chip-label">Déclaration</span>
+        <span class="chip-label">Déclaration habitation</span>
         <strong>Étape 1 / 3</strong>
       </div>
     </div>
@@ -27,18 +36,19 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
           <div class="hero-badge">Sinistre habitation</div>
 
           <h1>
             Déclarez votre sinistre habitation
-            <span>dans un parcours simple et guidé.</span>
+            <span>dans un parcours plus clair et plus premium.</span>
           </h1>
 
           <p class="hero-text">
-            Renseignez les informations essentielles concernant les dégâts matériels
-            afin de lancer la prise en charge de votre dossier habitation dans InSurFlow.
+            Renseignez les informations essentielles sur les dégâts matériels
+            pour lancer votre dossier habitation dans une expérience plus douce,
+            plus moderne et plus guidée.
           </p>
 
           <div class="hero-actions">
@@ -59,84 +69,89 @@
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Validation de police automatique</span>
+              <span>Vérification de la police</span>
             </div>
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Traitement rapide du dossier</span>
+              <span>Déclaration guidée</span>
             </div>
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Traitement habitation</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Traitement habitation</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>24/7</strong>
-              <span>Déclaration disponible</span>
-            </article>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>24/7</strong>
+                <span>Déclaration disponible</span>
+              </article>
 
-            <article class="mini-stat">
-              <strong>3</strong>
-              <span>Étapes guidées</span>
-            </article>
-          </div>
+              <article class="hero-mini-card">
+                <strong>3</strong>
+                <span>Étapes guidées</span>
+              </article>
+            </div>
 
-          <div class="hero-image">
-            <img src="assets/images/home-insurance.jpg" alt="Sinistre habitation" />
+            <div class="hero-visual">
+              <img src="assets/images/home-insurance.jpg" alt="Sinistre habitation" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="claim-layout">
-        <aside class="process-sidebar">
-          <div class="sidebar-card">
-            <p class="sidebar-title">Processus</p>
+      <section class="workspace-grid">
+        <aside class="left-column">
+          <div class="panel progress-panel">
+            <p class="panel-kicker">Progression</p>
 
             <div class="step-list">
-              <div class="step-item active">
-                <div class="step-num">1</div>
+              <div class="step-card active">
+                <div class="step-number">1</div>
                 <div>
-                  <div class="step-label">Informations</div>
-                  <div class="step-sublabel">Détails du sinistre</div>
+                  <h3>Informations</h3>
+                  <p>Détails du sinistre</p>
                 </div>
               </div>
 
-              <div class="step-item">
-                <div class="step-num">2</div>
+              <div class="step-card">
+                <div class="step-number">2</div>
                 <div>
-                  <div class="step-label">Justificatifs</div>
-                  <div class="step-sublabel">Photos & documents</div>
+                  <h3>Justificatifs</h3>
+                  <p>Photos & documents</p>
                 </div>
               </div>
 
-              <div class="step-item">
-                <div class="step-num">3</div>
+              <div class="step-card">
+                <div class="step-number">3</div>
                 <div>
-                  <div class="step-label">Confirmation</div>
-                  <div class="step-sublabel">Récapitulatif final</div>
+                  <h3>Confirmation</h3>
+                  <p>Récapitulatif final</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="sidebar-card support-card">
+          <div class="panel support-panel">
             <div class="support-icon">H</div>
-            <h3>Assistance habitation dédiée</h3>
-            <p>Un parcours pensé pour les dégâts matériels et la prise en charge rapide.</p>
+            <h2>Assistance habitation dédiée</h2>
+            <p>
+              Un parcours pensé pour les dégâts matériels, les incidents du logement
+              et la prise en charge rapide du dossier.
+            </p>
 
-            <ul class="support-list">
-              <li *ngFor="let tip of supportTips">
-                <strong>{{ tip.title }}</strong><br />
-                <span>{{ tip.text }}</span>
-              </li>
-            </ul>
+            <div class="tips-list">
+              <article class="tip-card" *ngFor="let tip of supportTips">
+                <h3>{{ tip.title }}</h3>
+                <p>{{ tip.text }}</p>
+              </article>
+            </div>
           </div>
         </aside>
 
-        <section class="form-section">
+        <section class="right-column">
           <div class="alert alert-error" *ngIf="errorMessage">
             <span>⚠</span>
             <span>{{ errorMessage }}</span>
@@ -147,16 +162,16 @@
             <span>{{ successMessage }}</span>
           </div>
 
-          <div class="form-card">
-            <div class="card-header">
-              <div class="card-icon">H</div>
+          <div class="panel form-panel">
+            <div class="form-head">
+              <div class="form-head-icon">H</div>
               <div>
                 <h2>Informations du sinistre habitation</h2>
-                <p>Renseignez les informations nécessaires pour lancer votre dossier habitation.</p>
+                <p>Complétez les éléments nécessaires pour lancer votre dossier habitation.</p>
               </div>
             </div>
 
-            <div class="card-body">
+            <div class="form-body">
               <div class="form-grid">
                 <div class="form-group full">
                   <label class="form-label">Police d’assurance habitation</label>
@@ -176,6 +191,10 @@
                       </option>
                     </select>
                     <span class="select-arrow">▼</span>
+                  </div>
+
+                  <div class="helper-text" *ngIf="!loadingPolicies && policies.length === 0">
+                    Aucune police habitation active n’a été trouvée pour ce parcours.
                   </div>
 
                   <div class="selected-policy" *ngIf="selectedPolicy">
@@ -245,19 +264,23 @@
                     rows="5"
                     placeholder="Décrivez les circonstances, les pièces touchées, les équipements endommagés et les éléments importants du sinistre."
                   ></textarea>
+
+                  <div class="helper-text">
+                    Conseil : précisez les pièces concernées, les biens touchés et l’origine probable du dommage.
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="card-footer">
+            <div class="form-footer">
               <div class="footer-note">
                 <span class="footer-bullet"></span>
-                <span>Étape 1 sur 3 — Informations sinistre habitation</span>
+                <span>Étape 1 sur 3 — Informations du sinistre habitation</span>
               </div>
 
               <button
                 type="button"
-                class="btn-primary"
+                class="submit-btn"
                 (click)="next()"
                 [disabled]="loading || loadingPolicies"
               >

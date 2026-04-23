@@ -2,10 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, SlicePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { forkJoin, of, switchMap } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { Claim, ClaimDocument } from '../../models/Claim/claim.model';
-import { ClaimValidationService, ReviewData } from '../../services/Claim Validation';
 import { ClaimService } from '../../services/claim.service';
+import { AgentResult, AgentResultService } from '../../services/agent-result.service';
+import { ExpertFeedbackService } from '../../services/expert-feedback.service';
+import {ClaimValidationService, ReviewData} from "../../services/Claim Validation";
+import {ExpertFeedbackRequest} from "../../models/expert-feedback.model";
 
 @Component({
   selector: 'app-claim-validation',
@@ -17,7 +22,7 @@ import { ClaimService } from '../../services/claim.service';
     FormsModule
   ],
   templateUrl: './claim-validation.component.html',
-  styleUrl: './claim-validation.component.css'
+  styleUrls: ['./claim-validation.component.css']
 })
 export class ClaimValidationComponent implements OnInit {
 
@@ -25,6 +30,7 @@ export class ClaimValidationComponent implements OnInit {
   selectedClaim: Claim | null = null;
   reviewData: ReviewData | null = null;
   claimDetails: Claim | null = null;
+  agentResults: AgentResult[] = [];
 
   loading = false;
   reviewLoading = false;
@@ -32,6 +38,35 @@ export class ClaimValidationComponent implements OnInit {
   actionType: 'approve' | 'reject' | null = null;
 
   gestionnairComment = '';
+
+  feedbackForm: ExpertFeedbackRequest = {
+    claimId: 0,
+    reviewedBy: '',
+    useForLearning: true,
+    globalComment: '',
+
+    predictedType: '',
+    routeurConfidence: 0,
+    routeurCorrect: null,
+    finalType: '',
+    routeurComment: '',
+
+    predictedDecision: '',
+    validationConfidence: 0,
+    validationCorrect: null,
+    finalDecision: '',
+    validationComment: '',
+
+    predictedEstimationMin: 0,
+    predictedEstimationMoyenne: 0,
+    predictedEstimationMax: 0,
+    estimateurConfidence: 0,
+    estimateEvaluation: 'CORRECTE',
+    finalEstimationMin: 0,
+    finalEstimationMoyenne: 0,
+    finalEstimationMax: 0,
+    estimateurComment: ''
+  };
 
   toast = {
     visible: false,
@@ -42,6 +77,8 @@ export class ClaimValidationComponent implements OnInit {
   constructor(
     private claimValidationService: ClaimValidationService,
     private claimService: ClaimService,
+    private agentResultService: AgentResultService,
+    private expertFeedbackService: ExpertFeedbackService,
     private sanitizer: DomSanitizer
   ) {}
 
@@ -67,91 +104,184 @@ export class ClaimValidationComponent implements OnInit {
     this.selectedClaim = claim;
     this.reviewData = null;
     this.claimDetails = null;
+    this.agentResults = [];
     this.gestionnairComment = '';
     this.reviewLoading = true;
 
-    let reviewDone = false;
-    let detailsDone = false;
+    this.resetFeedbackForm(claim.id);
 
-    const finish = () => {
-      if (reviewDone && detailsDone) {
+    forkJoin({
+      review: this.claimValidationService.getClaimReview(claim.id),
+      details: this.claimService.getClaimById(claim.id),
+      agentResults: this.agentResultService.getResultsByClaimId(claim.id),
+      existingFeedback: this.expertFeedbackService.getFeedbackByClaimId(claim.id).pipe(
+        catchError(() => of(null))
+      )
+    }).subscribe({
+      next: ({ review, details, agentResults, existingFeedback }) => {
+        this.reviewData = review;
+        this.claimDetails = details;
+        this.agentResults = agentResults || [];
+
+        this.prefillFromAgentResults(agentResults || []);
+
+        if (existingFeedback) {
+          this.prefillFromExistingFeedback(existingFeedback);
+        }
+
         this.reviewLoading = false;
-        console.log('reviewData =', this.reviewData);
-        console.log('claimDetails =', this.claimDetails);
-        console.log('documents =', this.claimDetails?.documents);
-      }
-    };
-
-    this.claimValidationService.getClaimReview(claim.id).subscribe({
-      next: (data) => {
-        this.reviewData = data;
-        reviewDone = true;
-        finish();
-      },
-      error: () => {
-        reviewDone = true;
-        finish();
-        this.showToast('Impossible de charger le rapport', 'error');
-      }
-    });
-
-    this.claimService.getClaimById(claim.id).subscribe({
-      next: (data) => {
-        this.claimDetails = data;
-        detailsDone = true;
-        finish();
       },
       error: (err) => {
-        console.error('Erreur getClaimById:', err);
-        detailsDone = true;
-        finish();
-        this.showToast('Impossible de charger les documents du dossier', 'error');
+        console.error(err);
+        this.reviewLoading = false;
+        this.showToast('Impossible de charger les données du dossier', 'error');
       }
     });
   }
 
   approveClaim(): void {
-    if (!this.selectedClaim || this.actionLoading) return;
-    this.actionLoading = true;
-    this.actionType = 'approve';
+    this.submitDecision('approve');
+  }
 
-    this.claimValidationService.approveClaim(this.selectedClaim.id, this.gestionnairComment).subscribe({
+  rejectClaim(): void {
+    this.submitDecision('reject');
+  }
+
+  private submitDecision(action: 'approve' | 'reject'): void {
+    if (!this.selectedClaim || this.actionLoading) return;
+
+    this.actionLoading = true;
+    this.actionType = action;
+
+    this.feedbackForm.claimId = this.selectedClaim.id;
+    this.feedbackForm.globalComment = this.gestionnairComment;
+
+    this.expertFeedbackService.saveFeedback(this.feedbackForm).pipe(
+      switchMap(() => {
+        if (action === 'approve') {
+          return this.claimValidationService.approveClaim(this.selectedClaim!.id, this.gestionnairComment);
+        }
+        return this.claimValidationService.rejectClaim(this.selectedClaim!.id, this.gestionnairComment);
+      })
+    ).subscribe({
       next: (res) => {
-        this.showToast(`Dossier #${res.claimId} approuvé avec succès`, 'success');
+        this.showToast(
+          action === 'approve'
+            ? `Dossier #${res.claimId} approuvé avec feedback enregistré`
+            : `Dossier #${res.claimId} rejeté avec feedback enregistré`,
+          'success'
+        );
+
         this.removeClaim(this.selectedClaim!.id);
         this.selectedClaim = null;
         this.claimDetails = null;
+        this.reviewData = null;
+        this.agentResults = [];
         this.actionLoading = false;
         this.actionType = null;
       },
-      error: () => {
-        this.showToast("Erreur lors de l'approbation", 'error');
+      error: (err) => {
+        console.error(err);
+        this.showToast("Erreur lors de l'enregistrement de la revue expert", 'error');
         this.actionLoading = false;
         this.actionType = null;
       }
     });
   }
 
-  rejectClaim(): void {
-    if (!this.selectedClaim || this.actionLoading) return;
-    this.actionLoading = true;
-    this.actionType = 'reject';
+  private prefillFromAgentResults(results: AgentResult[]): void {
+    const routeur = results.find(r => r.agentName === 'AgentRouteur');
+    const validateur = results.find(r => r.agentName === 'AgentValidateur');
+    const estimateur = results.find(r => r.agentName === 'AgentEstimateur');
 
-    this.claimValidationService.rejectClaim(this.selectedClaim.id, this.gestionnairComment).subscribe({
-      next: (res) => {
-        this.showToast(`Dossier #${res.claimId} rejeté`, 'success');
-        this.removeClaim(this.selectedClaim!.id);
-        this.selectedClaim = null;
-        this.claimDetails = null;
-        this.actionLoading = false;
-        this.actionType = null;
-      },
-      error: () => {
-        this.showToast('Erreur lors du rejet', 'error');
-        this.actionLoading = false;
-        this.actionType = null;
-      }
-    });
+    const routeurJson = this.safeParseJson(routeur?.rawLlmResponse);
+    const validateurJson = this.safeParseJson(validateur?.rawLlmResponse);
+    const estimateurJson = this.safeParseJson(estimateur?.rawLlmResponse);
+
+    this.feedbackForm.predictedType = routeurJson?.type || '';
+    this.feedbackForm.routeurConfidence = routeurJson?.confidence || routeur?.confidenceScore || 0;
+    this.feedbackForm.finalType = routeurJson?.type || '';
+
+    this.feedbackForm.predictedDecision = validateurJson?.decision || validateur?.conclusion || '';
+    this.feedbackForm.validationConfidence = validateurJson?.confidence || validateur?.confidenceScore || 0;
+    this.feedbackForm.finalDecision = validateurJson?.decision || validateur?.conclusion || '';
+
+    this.feedbackForm.predictedEstimationMin = estimateurJson?.estimationMin || 0;
+    this.feedbackForm.predictedEstimationMoyenne = estimateurJson?.estimationMoyenne || 0;
+    this.feedbackForm.predictedEstimationMax = estimateurJson?.estimationMax || 0;
+    this.feedbackForm.estimateurConfidence = estimateurJson?.confidence || estimateur?.confidenceScore || 0;
+
+    this.feedbackForm.finalEstimationMin = this.feedbackForm.predictedEstimationMin;
+    this.feedbackForm.finalEstimationMoyenne = this.feedbackForm.predictedEstimationMoyenne;
+    this.feedbackForm.finalEstimationMax = this.feedbackForm.predictedEstimationMax;
+  }
+
+  private prefillFromExistingFeedback(feedback: any): void {
+    this.feedbackForm.reviewedBy = feedback.reviewedBy || '';
+    this.feedbackForm.useForLearning = feedback.useForLearning ?? true;
+    this.feedbackForm.globalComment = feedback.globalComment || '';
+
+    this.feedbackForm.predictedType = feedback.predictedType || '';
+    this.feedbackForm.routeurConfidence = feedback.routeurConfidence || 0;
+    this.feedbackForm.routeurCorrect = feedback.routeurCorrect;
+    this.feedbackForm.finalType = feedback.finalType || '';
+    this.feedbackForm.routeurComment = feedback.routeurComment || '';
+
+    this.feedbackForm.predictedDecision = feedback.predictedDecision || '';
+    this.feedbackForm.validationConfidence = feedback.validationConfidence || 0;
+    this.feedbackForm.validationCorrect = feedback.validationCorrect;
+    this.feedbackForm.finalDecision = feedback.finalDecision || '';
+    this.feedbackForm.validationComment = feedback.validationComment || '';
+
+    this.feedbackForm.predictedEstimationMin = feedback.predictedEstimationMin || 0;
+    this.feedbackForm.predictedEstimationMoyenne = feedback.predictedEstimationMoyenne || 0;
+    this.feedbackForm.predictedEstimationMax = feedback.predictedEstimationMax || 0;
+    this.feedbackForm.estimateurConfidence = feedback.estimateurConfidence || 0;
+    this.feedbackForm.estimateEvaluation = feedback.estimateEvaluation || 'CORRECTE';
+    this.feedbackForm.finalEstimationMin = feedback.finalEstimationMin || 0;
+    this.feedbackForm.finalEstimationMoyenne = feedback.finalEstimationMoyenne || 0;
+    this.feedbackForm.finalEstimationMax = feedback.finalEstimationMax || 0;
+    this.feedbackForm.estimateurComment = feedback.estimateurComment || '';
+  }
+
+  private resetFeedbackForm(claimId: number): void {
+    this.feedbackForm = {
+      claimId,
+      reviewedBy: '',
+      useForLearning: true,
+      globalComment: '',
+
+      predictedType: '',
+      routeurConfidence: 0,
+      routeurCorrect: null,
+      finalType: '',
+      routeurComment: '',
+
+      predictedDecision: '',
+      validationConfidence: 0,
+      validationCorrect: null,
+      finalDecision: '',
+      validationComment: '',
+
+      predictedEstimationMin: 0,
+      predictedEstimationMoyenne: 0,
+      predictedEstimationMax: 0,
+      estimateurConfidence: 0,
+      estimateEvaluation: 'CORRECTE',
+      finalEstimationMin: 0,
+      finalEstimationMoyenne: 0,
+      finalEstimationMax: 0,
+      estimateurComment: ''
+    };
+  }
+
+  private safeParseJson(value?: string): any {
+    if (!value) return null;
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
   }
 
   closePanel(event: MouseEvent): void {
@@ -174,14 +304,12 @@ export class ClaimValidationComponent implements OnInit {
     );
   }
 
-
   buildFileUrl(filePath: string): string {
     if (!filePath) return '';
     const normalized = filePath.replace(/\\/g, '/');
     const fileName = normalized.split('/').pop();
     return `http://localhost:8080/uploads/${fileName}`;
   }
-
 
   getSafePdfUrl(filePath: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.buildFileUrl(filePath));
@@ -195,5 +323,4 @@ export class ClaimValidationComponent implements OnInit {
     this.toast = { visible: true, message, type };
     setTimeout(() => this.toast.visible = false, 3500);
   }
-
 }

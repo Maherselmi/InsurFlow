@@ -42,16 +42,16 @@ export class ClaimStep1HabitationComponent implements OnInit {
 
   supportTips: SupportTip[] = [
     {
-      title: 'Décrivez les dégâts',
-      text: 'Indiquez les pièces concernées, les éléments touchés et l’étendue des dommages.'
+      title: 'Décrivez précisément les dégâts',
+      text: 'Indiquez les pièces touchées, les objets endommagés et l’étendue du sinistre.'
     },
     {
-      title: 'Choisissez la bonne police',
-      text: 'Votre contrat habitation est vérifié avant de passer à l’étape suivante.'
+      title: 'Sélectionnez la bonne police',
+      text: 'Votre contrat habitation est vérifié avant le passage à l’étape suivante.'
     },
     {
       title: 'Lancez rapidement le dossier',
-      text: 'Une saisie claire au départ facilite le traitement du sinistre.'
+      text: 'Une saisie claire dès le départ facilite l’analyse et la prise en charge.'
     }
   ];
 
@@ -123,7 +123,7 @@ export class ClaimStep1HabitationComponent implements OnInit {
     this.successMessage = '';
 
     this.selectedPolicy =
-      this.policies.find(p => p.id === Number(this.claim.policyId)) || null;
+      this.policies.find((p) => p.id === Number(this.claim.policyId)) || null;
 
     if (!this.selectedPolicy) {
       this.claim.clientId = null;

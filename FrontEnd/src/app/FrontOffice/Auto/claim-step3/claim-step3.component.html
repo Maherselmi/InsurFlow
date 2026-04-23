@@ -1,11 +1,20 @@
 <div class="claim-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
@@ -19,7 +28,7 @@
       </nav>
 
       <div class="header-chip">
-        <span class="chip-label">Déclaration</span>
+        <span class="chip-label">Déclaration auto</span>
         <strong>Étape 3 / 3</strong>
       </div>
     </div>
@@ -27,7 +36,7 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
           <div class="hero-badge">Confirmation du dossier</div>
 
@@ -39,7 +48,7 @@
           <p class="hero-text">
             Votre déclaration a été transmise avec succès. Le dossier passe
             maintenant en phase d’analyse et de traitement dans votre espace
-            InSurFlow.
+            InSurFlow, dans une expérience plus claire et plus premium.
           </p>
 
           <div class="hero-points">
@@ -55,67 +64,69 @@
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Traitement en cours</span>
+              <span>Traitement maintenant lancé</span>
             </div>
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Référence dossier</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Référence dossier</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>✓</strong>
-              <span>Dossier transmis</span>
-            </article>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>✓</strong>
+                <span>Dossier transmis</span>
+              </article>
 
-            <article class="mini-stat">
-              <strong>72h</strong>
-              <span>Traitement cible</span>
-            </article>
-          </div>
+              <article class="hero-mini-card">
+                <strong>72h</strong>
+                <span>Délai cible</span>
+              </article>
+            </div>
 
-          <div class="hero-image">
-            <img src="assets/images/demarche-auto.jpg" alt="Confirmation sinistre auto" />
+            <div class="hero-visual">
+              <img src="assets/images/demarche-auto.jpg" alt="Confirmation sinistre automobile" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="claim-layout">
-        <aside class="process-sidebar">
-          <div class="sidebar-card">
-            <p class="sidebar-title">Progression</p>
+      <section class="workspace-grid">
+        <aside class="left-column">
+          <div class="panel progress-panel">
+            <p class="panel-kicker">Progression</p>
 
             <div class="step-list">
-              <div class="step-item done">
-                <div class="step-num">✓</div>
+              <div class="step-card done">
+                <div class="step-number">✓</div>
                 <div>
-                  <div class="step-label">Informations</div>
-                  <div class="step-sublabel">Détails du sinistre</div>
+                  <h3>Informations</h3>
+                  <p>Détails du sinistre validés</p>
                 </div>
               </div>
 
-              <div class="step-item done">
-                <div class="step-num">✓</div>
+              <div class="step-card done">
+                <div class="step-number">✓</div>
                 <div>
-                  <div class="step-label">Justificatifs</div>
-                  <div class="step-sublabel">Photos & documents</div>
+                  <h3>Justificatifs</h3>
+                  <p>Photos & documents reçus</p>
                 </div>
               </div>
 
-              <div class="step-item active">
-                <div class="step-num">3</div>
+              <div class="step-card active">
+                <div class="step-number">3</div>
                 <div>
-                  <div class="step-label">Confirmation</div>
-                  <div class="step-sublabel">Récapitulatif final</div>
+                  <h3>Confirmation</h3>
+                  <p>Récapitulatif final</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="sidebar-card support-card">
+          <div class="panel support-panel">
             <div class="support-icon">✓</div>
-            <h3>Expertise auto InSurFlow</h3>
+            <h2>Traitement auto InSurFlow</h2>
             <p>
               Votre dossier suit maintenant le circuit d’analyse de votre sinistre
               automobile avec un suivi centralisé dans votre espace client.
@@ -129,10 +140,36 @@
               <li>Validation finale du traitement</li>
             </ul>
           </div>
+
+          <div class="panel summary-panel">
+            <p class="panel-kicker">Résumé</p>
+
+            <div class="summary-grid">
+              <article class="summary-card">
+                <span>Référence</span>
+                <strong>{{ reference }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Statut</span>
+                <strong>Transmis</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Étape</span>
+                <strong>3 / 3</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Suivi</span>
+                <strong>Espace client</strong>
+              </article>
+            </div>
+          </div>
         </aside>
 
-        <section class="content-section">
-          <div class="success-card">
+        <section class="right-column">
+          <div class="panel success-panel">
             <div class="success-top">
               <div class="success-icon">✓</div>
 
@@ -179,8 +216,8 @@
               <h3>Prochaines étapes</h3>
 
               <div class="steps-grid">
-                <div class="step-card" *ngFor="let step of nextSteps">
-                  <span class="step-card-icon">{{ step.id }}</span>
+                <div class="mini-step-card" *ngFor="let step of nextSteps">
+                  <span class="mini-step-icon">{{ step.id }}</span>
                   <div>
                     <strong>{{ step.title }}</strong>
                     <p>{{ step.text }}</p>
@@ -197,15 +234,15 @@
             </div>
 
             <div class="actions-row">
-              <button class="btn-secondary" type="button" (click)="goToClaimsHome()">
+              <button class="btn btn-secondary" type="button" (click)="goToClaimsHome()">
                 Retour aux sinistres
               </button>
 
-              <button class="btn-light" type="button" (click)="goToMyFiles()">
+              <button class="btn btn-light" type="button" (click)="goToMyFiles()">
                 Voir mes dossiers
               </button>
 
-              <button class="btn-primary" type="button" (click)="newClaim()">
+              <button class="btn btn-primary" type="button" (click)="newClaim()">
                 Déclarer un nouveau sinistre
               </button>
             </div>

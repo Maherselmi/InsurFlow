@@ -24,6 +24,13 @@ interface BenefitItem {
   text: string;
 }
 
+interface ProcessStep {
+  id: string;
+  title: string;
+  text: string;
+  icon: 'edit' | 'upload' | 'follow';
+}
+
 @Component({
   selector: 'app-claims-home',
   standalone: true,
@@ -84,13 +91,34 @@ export class ClaimsHomeComponent implements OnInit {
     }
   ];
 
+  processSteps: ProcessStep[] = [
+    {
+      id: '01',
+      title: 'Choisissez votre type de sinistre',
+      text: 'Sélectionnez auto, santé ou habitation pour démarrer le bon parcours de déclaration.',
+      icon: 'edit'
+    },
+    {
+      id: '02',
+      title: 'Ajoutez vos pièces et justificatifs',
+      text: 'Déposez vos documents, photos et informations utiles dans le même espace.',
+      icon: 'upload'
+    },
+    {
+      id: '03',
+      title: 'Suivez l’avancement du dossier',
+      text: 'Consultez les décisions, rapports et évolutions de traitement à chaque étape.',
+      icon: 'follow'
+    }
+  ];
+
   client: Client | null = null;
   loadingProfile = true;
 
   constructor(
-      private router: Router,
-      private authService: AuthService,
-      private clientService: ClientService
+    private router: Router,
+    private authService: AuthService,
+    private clientService: ClientService
   ) {}
 
   ngOnInit(): void {
@@ -113,7 +141,7 @@ export class ClaimsHomeComponent implements OnInit {
     this.clientService.getAllClients().subscribe({
       next: (clients) => {
         const found = clients.find(
-            (c) => c.email?.toLowerCase() === email.toLowerCase()
+          (c) => c.email?.toLowerCase() === email.toLowerCase()
         );
 
         this.client = found ?? null;

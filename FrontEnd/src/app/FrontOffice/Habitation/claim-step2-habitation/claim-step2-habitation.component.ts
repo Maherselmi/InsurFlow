@@ -116,7 +116,7 @@ export class ClaimStep2HabitationComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    newFiles.forEach(file => {
+    newFiles.forEach((file) => {
       if (!allowed.includes(file.type)) {
         this.errorMessage = 'Seuls les fichiers JPG, PNG et PDF sont autorisés.';
         return;
@@ -128,7 +128,7 @@ export class ClaimStep2HabitationComponent implements OnInit {
       }
 
       const alreadyExists = this.files.some(
-        f =>
+        (f) =>
           f.name === file.name &&
           f.size === file.size &&
           f.lastModified === file.lastModified
@@ -167,6 +167,7 @@ export class ClaimStep2HabitationComponent implements OnInit {
     if (bytes < 1024 * 1024) {
       return (bytes / 1024).toFixed(1) + ' Ko';
     }
+
     return (bytes / (1024 * 1024)).toFixed(1) + ' Mo';
   }
 
@@ -205,7 +206,7 @@ export class ClaimStep2HabitationComponent implements OnInit {
 
     let completed = 0;
 
-    this.files.forEach(file => {
+    this.files.forEach((file) => {
       this.claimService.uploadDocument(this.claimId, file).subscribe({
         next: () => {
           completed++;

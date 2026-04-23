@@ -1,22 +1,34 @@
 <div class="claim-page">
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
+
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
-          [class.active]="item.label === 'Sinistres'"
+          [class.active]="isActiveNav(item.route)"
         >
           {{ item.label }}
         </a>
       </nav>
 
       <div class="header-chip">
-        <span class="chip-label">Déclaration</span>
+        <span class="chip-label">Déclaration santé</span>
         <strong>Étape 3 / 3</strong>
       </div>
     </div>
@@ -24,18 +36,19 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
-          <p class="eyebrow">Confirmation du dossier santé</p>
+          <div class="hero-badge">Confirmation du dossier santé</div>
 
           <h1>
             Votre dossier santé est bien enregistré
-            <span>et en attente de validation.</span>
+            <span>et prêt pour validation.</span>
           </h1>
 
           <p class="hero-text">
-            Votre déclaration médicale a été transmise avec succès.
-            Les documents fournis seront analysés afin de lancer la prise en charge.
+            Votre déclaration médicale a été transmise avec succès. Les documents
+            fournis vont maintenant être analysés afin de lancer la prise en charge
+            dans votre espace InSurFlow.
           </p>
 
           <div class="hero-points">
@@ -56,84 +69,116 @@
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Référence dossier santé</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Référence dossier santé</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>✓</strong>
-              <span>Dossier transmis</span>
-            </article>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>✓</strong>
+                <span>Dossier transmis</span>
+              </article>
 
-            <article class="mini-stat">
-              <strong>24h</strong>
-              <span>Validation cible</span>
-            </article>
-          </div>
+              <article class="hero-mini-card">
+                <strong>24h</strong>
+                <span>Validation cible</span>
+              </article>
+            </div>
 
-          <div class="hero-image">
-            <img src="assets/images/health-insurance.jpg" alt="Confirmation dossier santé" />
+            <div class="hero-visual">
+              <img src="assets/images/health-insurance.jpg" alt="Confirmation dossier santé" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="claim-layout">
-        <aside class="process-sidebar">
-          <div class="sidebar-card">
-            <p class="sidebar-title">Processus</p>
+      <section class="workspace-grid">
+        <aside class="left-column">
+          <div class="panel progress-panel">
+            <p class="panel-kicker">Progression</p>
 
-            <div class="step-list">
-              <div class="step-item done">
-                <div class="step-num">✓</div>
+            <div class="process-list">
+              <div class="process-item done">
+                <div class="process-number">✓</div>
                 <div>
-                  <div class="step-label">Informations</div>
-                  <div class="step-sublabel">Détails du sinistre</div>
+                  <h3>Informations</h3>
+                  <p>Détails du dossier</p>
                 </div>
               </div>
 
-              <div class="step-item done">
-                <div class="step-num">✓</div>
+              <div class="process-item done">
+                <div class="process-number">✓</div>
                 <div>
-                  <div class="step-label">Justificatifs</div>
-                  <div class="step-sublabel">Ordonnances & documents</div>
+                  <h3>Justificatifs</h3>
+                  <p>Ordonnances & documents</p>
                 </div>
               </div>
 
-              <div class="step-item active">
-                <div class="step-num">3</div>
+              <div class="process-item active">
+                <div class="process-number">3</div>
                 <div>
-                  <div class="step-label">Confirmation</div>
-                  <div class="step-sublabel">Récapitulatif final</div>
+                  <h3>Confirmation</h3>
+                  <p>Récapitulatif final</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="sidebar-card support-card">
+          <div class="panel support-panel">
             <div class="support-icon">S</div>
-            <h3>Prise en charge santé</h3>
-            <p>Votre dossier médical suit maintenant le circuit de validation InSurFlow.</p>
+            <h2>Prise en charge santé</h2>
+            <p>
+              Votre dossier médical suit maintenant le circuit de validation
+              InSurFlow avec un suivi centralisé dans votre espace client.
+            </p>
 
             <ul class="support-list">
               <li>Validation du dossier sous 24h</li>
               <li>Étude des justificatifs médicaux</li>
-              <li>Prise en charge du remboursement</li>
+              <li>Vérification de la couverture santé</li>
               <li>Suivi disponible dans votre espace</li>
-              <li>Mise à jour en temps réel</li>
+              <li>Mise à jour de l’avancement en temps réel</li>
             </ul>
+          </div>
+
+          <div class="panel summary-panel">
+            <p class="panel-kicker">Résumé</p>
+
+            <div class="summary-grid">
+              <article class="summary-card">
+                <span>Référence</span>
+                <strong>{{ reference }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Statut</span>
+                <strong>Transmis</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Étape</span>
+                <strong>3 / 3</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Suivi</span>
+                <strong>Espace client</strong>
+              </article>
+            </div>
           </div>
         </aside>
 
-        <section class="content-section">
-          <div class="success-card">
+        <section class="right-column">
+          <div class="panel success-panel">
             <div class="success-top">
               <div class="success-icon">✓</div>
 
               <div class="success-head">
                 <h2>Dossier médical soumis avec succès</h2>
                 <p>
-                  Votre demande de prise en charge santé a été transmise à notre service médical.
-                  Un conseiller analysera vos documents dans les meilleurs délais.
+                  Votre demande de prise en charge santé a été transmise à notre
+                  service médical. Un conseiller analysera vos documents dans les
+                  meilleurs délais.
                 </p>
               </div>
             </div>
@@ -171,28 +216,12 @@
             <div class="next-steps-card">
               <h3>Prochaines étapes</h3>
 
-              <div class="steps-grid">
-                <div class="step-card">
-                  <span class="step-card-icon">1</span>
+              <div class="next-steps-grid">
+                <div class="next-step-card" *ngFor="let step of nextSteps">
+                  <span class="next-step-icon">{{ step.id }}</span>
                   <div>
-                    <strong>Validation médicale</strong>
-                    <p>Analyse des informations et justificatifs transmis.</p>
-                  </div>
-                </div>
-
-                <div class="step-card">
-                  <span class="step-card-icon">2</span>
-                  <div>
-                    <strong>Prise en charge</strong>
-                    <p>Étude de remboursement et traitement du dossier santé.</p>
-                  </div>
-                </div>
-
-                <div class="step-card">
-                  <span class="step-card-icon">3</span>
-                  <div>
-                    <strong>Suivi dans votre espace</strong>
-                    <p>Consultez l’avancement depuis vos dossiers InSurFlow.</p>
+                    <strong>{{ step.title }}</strong>
+                    <p>{{ step.text }}</p>
                   </div>
                 </div>
               </div>
@@ -200,21 +229,22 @@
 
             <div class="contact-card">
               <p class="contact-line">
-                Une question sur votre prise en charge ? Consultez votre espace client
-                ou votre suivi de dossiers pour voir les prochaines mises à jour.
+                Une question sur votre prise en charge ? Consultez votre espace
+                client ou votre suivi de dossiers pour voir les prochaines mises
+                à jour.
               </p>
             </div>
 
             <div class="actions-row">
-              <button class="btn-secondary" type="button" (click)="goToSinistre()">
+              <button class="btn btn-secondary" type="button" (click)="goToClaimsHome()">
                 Retour aux sinistres
               </button>
 
-              <button class="btn-light" type="button" (click)="goToDecisions()">
+              <button class="btn btn-light" type="button" (click)="goToMyFiles()">
                 Voir mes dossiers
               </button>
 
-              <button class="btn-primary" type="button" (click)="newClaim()">
+              <button class="btn btn-primary" type="button" (click)="newClaim()">
                 Déclarer un nouveau sinistre santé
               </button>
             </div>

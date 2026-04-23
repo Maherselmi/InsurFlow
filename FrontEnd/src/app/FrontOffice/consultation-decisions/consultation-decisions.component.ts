@@ -74,6 +74,28 @@ export class ConsultationDecisionsComponent implements OnInit {
     return this.claims.filter(claim => claim.status === 'CLOSED').length;
   }
 
+  get sortedClaims(): Claim[] {
+    return [...this.claims].sort((a, b) => {
+      const order = ['PENDING_VALIDATION', 'IN_ANALYSIS', 'SUBMITTED', 'APPROVED', 'REJECTED', 'CLOSED'];
+
+      const aIndex = order.indexOf(a.status || '');
+      const bIndex = order.indexOf(b.status || '');
+
+      if (aIndex !== bIndex) {
+        return aIndex - bIndex;
+      }
+
+      const aDate = new Date(a.createdAt || '').getTime();
+      const bDate = new Date(b.createdAt || '').getTime();
+
+      if (isNaN(aDate) && isNaN(bDate)) return 0;
+      if (isNaN(aDate)) return 1;
+      if (isNaN(bDate)) return -1;
+
+      return bDate - aDate;
+    });
+  }
+
   formatStatus(status: string): string {
     const map: Record<string, string> = {
       SUBMITTED: 'Soumis',
@@ -91,23 +113,17 @@ export class ConsultationDecisionsComponent implements OnInit {
     switch (status) {
       case 'APPROVED':
         return 'approved';
-
       case 'REJECTED':
         return 'rejected';
-
       case 'PENDING_VALIDATION':
       case 'IN_ANALYSIS':
         return 'pending';
-
       case 'CLOSED':
         return 'closed';
-
       default:
         return 'submitted';
     }
   }
-
-
 
   getClientFullName(claim: Claim): string {
     const firstName = claim.policy?.client?.firstName || '';
@@ -115,6 +131,21 @@ export class ConsultationDecisionsComponent implements OnInit {
     const fullName = `${firstName} ${lastName}`.trim();
 
     return fullName || 'Client non renseigné';
+  }
+
+  getClaimTone(claim: Claim): string {
+    const type = (claim.policy?.type || '').toUpperCase();
+
+    switch (type) {
+      case 'AUTO':
+        return 'tone-auto';
+      case 'SANTE':
+        return 'tone-health';
+      case 'HABITATION':
+        return 'tone-home';
+      default:
+        return 'tone-default';
+    }
   }
 
   goToReport(claim: Claim): void {

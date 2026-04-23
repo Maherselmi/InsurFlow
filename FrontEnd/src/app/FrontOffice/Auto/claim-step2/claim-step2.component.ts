@@ -61,9 +61,9 @@ export class ClaimStep2Component implements OnInit {
   uploadProgress = 0;
 
   constructor(
-      private claimService: ClaimService,
-      private router: Router,
-      @Inject(PLATFORM_ID) private platformId: Object
+    private claimService: ClaimService,
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
@@ -85,10 +85,10 @@ export class ClaimStep2Component implements OnInit {
 
     if (route === '/Claim_Home') {
       return (
-          currentUrl.startsWith('/Claim_Home') ||
-          currentUrl.startsWith('/claim') ||
-          currentUrl.startsWith('/Sante') ||
-          currentUrl.startsWith('/Habitation')
+        currentUrl.startsWith('/Claim_Home') ||
+        currentUrl.startsWith('/claim') ||
+        currentUrl.startsWith('/Sante') ||
+        currentUrl.startsWith('/Habitation')
       );
     }
 
@@ -130,10 +130,10 @@ export class ClaimStep2Component implements OnInit {
       }
 
       const alreadyExists = this.files.some(
-          (f) =>
-              f.name === file.name &&
-              f.size === file.size &&
-              f.lastModified === file.lastModified
+        (f) =>
+          f.name === file.name &&
+          f.size === file.size &&
+          f.lastModified === file.lastModified
       );
 
       if (!alreadyExists) {
@@ -228,7 +228,7 @@ export class ClaimStep2Component implements OnInit {
               error: (err) => {
                 this.loading = false;
                 this.errorMessage =
-                    `Erreur traitement : ${err?.message || 'Erreur inconnue.'}`;
+                  `Erreur traitement : ${err?.message || 'Erreur inconnue.'}`;
                 console.error('Erreur orchestrateur :', err);
               }
             });
@@ -237,7 +237,7 @@ export class ClaimStep2Component implements OnInit {
         error: (err) => {
           this.loading = false;
           this.errorMessage =
-              `Erreur upload : ${err?.message || 'Erreur inconnue.'}`;
+            `Erreur upload : ${err?.message || 'Erreur inconnue.'}`;
           console.error('Erreur upload :', err);
         }
       });

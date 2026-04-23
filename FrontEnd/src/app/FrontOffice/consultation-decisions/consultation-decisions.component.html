@@ -1,11 +1,20 @@
 <div class="claims-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
@@ -26,84 +35,94 @@
 
   <main class="claims-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
-          <p class="eyebrow">Suivi des dossiers</p>
+          <div class="hero-badge">Suivi premium des dossiers</div>
 
           <h1>
             Consultez vos sinistres
-            <span>dans un espace clair et moderne.</span>
+            <span>dans un espace plus clair et plus élégant.</span>
           </h1>
 
           <p class="hero-text">
-            Retrouvez tous vos dossiers, leur statut d’avancement et les rapports
-            associés dans une interface premium pensée dans le style InSurFlow.
+            Retrouvez vos dossiers, leur avancement, leurs décisions et leurs rapports
+            dans une interface plus lumineuse, cohérente avec l’univers InSurFlow.
           </p>
 
           <div class="hero-actions">
-            <button class="btn-primary" type="button" (click)="goToDecisions()">
+            <button class="btn btn-primary" type="button" (click)="goToDecisions()">
               Voir mes dossiers
             </button>
 
-            <button class="btn-secondary" type="button" (click)="goToPolice()">
+            <button class="btn btn-secondary" type="button" (click)="goToPolice()">
               Voir mes polices
             </button>
 
-            <button class="btn-secondary" type="button" (click)="goToClaimsHome()">
+            <button class="btn btn-ghost" type="button" (click)="goToClaimsHome()">
               Déclarer un sinistre
             </button>
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Vue d’ensemble</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-top">
+              <div class="hero-panel-kicker">Vue synthétique</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>{{ totalClaims }}</strong>
-              <span>Dossiers totaux</span>
-            </article>
+              <div class="hero-mini-grid">
+                <article class="hero-mini-card">
+                  <strong>{{ totalClaims }}</strong>
+                  <span>Dossiers totaux</span>
+                </article>
 
-            <article class="mini-stat">
-              <strong>{{ pendingClaims }}</strong>
-              <span>En cours</span>
-            </article>
-          </div>
+                <article class="hero-mini-card">
+                  <strong>{{ pendingClaims }}</strong>
+                  <span>En cours</span>
+                </article>
+              </div>
+            </div>
 
-          <div class="hero-image">
-            <img src="../../../assets/images/demarche-decision.jpg" alt="Suivi des sinistres" />
+            <div class="hero-panel-bottom">
+              <div class="hero-visual">
+                <img src="../../../assets/images/demarche-decision.jpg" alt="Suivi des dossiers InSurFlow" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="stats-grid" *ngIf="!loading">
+      <section class="stats-row" *ngIf="!loading">
         <article class="stat-card">
           <span class="stat-label">Total dossiers</span>
           <strong>{{ totalClaims }}</strong>
+          <p>Nombre total de dossiers visibles dans votre espace client.</p>
         </article>
 
         <article class="stat-card">
           <span class="stat-label">Approuvés</span>
           <strong>{{ approvedClaims }}</strong>
+          <p>Dossiers validés et prêts à être consultés en détail.</p>
         </article>
 
         <article class="stat-card">
           <span class="stat-label">En attente / analyse</span>
           <strong>{{ pendingClaims }}</strong>
+          <p>Dossiers encore en traitement ou en revue.</p>
         </article>
 
-        <article class="stat-card">
+        <article class="stat-card stat-highlight">
           <span class="stat-label">Rejetés / clôturés</span>
           <strong>{{ rejectedClaims + closedClaims }}</strong>
+          <p>Dossiers finalisés ou fermés dans votre historique.</p>
         </article>
       </section>
 
-      <div class="loading-state" *ngIf="loading">
+      <div class="loading-shell" *ngIf="loading">
         <div class="loader"></div>
         <p>Chargement des dossiers...</p>
       </div>
 
-      <section class="claims-section" *ngIf="!loading && claims.length > 0">
+      <section class="claims-section" *ngIf="!loading && sortedClaims.length > 0">
         <div class="section-head">
           <div>
             <p class="section-kicker">Mes dossiers</p>
@@ -112,10 +131,19 @@
         </div>
 
         <div class="claims-grid">
-          <article class="claim-card" *ngFor="let claim of claims">
-            <div class="claim-card-top">
-              <div class="claim-icon">
-                {{ claim.id }}
+          <article
+            class="claim-card"
+            *ngFor="let claim of sortedClaims"
+            [ngClass]="getClaimTone(claim)"
+          >
+            <div class="claim-top">
+              <div class="claim-id-block">
+                <div class="claim-icon">#{{ claim.id }}</div>
+
+                <div class="claim-title-wrap">
+                  <h3>{{ claim.description || 'Sinistre sans description' }}</h3>
+                  <p>{{ getClientFullName(claim) }}</p>
+                </div>
               </div>
 
               <span class="status-badge" [ngClass]="getStatusClass(claim.status)">
@@ -123,32 +151,32 @@
               </span>
             </div>
 
-            <div class="claim-body">
-              <div class="claim-row full">
-                <span class="label">Description</span>
-                <p>{{ claim.description || 'Aucune description disponible.' }}</p>
+            <div class="claim-summary">
+              <p>
+                Consultez les détails du dossier, son état d’avancement et le rapport
+                généré à partir de son traitement.
+              </p>
+            </div>
+
+            <div class="claim-info-grid">
+              <div class="claim-row">
+                <span class="label">Date du sinistre</span>
+                <p>{{ claim.incidentDate | date:'dd/MM/yyyy' }}</p>
               </div>
 
-              <div class="claim-info-grid">
-                <div class="claim-row">
-                  <span class="label">Client</span>
-                  <p>{{ getClientFullName(claim) }}</p>
-                </div>
+              <div class="claim-row">
+                <span class="label">Police</span>
+                <p>{{ claim.policy?.policyNumber || '-' }}</p>
+              </div>
 
-                <div class="claim-row">
-                  <span class="label">Date du sinistre</span>
-                  <p>{{ claim.incidentDate | date:'dd/MM/yyyy' }}</p>
-                </div>
+              <div class="claim-row">
+                <span class="label">Type contrat</span>
+                <p>{{ claim.policy?.type || '-' }}</p>
+              </div>
 
-                <div class="claim-row">
-                  <span class="label">Police</span>
-                  <p>{{ claim.policy?.policyNumber || '-' }}</p>
-                </div>
-
-                <div class="claim-row">
-                  <span class="label">Statut</span>
-                  <p>{{ formatStatus(claim.status) }}</p>
-                </div>
+              <div class="claim-row">
+                <span class="label">Statut</span>
+                <p>{{ formatStatus(claim.status) }}</p>
               </div>
             </div>
 
@@ -162,7 +190,7 @@
         </div>
       </section>
 
-      <section class="empty-state" *ngIf="!loading && claims.length === 0">
+      <section class="empty-state" *ngIf="!loading && sortedClaims.length === 0">
         <div class="empty-icon">○</div>
         <h3>Aucun sinistre disponible</h3>
         <p>Les dossiers apparaîtront ici dès qu’ils seront créés ou traités.</p>

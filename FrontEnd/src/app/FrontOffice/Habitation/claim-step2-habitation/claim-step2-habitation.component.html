@@ -1,11 +1,20 @@
 <div class="claim-page">
-  <div class="bg-orb orb-left"></div>
-  <div class="bg-orb orb-right"></div>
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
-        <span class="brand-main">INsurFlow</span><span class="brand-dot">.</span>
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">insurance experience platform</span>
+        </span>
       </a>
 
       <nav class="main-nav">
@@ -19,7 +28,7 @@
       </nav>
 
       <div class="header-chip">
-        <span class="chip-label">Déclaration</span>
+        <span class="chip-label">Déclaration habitation</span>
         <strong>Étape 2 / 3</strong>
       </div>
     </div>
@@ -27,7 +36,7 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-card">
+      <section class="hero-shell">
         <div class="hero-copy">
           <div class="hero-badge">Justificatifs habitation</div>
 
@@ -38,7 +47,8 @@
 
           <p class="hero-text">
             Déposez vos photos des dégâts, devis, constats et documents utiles
-            afin de finaliser votre déclaration habitation dans InSurFlow.
+            pour finaliser votre déclaration habitation dans une interface claire,
+            douce et premium.
           </p>
 
           <div class="hero-actions">
@@ -55,78 +65,83 @@
           <div class="hero-points">
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Photos JPG / PNG</span>
+              <span>JPG / PNG / PDF</span>
             </div>
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Justificatifs PDF</span>
+              <span>10 Mo maximum</span>
             </div>
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>10 Mo maximum par fichier</span>
+              <span>Traitement lancé après envoi</span>
             </div>
           </div>
         </div>
 
-        <div class="hero-panel">
-          <div class="hero-panel-badge">Documents habitation</div>
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Documents habitation</div>
 
-          <div class="hero-panel-top">
-            <article class="mini-stat">
-              <strong>{{ totalFiles }}</strong>
-              <span>Fichier(s) sélectionné(s)</span>
-            </article>
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>{{ totalFiles }}</strong>
+                <span>Fichier(s)</span>
+              </article>
 
-            <article class="mini-stat">
-              <strong>{{ totalSize }}</strong>
-              <span>Taille totale</span>
-            </article>
-          </div>
+              <article class="hero-mini-card">
+                <strong>{{ totalSize }}</strong>
+                <span>Taille totale</span>
+              </article>
+            </div>
 
-          <div class="hero-image">
-            <img src="assets/images/home-insurance.jpg" alt="Documents habitation" />
+            <div class="hero-visual">
+              <img src="assets/images/home-insurance.jpg" alt="Documents habitation" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="claim-layout">
-        <aside class="process-sidebar">
-          <div class="sidebar-card">
-            <p class="sidebar-title">Processus</p>
+      <section class="workspace-grid">
+        <aside class="left-column">
+          <div class="panel progress-panel">
+            <p class="panel-kicker">Progression</p>
 
             <div class="step-list">
-              <div class="step-item done">
-                <div class="step-num">✓</div>
+              <div class="step-card done">
+                <div class="step-number">✓</div>
                 <div>
-                  <div class="step-label">Informations</div>
-                  <div class="step-sublabel">Détails du sinistre</div>
+                  <h3>Informations</h3>
+                  <p>Détails du sinistre</p>
                 </div>
               </div>
 
-              <div class="step-item active">
-                <div class="step-num">2</div>
+              <div class="step-card active">
+                <div class="step-number">2</div>
                 <div>
-                  <div class="step-label">Justificatifs</div>
-                  <div class="step-sublabel">Photos & documents</div>
+                  <h3>Justificatifs</h3>
+                  <p>Photos & documents</p>
                 </div>
               </div>
 
-              <div class="step-item">
-                <div class="step-num">3</div>
+              <div class="step-card">
+                <div class="step-number">3</div>
                 <div>
-                  <div class="step-label">Confirmation</div>
-                  <div class="step-sublabel">Récapitulatif final</div>
+                  <h3>Confirmation</h3>
+                  <p>Récapitulatif final</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="sidebar-card support-card">
+          <div class="panel support-panel">
             <div class="support-icon">H</div>
-            <h3>Documents habitation acceptés</h3>
-            <p>Ajoutez les pièces les plus utiles pour accélérer le traitement du dossier habitation.</p>
+            <h2>Documents habitation acceptés</h2>
+            <p>
+              Ajoutez les pièces les plus utiles pour accélérer le traitement
+              du dossier habitation.
+            </p>
 
             <ul class="support-list">
               <li>Photos des dégâts</li>
@@ -137,9 +152,35 @@
               <li>Diagnostic ou document d’expertise</li>
             </ul>
           </div>
+
+          <div class="panel summary-panel">
+            <p class="panel-kicker">Résumé</p>
+
+            <div class="summary-grid">
+              <article class="summary-card">
+                <span>ID dossier</span>
+                <strong>{{ claimId || '-' }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Fichiers</span>
+                <strong>{{ totalFiles }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Taille</span>
+                <strong>{{ totalSize }}</strong>
+              </article>
+
+              <article class="summary-card">
+                <span>Étape</span>
+                <strong>2 / 3</strong>
+              </article>
+            </div>
+          </div>
         </aside>
 
-        <section class="form-section">
+        <section class="right-column">
           <div class="alert alert-error" *ngIf="errorMessage">
             <span>⚠</span>
             <span>{{ errorMessage }}</span>
@@ -150,31 +191,31 @@
             <span>{{ successMessage }}</span>
           </div>
 
-          <div class="form-card">
-            <div class="card-header">
-              <div class="card-icon">H</div>
+          <div class="panel upload-panel">
+            <div class="form-head">
+              <div class="form-head-icon">H</div>
               <div>
                 <h2>Justificatifs des dégâts matériels</h2>
                 <p>Ajoutez les documents nécessaires pour finaliser votre dossier habitation.</p>
               </div>
             </div>
 
-            <div class="card-body">
+            <div class="form-body">
+              <input
+                #fileInput
+                type="file"
+                multiple
+                accept="image/*,.pdf"
+                (change)="onFileSelected($event)"
+                hidden
+              />
+
               <div
                 class="drop-zone"
                 (dragover)="onDragOver($event)"
                 (drop)="onDrop($event)"
                 (click)="fileInput.click()"
               >
-                <input
-                  #fileInput
-                  type="file"
-                  multiple
-                  accept="image/*,.pdf"
-                  (change)="onFileSelected($event)"
-                  hidden
-                />
-
                 <div class="drop-icon">↑</div>
                 <h3>Glissez vos documents habitation ici</h3>
                 <p>ou cliquez pour parcourir vos dossiers</p>
@@ -200,6 +241,7 @@
               <div class="file-list" *ngIf="files.length > 0">
                 <div class="file-list-header">
                   <span>{{ files.length }} document(s) habitation sélectionné(s)</span>
+
                   <button
                     class="btn-clear"
                     type="button"
@@ -245,19 +287,20 @@
               </div>
             </div>
 
-            <div class="card-footer">
-              <button type="button" class="btn-secondary" (click)="back()">
-                Retour
-              </button>
+            <div class="form-footer">
+              <div class="footer-note">
+                <span class="footer-bullet"></span>
+                <span>Étape 2 sur 3 — Ajout des justificatifs habitation</span>
+              </div>
 
               <button
                 type="button"
-                class="btn-primary"
+                class="submit-btn"
                 (click)="upload()"
                 [disabled]="!canUpload"
               >
                 <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
-                <span *ngIf="!loading">Soumettre mon dossier habitation</span>
+                <span *ngIf="!loading">Continuer vers la confirmation</span>
               </button>
             </div>
           </div>

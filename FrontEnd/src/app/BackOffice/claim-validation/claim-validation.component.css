@@ -811,3 +811,49 @@ textarea:focus {
     max-width: unset;
   }
 }
+.feedback-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.feedback-card {
+  background: #f8fbff;
+  border: 1px solid #dde7f2;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.feedback-card h5 {
+  margin: 0 0 12px;
+  color: #0a1f3d;
+  font-size: 16px;
+}
+
+.feedback-card label {
+  display: block;
+  margin: 10px 0 6px;
+  font-weight: 700;
+  color: #3a4f67;
+}
+
+.feedback-card input,
+.feedback-card select,
+.feedback-card textarea {
+  width: 100%;
+  border: 1px solid #d6e0eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.feedback-card textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.learn-checkbox {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}

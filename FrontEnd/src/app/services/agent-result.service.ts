@@ -35,7 +35,10 @@ export class AgentResultService {
     return this.http.get<AgentResult[]>(this.apiUrl);
   }
 
-  getByClaim(claimId: number): Observable<AgentResult[]> {
+  getClaimById(claimId: number): Observable<AgentResult[]> {
+    return this.http.get<AgentResult[]>(`${this.apiUrl}/claim/${claimId}`);
+  }
+  getResultsByClaimId(claimId: number): Observable<AgentResult[]> {
     return this.http.get<AgentResult[]>(`${this.apiUrl}/claim/${claimId}`);
   }
 }

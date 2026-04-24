@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Claim } from '../models/Claim/claim.model';
-import { ClaimService } from '../services/claim.service';
+import { Claim } from '../../models/Claim/claim.model';
+import { ClaimService } from '../../services/claim.service';
 
 interface NavItem {
   label: string;

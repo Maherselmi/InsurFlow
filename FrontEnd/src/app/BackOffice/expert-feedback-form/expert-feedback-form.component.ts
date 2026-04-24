@@ -6,14 +6,14 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { forkJoin, of, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { Claim, ClaimDocument } from '../models/Claim/claim.model';
-import { AgentResult } from '../models/agent-result.model';
-import { ExpertFeedbackRequest } from '../models/expert-feedback.model';
+import { Claim, ClaimDocument } from '../../models/Claim/claim.model';
+import { AgentResult } from '../../models/agent-result.model';
+import { ExpertFeedbackRequest } from '../../models/expert-feedback.model';
 
-import { AgentResultService } from '../services/agent-result.service';
-import { ExpertFeedbackService } from '../services/expert-feedback.service';
-import { ClaimService } from '../services/claim.service';
-import { ClaimValidationService, ReviewData } from '../services/Claim Validation';
+import { AgentResultService } from '../../services/agent-result.service';
+import { ExpertFeedbackService } from '../../services/expert-feedback.service';
+import { ClaimService } from '../../services/claim.service';
+import { ClaimValidationService, ReviewData } from '../../services/Claim Validation';
 
 interface NavItem {
   label: string;

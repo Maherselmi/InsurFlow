@@ -29,9 +29,9 @@ import {DashboardComponent} from "./BackOffice/dashboard/dashboard.component";
 import {PolicesComponent} from "./FrontOffice/polices/polices.component";
 import {ClaimValidationComponent} from "./BackOffice/claim-validation/claim-validation.component";
 import {ParametresIaComponent} from "./BackOffice/parametres-ia/parametres-ia.component";
-import {FeedbackClaimsListComponent} from "./feedback-claims-list/feedback-claims-list.component";
-import {ExpertFeedbackFormComponent} from "./expert-feedback-form/expert-feedback-form.component";
-import {ExpertSpaceComponent} from "./expert-space/expert-space.component";
+import {FeedbackClaimsListComponent} from "./BackOffice/feedback-claims-list/feedback-claims-list.component";
+import {ExpertFeedbackFormComponent} from "./BackOffice/expert-feedback-form/expert-feedback-form.component";
+import {ExpertSpaceComponent} from "./BackOffice/expert-space/expert-space.component";
 
 export const routes: Routes = [
   { path: 'PolicesList', component: PolicesComponent },

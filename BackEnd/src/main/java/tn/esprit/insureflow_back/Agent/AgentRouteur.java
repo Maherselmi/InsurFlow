@@ -10,6 +10,7 @@ import tn.esprit.insureflow_back.Service.AgentLearningMemoryService;
 import tn.esprit.insureflow_back.Service.AiAgentConfigService;
 import tn.esprit.insureflow_back.Service.LLMService;
 
+import java.text.Normalizer;
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -30,6 +31,10 @@ public class AgentRouteur {
     private static final double DEFAULT_CONFIDENCE = 0.50;
     private static final String DEFAULT_TYPE = "INCONNU";
 
+    private static final double FAST_PATH_CONFIDENCE = 0.92;
+    private static final int MAX_LEARNING_CHARS = 400;
+    private static final int MAX_DESCRIPTION_CHARS = 700;
+
     private static final Set<String> ALLOWED_TYPES = Set.of(
             "AUTO",
             "HABITATION",
@@ -42,6 +47,9 @@ public class AgentRouteur {
 
     private static final Pattern CONFIDENCE_PATTERN =
             Pattern.compile("\"confidence\"\\s*:\\s*([0-9]*\\.?[0-9]+)");
+
+    private static final Pattern JUSTIFICATION_PATTERN =
+            Pattern.compile("\"justification\"\\s*:\\s*\"(.*?)\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
     public AgentResult classifier(Claim claim) {
         if (claim == null) {
@@ -59,12 +67,35 @@ public class AgentRouteur {
                     DEFAULT_CONFIDENCE,
                     true,
                     "Description vide ou absente",
-                    null
+                    buildRawJson(DEFAULT_TYPE, DEFAULT_CONFIDENCE, "Description vide ou absente")
             );
         }
 
         double humanReviewThreshold = aiAgentConfigService.getThreshold(CONFIG_KEY);
         log.info("Seuil de confiance dynamique pour {} = {}", CONFIG_KEY, humanReviewThreshold);
+
+        ParsedClassification fastResult = fastPath(description);
+        if (fastResult != null) {
+            boolean needsHumanReview = fastResult.confidence() < humanReviewThreshold;
+
+            log.info(
+                    "Fast-path routeur pour dossier #{} | type={} | confidence={} | threshold={} | humanReview={}",
+                    claim.getId(),
+                    fastResult.type(),
+                    fastResult.confidence(),
+                    humanReviewThreshold,
+                    needsHumanReview
+            );
+
+            return buildResult(
+                    claim,
+                    fastResult.type(),
+                    fastResult.confidence(),
+                    needsHumanReview,
+                    fastResult.justification(),
+                    buildRawJson(fastResult.type(), fastResult.confidence(), fastResult.justification())
+            );
+        }
 
         String learningExamples =
                 learningMemoryService.buildMemoryBlock(AgentName.AGENT_ROUTEUR, claim.getId());
@@ -73,7 +104,8 @@ public class AgentRouteur {
             log.info("Aucun exemple learning disponible pour {}", AGENT_NAME);
             learningExamples = "";
         } else {
-            log.info("Exemples learning chargés pour {}", AGENT_NAME);
+            learningExamples = truncate(learningExamples, MAX_LEARNING_CHARS);
+            log.info("Exemples learning chargés pour {} (tronqués à {} caractères)", AGENT_NAME, MAX_LEARNING_CHARS);
         }
 
         String prompt = buildPrompt(description, learningExamples);
@@ -104,58 +136,73 @@ public class AgentRouteur {
         );
     }
 
+    private ParsedClassification fastPath(String description) {
+        String lower = normalize(description);
+
+        if (containsAny(lower,
+                "voiture", "vehicule", "vehicules", "vehicle", "collision", "carrosserie",
+                "pare brise", "parebrise", "bris de glace", "retro", "retroviseur",
+                "accident", "auto", "immatriculation")) {
+            return new ParsedClassification("AUTO", FAST_PATH_CONFIDENCE, "Classification rapide par mots-clés AUTO");
+        }
+
+        if (containsAny(lower,
+                "maison", "habitation", "logement", "incendie", "fuite", "canalisation",
+                "degat des eaux", "degats des eaux", "cambriolage", "effraction",
+                "inondation", "vandalism", "vandalisme")) {
+            return new ParsedClassification("HABITATION", FAST_PATH_CONFIDENCE, "Classification rapide par mots-clés HABITATION");
+        }
+
+        if (containsAny(lower,
+                "hopital", "hospitalisation", "maladie", "medecin", "fracture",
+                "operation", "soins", "frais medicaux", "consultation",
+                "scanner", "radio", "ordonnance", "medicament", "sante")) {
+            return new ParsedClassification("SANTE", FAST_PATH_CONFIDENCE, "Classification rapide par mots-clés SANTE");
+        }
+
+        if (containsAny(lower,
+                "voyage", "bagage", "bagages", "annulation", "etranger",
+                "deplacement", "retard vol", "retard avion", "rapatriement")) {
+            return new ParsedClassification("VOYAGE", FAST_PATH_CONFIDENCE, "Classification rapide par mots-clés VOYAGE");
+        }
+
+        return null;
+    }
+
     private String buildPrompt(String description, String learningExamples) {
         String memorySection = learningExamples == null || learningExamples.isBlank()
                 ? "Aucun exemple historique validé disponible."
                 : learningExamples;
 
         return """
-        Tu es un agent expert en classification de sinistres d’assurance.
+                Tu classes un sinistre d’assurance en un seul type parmi :
+                AUTO, HABITATION, SANTE, VOYAGE.
 
-        Ta mission :
-        analyser la description du sinistre et retourner UN SEUL type parmi :
-        - AUTO
-        - HABITATION
-        - SANTE
-        - VOYAGE
+                Réponds uniquement en JSON valide :
+                {
+                  "type": "AUTO|HABITATION|SANTE|VOYAGE",
+                  "confidence": 0.0,
+                  "justification": "courte justification"
+                }
 
-        Définitions :
-        - AUTO : dommages matériels au véhicule, collision, carrosserie, bris de glace,
-                 vol de véhicule, rayures, accident de voiture
-        - HABITATION : incendie maison, dégât des eaux, fuite canalisation,
-                       cambriolage, dommage logement
-        - SANTE : hospitalisation, maladie, fracture, opération chirurgicale,
-                  soins, frais médicaux
-        - VOYAGE : annulation voyage, perte de bagages, assistance à l’étranger,
-                   incident pendant déplacement
+                Règles :
+                - un seul type
+                - confidence entre 0.0 et 1.0
+                - justification courte
+                - aucun texte avant ou après le JSON
 
-        EXEMPLES HISTORIQUES VALIDES PAR EXPERT
-        %s
+                Exemples validés :
+                %s
 
-        Règles obligatoires :
-        - Retourne uniquement un JSON valide
-        - N’ajoute aucun texte avant ou après le JSON
-        - Le champ "type" doit être exactement l’un des 4 types autorisés
-        - Le champ "confidence" doit être un nombre entre 0.0 et 1.0
-        - Le champ "justification" doit être court
-        - Inspire-toi des exemples validés, sans copier mécaniquement
-
-        Description du sinistre :
-        "%s"
-
-        Format JSON strict attendu :
-        {
-          "type": "AUTO|HABITATION|SANTE|VOYAGE",
-          "confidence": 0.0,
-          "justification": "..."
-        }
-        """.formatted(memorySection, escapeForPrompt(description));
+                Description :
+                "%s"
+                """.formatted(memorySection, escapeForPrompt(truncate(description, MAX_DESCRIPTION_CHARS)));
     }
 
     private String callLlmSafely(String prompt) {
         try {
             String response = llmService.genererReponse(prompt);
-            log.info("Réponse brute LLM: {}", response);
+            log.info("Réponse brute LLM routeur: {}", response);
             return response == null ? "" : response.trim();
         } catch (Exception e) {
             log.error("Erreur lors de l'appel au LLM", e);
@@ -179,7 +226,7 @@ public class AgentRouteur {
             ParsedClassification fallback = fallbackClassification(rawResponse, "Type non parsé depuis le JSON");
             return new ParsedClassification(
                     fallback.type(),
-                    Math.min(confidence, fallback.confidence()),
+                    Math.min(Math.max(confidence, DEFAULT_CONFIDENCE), fallback.confidence()),
                     fallback.justification()
             );
         }
@@ -188,14 +235,24 @@ public class AgentRouteur {
     }
 
     private String extractJsonBlock(String response) {
-        int firstBrace = response.indexOf('{');
-        int lastBrace = response.lastIndexOf('}');
-
-        if (firstBrace >= 0 && lastBrace > firstBrace) {
-            return response.substring(firstBrace, lastBrace + 1).trim();
+        if (response == null || response.isBlank()) {
+            return "";
         }
 
-        return response.trim();
+        String cleaned = response
+                .replaceAll("(?s)<think>.*?</think>", "")
+                .replace("```json", "")
+                .replace("```", "")
+                .trim();
+
+        int firstBrace = cleaned.indexOf('{');
+        int lastBrace = cleaned.lastIndexOf('}');
+
+        if (firstBrace >= 0 && lastBrace > firstBrace) {
+            return cleaned.substring(firstBrace, lastBrace + 1).trim();
+        }
+
+        return cleaned;
     }
 
     private String parseType(String response) {
@@ -230,11 +287,10 @@ public class AgentRouteur {
 
     private String parseJustification(String response) {
         try {
-            Pattern justificationPattern =
-                    Pattern.compile("\"justification\"\\s*:\\s*\"(.*?)\"", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-            Matcher matcher = justificationPattern.matcher(response);
+            Matcher matcher = JUSTIFICATION_PATTERN.matcher(response);
             if (matcher.find()) {
-                return matcher.group(1).trim();
+                String justification = matcher.group(1).trim();
+                return justification.isBlank() ? "Justification indisponible" : justification;
             }
         } catch (Exception e) {
             log.warn("Erreur parsing justification", e);
@@ -246,19 +302,19 @@ public class AgentRouteur {
     private ParsedClassification fallbackClassification(String text, String reason) {
         String lower = normalize(text);
 
-        if (containsAny(lower, "voiture", "vehicule", "véhicule", "collision", "carrosserie", "bris de glace", "accident", "auto")) {
+        if (containsAny(lower, "voiture", "vehicule", "collision", "carrosserie", "bris de glace", "accident", "auto")) {
             return new ParsedClassification("AUTO", 0.55, reason + " - fallback mots-clés AUTO");
         }
 
-        if (containsAny(lower, "maison", "habitation", "incendie", "degat des eaux", "dégât des eaux", "fuite", "canalisation", "cambriolage", "logement")) {
+        if (containsAny(lower, "maison", "habitation", "incendie", "degat des eaux", "fuite", "canalisation", "cambriolage", "logement")) {
             return new ParsedClassification("HABITATION", 0.55, reason + " - fallback mots-clés HABITATION");
         }
 
-        if (containsAny(lower, "hopital", "hôpital", "hospitalisation", "maladie", "medecin", "médecin", "fracture", "operation", "opération", "frais medicaux", "frais médicaux", "sante", "santé")) {
+        if (containsAny(lower, "hopital", "hospitalisation", "maladie", "medecin", "fracture", "operation", "frais medicaux", "sante")) {
             return new ParsedClassification("SANTE", 0.55, reason + " - fallback mots-clés SANTE");
         }
 
-        if (containsAny(lower, "voyage", "bagage", "bagages", "annulation", "etranger", "étranger", "deplacement", "déplacement")) {
+        if (containsAny(lower, "voyage", "bagage", "bagages", "annulation", "etranger", "deplacement")) {
             return new ParsedClassification("VOYAGE", 0.55, reason + " - fallback mots-clés VOYAGE");
         }
 
@@ -288,6 +344,17 @@ public class AgentRouteur {
         return "Type de sinistre classifié : " + type + " | Justification : " + justification;
     }
 
+    private String buildRawJson(String type, double confidence, String justification) {
+        String safeJustification = justification == null ? "" : justification.replace("\"", "\\\"");
+        return """
+                {
+                  "type": "%s",
+                  "confidence": %.2f,
+                  "justification": "%s"
+                }
+                """.formatted(type, confidence, safeJustification).trim();
+    }
+
     private String safeText(String value) {
         return value == null ? "" : value.trim();
     }
@@ -310,7 +377,24 @@ public class AgentRouteur {
     }
 
     private String normalize(String text) {
-        return text == null ? "" : text.toLowerCase(Locale.ROOT).trim();
+        if (text == null) {
+            return "";
+        }
+
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(Locale.ROOT)
+                .trim();
+
+        return normalized.replaceAll("\\s+", " ");
+    }
+
+    private String truncate(String text, int maxLength) {
+        String value = safeText(text);
+        if (value.length() <= maxLength) {
+            return value;
+        }
+        return value.substring(0, maxLength);
     }
 
     private record ParsedClassification(String type, double confidence, String justification) {}

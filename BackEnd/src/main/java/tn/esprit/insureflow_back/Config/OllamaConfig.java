@@ -21,19 +21,21 @@ public class OllamaConfig {
 
     @Value("${ollama.embedding-model}")
     private String embeddingModelName;
+
     @Value("${ollama.vision-model}")
     private String visionModelName;
 
-    @Bean
+    @Bean(name = "chatLanguageModel")
     public ChatLanguageModel chatLanguageModel() {
         return OllamaChatModel.builder()
-                .baseUrl("http://localhost:11434")
-                .modelName("qwen2.5:7b")
-                .timeout(Duration.ofSeconds(2000))
+                .baseUrl(ollamaBaseUrl)
+                .modelName(chatModelName)
+                .temperature(0.0)
+                .timeout(Duration.ofSeconds(300))
                 .build();
     }
 
-    @Bean
+    @Bean(name = "embeddingModel")
     public EmbeddingModel embeddingModel() {
         return OllamaEmbeddingModel.builder()
                 .baseUrl(ollamaBaseUrl)
@@ -41,13 +43,13 @@ public class OllamaConfig {
                 .build();
     }
 
-    @Bean
+    @Bean(name = "visionLanguageModel")
     public ChatLanguageModel visionLanguageModel() {
         return OllamaChatModel.builder()
                 .baseUrl(ollamaBaseUrl)
                 .modelName(visionModelName)
-                .temperature(0.3)
-                .timeout(Duration.ofMinutes(15))
+                .temperature(0.1)
+                .timeout(Duration.ofMinutes(10))
                 .build();
     }
 }

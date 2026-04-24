@@ -37,14 +37,18 @@ public class AgentValidateur {
     private static final String AGENT_NAME = "AgentValidateur";
     private static final String CONFIG_KEY = "AGENT_VALIDATION";
 
-    private static final int MAX_PDF_SNIPPET_LENGTH = 2000;
-    private static final int MAX_RAG_MATCHES = 4;
-    private static final int MAX_RAG_CANDIDATES = 16;
-    private static final double MIN_RAG_SCORE = 0.65;
+    private static final int MAX_PDF_SNIPPET_LENGTH = 600;
+    private static final int MAX_RAG_MATCHES = 2;
+    private static final int MAX_RAG_CANDIDATES = 8;
+    private static final double MIN_RAG_SCORE = 0.72;
+
+    private static final int MAX_RAG_RETRIES = 2;
+    private static final long RETRY_DELAY_MS = 250L;
+
+    private static final int MAX_LEARNING_CHARS = 600;
+    private static final int MAX_CONTRACT_SEGMENT_CHARS = 500;
 
     private static final double DEFAULT_CONFIDENCE = 0.50;
-    private static final int MAX_RAG_RETRIES = 3;
-    private static final long RETRY_DELAY_MS = 800L;
 
     private static final String DECISION_COUVERT = "COUVERT";
     private static final String DECISION_EXCLU = "EXCLU";
@@ -78,22 +82,30 @@ public class AgentValidateur {
                     0.0,
                     "Aucune donnée exploitable pour analyser le sinistre",
                     true,
-                    null
+                    buildRawJson(DECISION_INCONNU, 0.0, "Aucune donnée exploitable pour analyser le sinistre", true)
             );
         }
 
         PolicyCheckResult preCheck = preCheckPolicy(claim, routedType);
         if (preCheck != null) {
-            log.warn("Pré-contrôle police pour claim #{} => {}", claim.getId(), preCheck.justification());
+            log.info("Pré-contrôle police pour claim #{} => {}", claim.getId(), preCheck.justification());
             return buildResult(
                     claim,
                     preCheck.decision(),
                     preCheck.confidence(),
                     preCheck.justification(),
                     preCheck.needsHumanReview(),
-                    null
+                    buildRawJson(
+                            preCheck.decision(),
+                            preCheck.confidence(),
+                            preCheck.justification(),
+                            preCheck.needsHumanReview()
+                    )
             );
         }
+
+        double humanReviewThreshold = aiAgentConfigService.getThreshold(CONFIG_KEY);
+        log.info("Seuil de confiance dynamique pour {} = {}", CONFIG_KEY, humanReviewThreshold);
 
         String typeContrat = resolveTypeContrat(claim, pdfText, routedType);
         String policyContext = buildPolicyContext(claim);
@@ -101,8 +113,8 @@ public class AgentValidateur {
         log.info("Type contrat retenu pour claim #{} : {} (routeur={})",
                 claim.getId(), typeContrat, safe(routedType));
 
-        String searchQuery = buildSearchQuery(claim, pdfText, typeContrat);
-        log.info("Requête RAG : {}", searchQuery);
+        String searchQuery = buildSearchQuery(claim, typeContrat);
+        log.info("Requête RAG compacte : {}", searchQuery);
 
         List<EmbeddingMatch<TextSegment>> matches = searchRelevantClauses(searchQuery, claim, typeContrat);
 
@@ -114,11 +126,16 @@ public class AgentValidateur {
                     0.0,
                     "Validation contractuelle impossible automatiquement : aucune clause pertinente retrouvée pour ce type de contrat",
                     true,
-                    null
+                    buildRawJson(
+                            DECISION_INCONNU,
+                            0.0,
+                            "Validation contractuelle impossible automatiquement : aucune clause pertinente retrouvée pour ce type de contrat",
+                            true
+                    )
             );
         }
 
-        log.info("{} clauses pertinentes filtrées trouvées", matches.size());
+        log.info("{} clause(s) pertinente(s) trouvée(s)", matches.size());
 
         String contractContext = buildContractContext(matches);
 
@@ -129,7 +146,8 @@ public class AgentValidateur {
             log.info("Aucun exemple learning disponible pour {}", AGENT_NAME);
             learningExamples = "";
         } else {
-            log.info("Exemples learning chargés pour {}", AGENT_NAME);
+            learningExamples = truncate(learningExamples, MAX_LEARNING_CHARS);
+            log.info("Exemples learning chargés pour {} (tronqués à {} caractères)", AGENT_NAME, MAX_LEARNING_CHARS);
         }
 
         String prompt = buildPrompt(
@@ -141,11 +159,11 @@ public class AgentValidateur {
                 learningExamples
         );
 
-        log.info("Envoi du prompt au LLM...");
+        log.info("Envoi du prompt optimisé au LLM...");
         String rawResponse = callLlmSafely(prompt);
         log.info("Réponse brute LLM : {}", rawResponse);
 
-        return parseResponse(rawResponse, claim);
+        return parseResponse(rawResponse, claim, humanReviewThreshold);
     }
 
     private PolicyCheckResult preCheckPolicy(Claim claim, String routedType) {
@@ -211,6 +229,13 @@ public class AgentValidateur {
 
                 List<EmbeddingMatch<TextSegment>> filtered = filterByContractType(candidates, expectedTypeContrat);
 
+                if (filtered.isEmpty()) {
+                    filtered = candidates.stream()
+                            .sorted(Comparator.comparingDouble(EmbeddingMatch<TextSegment>::score).reversed())
+                            .limit(MAX_RAG_MATCHES)
+                            .collect(Collectors.toList());
+                }
+
                 log.info("Recherche RAG réussie pour claim #{} à la tentative {} | candidats={} | filtrés={}",
                         claim.getId(), attempt, candidates.size(), filtered.size());
 
@@ -265,72 +290,47 @@ public class AgentValidateur {
         return filtered;
     }
 
-    private String buildSearchQuery(Claim claim, String pdfText, String typeContrat) {
-        String description = safe(claim.getDescription());
-        String date = claim.getIncidentDate() != null ? claim.getIncidentDate().toString() : "";
-        String shortPdfSnippet = truncate(pdfText, 700);
-
+    private String buildSearchQuery(Claim claim, String typeContrat) {
         Policy policy = claim.getPolicy();
-        String policyNumber = policy != null ? safe(policy.getPolicyNumber()) : "";
+
+        String description = truncate(safe(claim.getDescription()), 250);
         String formule = policy != null ? safe(policy.getFormule()) : "";
         String productCode = policy != null ? safe(policy.getProductCode()) : "";
-        String coverageDetails = policy != null ? safe(policy.getCoverageDetails()) : "";
+        String coverageDetails = policy != null ? truncate(safe(policy.getCoverageDetails()), 200) : "";
 
         return """
-                Police souscrite :
-                - Numéro : %s
-                - Type : %s
-                - Formule : %s
-                - Product code : %s
-                - Détails couverture : %s
-
-                Rechercher dans le contrat les clauses les plus pertinentes sur :
-                - garanties applicables
-                - exclusions
-                - plafonds / franchise
-                - conformité avec la police souscrite
-                - indemnisation / remboursement
-
-                Description du sinistre : %s
-                Date incident : %s
-                Extrait document sinistre : %s
+                typeContrat=%s
+                formule=%s
+                productCode=%s
+                couverture=%s
+                sinistre=%s
+                recherche=garanties exclusions plafonds franchise indemnisation
                 """.formatted(
-                policyNumber,
                 typeContrat,
                 formule,
                 productCode,
                 coverageDetails,
-                description,
-                date,
-                shortPdfSnippet
+                description
         );
     }
 
     private String buildContractContext(List<EmbeddingMatch<TextSegment>> matches) {
         return matches.stream()
-                .sorted(Comparator.comparingInt(match -> {
-                    TextSegment segment = match.embedded();
-                    String page = segment != null ? extractMetadata(segment, "pageNumber") : "0";
-                    try {
-                        return Integer.parseInt(page);
-                    } catch (Exception e) {
-                        return 0;
-                    }
-                }))
+                .sorted(Comparator.comparingDouble(EmbeddingMatch<TextSegment>::score).reversed())
+                .limit(MAX_RAG_MATCHES)
                 .map(match -> {
                     TextSegment segment = match.embedded();
-                    String text = segment != null ? safe(segment.text()) : "";
+                    String text = segment != null ? truncate(safe(segment.text()), MAX_CONTRACT_SEGMENT_CHARS) : "";
                     String file = segment != null ? extractMetadata(segment, "file") : "";
                     String typeContrat = segment != null ? extractMetadata(segment, "typeContrat") : "";
                     String pageNumber = segment != null ? extractMetadata(segment, "pageNumber") : "";
                     double score = match.score();
 
                     return """
-                            Clause pertinente
-                            Score similarité : %.3f
+                            Score : %.3f
                             Fichier : %s
-                            Type contrat : %s
-                            Page/Chunk : %s
+                            Type : %s
+                            Page : %s
                             Texte : %s
                             """.formatted(score, safe(file), safe(typeContrat), safe(pageNumber), text);
                 })
@@ -344,13 +344,13 @@ public class AgentValidateur {
         }
 
         return """
-                Numéro de police : %s
+                Numéro : %s
                 Type : %s
                 Formule : %s
                 Product code : %s
-                Date début : %s
-                Date fin : %s
-                Détails de couverture : %s
+                Début : %s
+                Fin : %s
+                Couverture : %s
                 """.formatted(
                 safe(policy.getPolicyNumber()),
                 safe(policy.getType()),
@@ -358,7 +358,7 @@ public class AgentValidateur {
                 safe(policy.getProductCode()),
                 policy.getStartDate() != null ? policy.getStartDate().toString() : "Non précisée",
                 policy.getEndDate() != null ? policy.getEndDate().toString() : "Non précisée",
-                safe(policy.getCoverageDetails())
+                truncate(safe(policy.getCoverageDetails()), 300)
         );
     }
 
@@ -368,7 +368,8 @@ public class AgentValidateur {
                                String typeContrat,
                                String policyContext,
                                String learningExamples) {
-        String description = safe(claim.getDescription());
+
+        String description = truncate(safe(claim.getDescription()), 400);
         String incidentDate = claim.getIncidentDate() != null ? claim.getIncidentDate().toString() : "Non précisée";
         String pdfSnippet = truncate(claimPdfText, MAX_PDF_SNIPPET_LENGTH);
 
@@ -379,54 +380,57 @@ public class AgentValidateur {
         return """
                 Tu es un expert juriste en assurance %s.
 
-                Tu dois vérifier si la demande du client est conforme à la police souscrite.
+                Tu dois décider si le sinistre déclaré est :
+                - COUVERT
+                - EXCLU
+                - INCONNU
 
-                Base d'analyse obligatoire :
-                1. la police souscrite du client
-                2. la déclaration du sinistre
-                3. le contenu du document fourni
-                4. les clauses contractuelles récupérées par RAG
-                5. les anciens cas validés par expert
+                Base obligatoire :
+                1. police souscrite
+                2. description du sinistre
+                3. extrait du document fourni
+                4. clauses contractuelles RAG
+                5. exemples historiques validés
 
-                POLICE SOUSCRITE
+                POLICE
                 %s
 
-                SINISTRE DÉCLARÉ
+                SINISTRE
                 Description : %s
                 Date : %s
 
-                EXTRAIT DU DOCUMENT DU SINISTRE
+                EXTRAIT DOCUMENT
                 %s
 
-                CLAUSES CONTRACTUELLES PERTINENTES
+                CLAUSES RAG
                 %s
 
-                EXEMPLES HISTORIQUES VALIDÉS PAR EXPERT
+                EXEMPLES VALIDÉS
                 %s
 
-                Règles de décision :
-                - Réponds COUVERT uniquement si la police et les clauses montrent clairement que le sinistre est pris en charge
-                - Réponds EXCLU uniquement si la police ou les clauses montrent clairement qu’il n’est pas couvert
-                - Réponds INCONNU si des informations manquent, si les clauses sont ambiguës, ou si la police n’est pas suffisamment précise
+                Règles :
+                - COUVERT si la police et les clauses montrent clairement la garantie
+                - EXCLU si la police ou les clauses montrent clairement l’exclusion
+                - INCONNU si information insuffisante, ambiguë ou non concluante
+                - needsHumanReview=true pour toute décision INCONNU
+                - justification courte et contractuelle
 
-                RÈGLES OBLIGATOIRES
-                - Réponds uniquement en JSON valide
-                - "decision" doit être exactement "COUVERT", "EXCLU" ou "INCONNU"
-                - "confidence" doit être entre 0.0 et 1.0
-                - "justification" doit être concise et mentionner la logique contractuelle
-                - "needsHumanReview" doit être true pour toute décision INCONNU
-                - Inspire-toi des exemples validés, sans les recopier mécaniquement
-
-                FORMAT JSON STRICT
+                Réponds uniquement en JSON valide :
                 {
                   "decision": "COUVERT | EXCLU | INCONNU",
                   "confidence": 0.0,
-                  "justification": "La police souscrite et la clause X couvrent explicitement ce sinistre.",
+                  "justification": "justification courte",
                   "needsHumanReview": false
                 }
-
-                Réponds uniquement avec le JSON, sans markdown, sans explication supplémentaire.
-                """.formatted(typeContrat, policyContext, description, incidentDate, pdfSnippet, contractContext, memorySection);
+                """.formatted(
+                typeContrat,
+                policyContext,
+                description,
+                incidentDate,
+                pdfSnippet,
+                contractContext,
+                memorySection
+        );
     }
 
     private String callLlmSafely(String prompt) {
@@ -439,7 +443,7 @@ public class AgentValidateur {
         }
     }
 
-    private AgentResult parseResponse(String raw, Claim claim) {
+    private AgentResult parseResponse(String raw, Claim claim, double humanReviewThreshold) {
         if (raw == null || raw.isBlank()) {
             log.warn("Réponse LLM vide");
             return buildResult(
@@ -448,12 +452,9 @@ public class AgentValidateur {
                     0.0,
                     "Réponse LLM vide",
                     true,
-                    raw
+                    buildRawJson(DECISION_INCONNU, 0.0, "Réponse LLM vide", true)
             );
         }
-
-        double humanReviewThreshold = aiAgentConfigService.getThreshold(CONFIG_KEY);
-        log.info("Seuil de confiance dynamique pour {} = {}", CONFIG_KEY, humanReviewThreshold);
 
         try {
             String cleanJson = extractJson(raw);
@@ -539,7 +540,7 @@ public class AgentValidateur {
                 0.40,
                 reason + " - décision déduite via fallback sécurisé",
                 needsHumanReview,
-                raw
+                buildRawJson(decision, 0.40, reason + " - décision déduite via fallback sécurisé", needsHumanReview)
         );
     }
 
@@ -562,6 +563,18 @@ public class AgentValidateur {
         return result;
     }
 
+    private String buildRawJson(String decision, double confidence, String justification, boolean needsHumanReview) {
+        String safeJustification = safe(justification).replace("\"", "\\\"");
+        return """
+                {
+                  "decision": "%s",
+                  "confidence": %.2f,
+                  "justification": "%s",
+                  "needsHumanReview": %s
+                }
+                """.formatted(decision, confidence, safeJustification, needsHumanReview);
+    }
+
     private String resolveTypeContrat(Claim claim, String pdfText, String routedType) {
         String normalizedRoutedType = normalizeType(routedType);
         if (!DECISION_INCONNU.equals(normalizedRoutedType)) {
@@ -577,11 +590,12 @@ public class AgentValidateur {
 
         String fullText = (safe(claim.getDescription()) + " " + safe(pdfText)).toUpperCase(Locale.ROOT);
 
-        if (fullText.contains("POL-") && fullText.contains("SANTE")) return "SANTE";
-        if (fullText.contains("POL-") && fullText.contains("AUTO")) return "AUTO";
-        if (containsAny(fullText.toLowerCase(Locale.ROOT), "hospitalisation", "scanner", "radio", "médical", "medical", "cnam")) return "SANTE";
-        if (containsAny(fullText.toLowerCase(Locale.ROOT), "véhicule", "vehicule", "immatriculation", "collision", "voiture")) return "AUTO";
-        if (containsAny(fullText.toLowerCase(Locale.ROOT), "habitation", "logement", "dégât des eaux", "degat des eaux")) return "HABITATION";
+        if (fullText.contains("SANTE")) return "SANTE";
+        if (fullText.contains("AUTO")) return "AUTO";
+        if (containsAny(fullText.toLowerCase(Locale.ROOT), "hospitalisation", "scanner", "radio", "medical", "médical", "cnam")) return "SANTE";
+        if (containsAny(fullText.toLowerCase(Locale.ROOT), "vehicule", "véhicule", "immatriculation", "collision", "voiture")) return "AUTO";
+        if (containsAny(fullText.toLowerCase(Locale.ROOT), "habitation", "logement", "degat des eaux", "dégât des eaux")) return "HABITATION";
+        if (containsAny(fullText.toLowerCase(Locale.ROOT), "voyage", "bagage", "etranger", "étranger")) return "VOYAGE";
 
         return DECISION_INCONNU;
     }
@@ -592,6 +606,7 @@ public class AgentValidateur {
         if (value.contains("AUTO")) return "AUTO";
         if (value.contains("SANTE")) return "SANTE";
         if (value.contains("HABITATION")) return "HABITATION";
+        if (value.contains("VOYAGE")) return "VOYAGE";
 
         return DECISION_INCONNU;
     }
@@ -635,7 +650,7 @@ public class AgentValidateur {
         if (safe.length() <= maxLength) {
             return safe;
         }
-        return safe.substring(0, maxLength) + "\n[... contenu tronqué ...]";
+        return safe.substring(0, maxLength);
     }
 
     private String safe(String value) {

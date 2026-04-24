@@ -11,163 +11,138 @@ import tn.esprit.insureflow_back.Domain.Entities.Claim;
 @RequiredArgsConstructor
 public class RapportService {
 
-    private final LLMService llmService;
-
     public String genererRapport(Claim claim,
                                  AgentResult routeResult,
                                  AgentResult validationResult,
                                  AgentResult estimationResult) {
 
-        String statut = claim.getStatus().name();
-        String prompt = buildPrompt(claim, routeResult, validationResult, estimationResult, statut);
+        String statut = claim.getStatus() != null ? claim.getStatus().name() : "INCONNU";
 
-        log.info(" Génération rapport IA — claim #{} statut: {}", claim.getId(), statut);
+        log.info("Génération rapport expert rapide - claim #{} statut: {}", claim.getId(), statut);
 
-        String raw = llmService.genererReponse(prompt);
-        return cleanReport(raw);
+        String routeConclusion = routeResult != null ? safe(routeResult.getConclusion()) : "Information non disponible";
+        String validationConclusion = validationResult != null ? safe(validationResult.getConclusion()) : "Information non disponible";
+        String estimationConclusion = estimationResult != null ? safe(estimationResult.getConclusion()) : "Information non disponible";
+
+        String routeConfidence = routeResult != null ? String.valueOf(routeResult.getConfidenceScore()) : "Information non disponible";
+        String validationConfidence = validationResult != null ? String.valueOf(validationResult.getConfidenceScore()) : "Information non disponible";
+        String estimationConfidence = estimationResult != null ? String.valueOf(estimationResult.getConfidenceScore()) : "Information non disponible";
+
+        String resume = buildResume(claim, statut);
+        String vigilance = buildPointsVigilance(routeResult, validationResult, estimationResult, statut);
+        String recommendation = buildRecommendation(statut, validationConclusion, estimationConclusion);
+        String humanDecision = buildHumanDecision(statut);
+
+        return """
+                Rapport de synthèse du sinistre n°%s
+
+                1. Résumé du dossier
+                %s
+
+                2. Analyse des agents
+                Agent routeur : %s | Confiance : %s
+                Agent validateur : %s | Confiance : %s
+                Agent estimateur : %s | Confiance : %s
+
+                3. Points de vigilance
+                %s
+
+                4. Recommandation finale
+                %s
+
+                5. Décision humaine
+                Statut : %s
+                Commentaire : %s
+                """
+                .formatted(
+                        claim.getId(),
+                        resume,
+                        routeConclusion,
+                        routeConfidence,
+                        validationConclusion,
+                        validationConfidence,
+                        estimationConclusion,
+                        estimationConfidence,
+                        vigilance,
+                        recommendation,
+                        statut,
+                        humanDecision
+                )
+                .trim();
     }
 
-    private String buildPrompt(Claim claim,
-                               AgentResult routeResult,
-                               AgentResult validationResult,
-                               AgentResult estimationResult,
-                               String statut) {
+    private String buildResume(Claim claim, String statut) {
+        return """
+                Sinistre déclaré sous le dossier %s, description : %s, date du sinistre : %s.
+                Statut actuel du dossier : %s.
+                """.formatted(
+                claim.getId(),
+                safe(claim.getDescription()),
+                claim.getIncidentDate() != null ? claim.getIncidentDate().toString() : "Information non disponible",
+                statut
+        ).trim();
+    }
+
+    private String buildPointsVigilance(AgentResult routeResult,
+                                        AgentResult validationResult,
+                                        AgentResult estimationResult,
+                                        String statut) {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("""
-                Tu es un expert senior en assurance.
-                Tu dois rédiger un rapport professionnel, clair, concis et exploitable par un gestionnaire humain.
-
-                RÈGLES OBLIGATOIRES DE RÉDACTION :
-                - Réponds uniquement en texte brut
-                - N'utilise jamais Markdown
-                - Interdiction d'utiliser les symboles suivants comme titres ou listes : #, ##, ###, *, **, -, ---
-                - N'écris pas deux fois la même idée
-                - N'utilise pas de phrases redondantes
-                - Chaque section doit être courte, claire et utile
-                - Si une information n'est pas disponible, indique simplement : "Information non disponible"
-                - Ne répète pas les conclusions déjà évidentes
-                - Le ton doit être professionnel, sobre, clair et orienté métier
-                - Le rapport final doit être directement exploitable dans une interface de gestion de sinistres
-
-                FORMAT STRICT À RESPECTER :
-                Rapport de synthèse du sinistre n°[ID]
-
-                1. Résumé du dossier
-                [paragraphe court]
-
-                2. Analyse des agents
-                Agent routeur : ...
-                Agent validateur : ...
-                Agent estimateur : ...
-
-                3. Points de vigilance
-                [paragraphe ou lignes courtes]
-
-                4. Recommandation finale
-                [paragraphe court]
-
-                5. Décision humaine
-                Statut : ...
-                Commentaire : ...
-
-                IMPORTANT :
-                - Pas de titres décoratifs
-                - Pas de puces Markdown
-                - Pas de répétition entre "résumé", "analyse" et "recommandation"
-                - Si le statut est APPROVED, insiste sur la justification de couverture et l'estimation
-                - Si le statut est REJECTED, insiste sur le motif de rejet
-                - Si le statut est PENDING_VALIDATION, insiste sur les incertitudes et les vérifications nécessaires
-
-                DONNÉES DU DOSSIER :
-                """);
-
-        sb.append("\nID Sinistre : ").append(claim.getId());
-        sb.append("\nDescription : ").append(safe(claim.getDescription()));
-        sb.append("\nDate du sinistre : ").append(claim.getIncidentDate());
-        sb.append("\nStatut final : ").append(statut);
-
-        if (routeResult != null) {
-            sb.append("\n\nDONNÉES AGENT ROUTEUR");
-            sb.append("\nConclusion : ").append(safe(routeResult.getConclusion()));
-            sb.append("\nScore de confiance : ").append(routeResult.getConfidenceScore());
-            sb.append("\nDétail brut : ").append(safe(routeResult.getRawLlmResponse()));
+        if (routeResult != null && routeResult.isNeedsHumanReview()) {
+            sb.append("Le routage nécessite une revue humaine. ");
         }
 
-        if (validationResult != null) {
-            sb.append("\n\nDONNÉES AGENT VALIDATEUR");
-            sb.append("\nConclusion : ").append(safe(validationResult.getConclusion()));
-            sb.append("\nScore de confiance : ").append(validationResult.getConfidenceScore());
-            sb.append("\nDétail brut : ").append(safe(validationResult.getRawLlmResponse()));
+        if (validationResult != null && validationResult.isNeedsHumanReview()) {
+            sb.append("La validation contractuelle comporte une incertitude ou une ambiguïté. ");
         }
 
-        if (estimationResult != null) {
-            sb.append("\n\nDONNÉES AGENT ESTIMATEUR");
-            sb.append("\nConclusion : ").append(safe(estimationResult.getConclusion()));
-            sb.append("\nScore de confiance : ").append(estimationResult.getConfidenceScore());
-            sb.append("\nDétail brut : ").append(safe(estimationResult.getRawLlmResponse()));
+        if (estimationResult != null && estimationResult.isNeedsHumanReview()) {
+            sb.append("L’estimation financière doit être confirmée manuellement. ");
         }
 
-        sb.append("\n\nINSTRUCTIONS SPÉCIFIQUES SELON LE STATUT :\n");
-
-        switch (statut) {
-            case "APPROVED" -> sb.append("""
-                    Le dossier est approuvé.
-                    Le rapport doit :
-                    - confirmer clairement la couverture
-                    - résumer le fondement de l'approbation
-                    - intégrer l'estimation financière sans répéter les mêmes montants plusieurs fois
-                    - proposer une recommandation opérationnelle simple
-                    """);
-
-            case "REJECTED" -> sb.append("""
-                    Le dossier est rejeté.
-                    Le rapport doit :
-                    - expliquer clairement le motif principal du rejet
-                    - mentionner la logique de non-couverture
-                    - éviter tout ton ambigu
-                    - proposer, si pertinent, une orientation sur les suites possibles
-                    """);
-
-            case "PENDING_VALIDATION" -> sb.append("""
-                    Le dossier est en attente de validation humaine.
-                    Le rapport doit :
-                    - expliquer la cause du blocage ou de l'incertitude
-                    - indiquer les points qui demandent une vérification humaine
-                    - aider le gestionnaire à prendre une décision
-                    - rester synthétique et orienté action
-                    """);
-
-            default -> sb.append("""
-                    Rédige un rapport neutre, structuré et professionnel.
-                    """);
+        if ("PENDING_VALIDATION".equals(statut)) {
+            sb.append("Le dossier reste en attente de validation humaine complémentaire. ");
         }
 
-        sb.append("""
-                
-                
-                GÉNÈRE MAINTENANT LE RAPPORT FINAL EN TEXTE BRUT UNIQUEMENT.
-                """);
+        if (sb.isEmpty()) {
+            sb.append("Aucun point de vigilance majeur identifié à ce stade.");
+        }
 
-        return sb.toString();
+        return sb.toString().trim();
     }
 
-    private String cleanReport(String raw) {
-        if (raw == null || raw.isBlank()) {
-            return "Rapport indisponible.";
-        }
+    private String buildRecommendation(String statut,
+                                       String validationConclusion,
+                                       String estimationConclusion) {
+        return switch (statut) {
+            case "APPROVED" -> """
+                    Recommandation : poursuivre le traitement du dossier sur la base d’une couverture confirmée.
+                    Estimation disponible : %s.
+                    """.formatted(estimationConclusion).trim();
 
-        return raw
-                .replace("###", "")
-                .replace("##", "")
-                .replace("#", "")
-                .replace("**", "")
-                .replace("*", "")
-                .replace("---", "")
-                .replaceAll("[ \\t]+", " ")
-                .replaceAll("\\n{3,}", "\n\n")
-                .trim();
+            case "REJECTED" -> """
+                    Recommandation : clôturer le dossier avec motif principal de non-couverture.
+                    Résultat validation : %s.
+                    """.formatted(validationConclusion).trim();
+
+            case "PENDING_VALIDATION" -> """
+                    Recommandation : transmettre le dossier à un gestionnaire ou expert pour décision finale.
+                    Résultat validation : %s.
+                    """.formatted(validationConclusion).trim();
+
+            default -> "Recommandation : poursuivre l’analyse du dossier.";
+        };
+    }
+
+    private String buildHumanDecision(String statut) {
+        return switch (statut) {
+            case "APPROVED" -> "Décision finale orientée vers l’approbation du dossier.";
+            case "REJECTED" -> "Décision finale orientée vers le rejet du dossier.";
+            case "PENDING_VALIDATION" -> "Décision différée dans l’attente d’une validation humaine.";
+            default -> "Décision non stabilisée.";
+        };
     }
 
     private String safe(String value) {

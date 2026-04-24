@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { forkJoin, of, switchMap } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -13,12 +13,17 @@ import { ExpertFeedbackRequest } from '../models/expert-feedback.model';
 import { AgentResultService } from '../services/agent-result.service';
 import { ExpertFeedbackService } from '../services/expert-feedback.service';
 import { ClaimService } from '../services/claim.service';
-import {ClaimValidationService, ReviewData} from "../services/Claim Validation";
+import { ClaimValidationService, ReviewData } from '../services/Claim Validation';
+
+interface NavItem {
+  label: string;
+  route: string;
+}
 
 @Component({
   selector: 'app-expert-feedback-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './expert-feedback-form.component.html',
   styleUrls: ['./expert-feedback-form.component.css']
 })
@@ -37,6 +42,13 @@ export class ExpertFeedbackFormComponent implements OnInit {
   successMessage = '';
 
   decisionComment = '';
+
+  navItems: NavItem[] = [
+    { label: 'Espace expert', route: '/Expert_Space' },
+    { label: 'Validation humaine', route: '/HumanValidationList' },
+    { label: 'Feedback expert', route: '/FeedbackClaimsList' },
+    { label: 'Dossiers', route: '/AdminClaimsList' }
+  ];
 
   feedbackForm: ExpertFeedbackRequest = {
     claimId: 0,
@@ -105,6 +117,45 @@ export class ExpertFeedbackFormComponent implements OnInit {
     return (this.claim?.documents || []).filter(
       (doc) => doc.fileType === 'application/pdf'
     );
+  }
+
+  get totalDocuments(): number {
+    return this.claim?.documents?.length || 0;
+  }
+
+  get pendingLabel(): string {
+    return this.isPendingValidation ? 'Validation humaine requise' : 'Feedback expert';
+  }
+
+  isActiveNav(route: string): boolean {
+    return this.router.url.startsWith(route);
+  }
+
+  getStatusLabel(status?: string): string {
+    const map: Record<string, string> = {
+      PENDING_VALIDATION: 'En attente expert',
+      APPROVED: 'Approuvé',
+      REJECTED: 'Rejeté',
+      CLOSED: 'Clôturé',
+      IN_ANALYSIS: 'En analyse',
+      SUBMITTED: 'Soumis'
+    };
+    return map[status || ''] || (status || '-');
+  }
+
+  getStatusClass(status?: string): string {
+    switch (status) {
+      case 'PENDING_VALIDATION':
+        return 'pending';
+      case 'APPROVED':
+        return 'approved';
+      case 'REJECTED':
+        return 'rejected';
+      case 'CLOSED':
+        return 'closed';
+      default:
+        return 'default';
+    }
   }
 
   loadData(): void {

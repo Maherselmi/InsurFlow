@@ -1,5 +1,6 @@
 :host {
   --bg: #f7f9fc;
+  --surface: rgba(255, 255, 255, 0.92);
   --text: #18314f;
   --text-soft: #66809d;
   --line: #dbe5f0;
@@ -7,14 +8,6 @@
   --primary: #4d7fb3;
   --primary-hover: #3d6d9f;
   --primary-deep: #355d8d;
-  --success-bg: #eaf8ef;
-  --success-text: #197343;
-  --danger-bg: #fff3f1;
-  --danger-text: #bf3e2b;
-  --warning-bg: #fff6e8;
-  --warning-text: #a56a00;
-  --neutral-bg: #eef4fa;
-  --neutral-text: #58708c;
   --shadow-sm: 0 12px 30px rgba(110, 138, 168, 0.10);
   --shadow-md: 0 24px 60px rgba(110, 138, 168, 0.16);
   --radius-xl: 34px;
@@ -40,7 +33,7 @@ button {
   font-family: inherit;
 }
 
-.feedback-page {
+.expert-page {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
@@ -187,7 +180,40 @@ button {
   border-radius: 999px;
 }
 
-.feedback-main {
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header-user-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.header-user-text strong {
+  font-size: 14px;
+}
+
+.header-user-text span {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.logout-btn {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.expert-main {
   position: relative;
   z-index: 1;
   padding: 42px 0 72px;
@@ -208,7 +234,8 @@ button {
 }
 
 .hero-badge,
-.section-kicker {
+.section-kicker,
+.eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -221,12 +248,17 @@ button {
 }
 
 .hero-badge::before,
-.section-kicker::before {
+.section-kicker::before,
+.eyebrow::before {
   content: "";
   width: 26px;
   height: 1px;
   background: currentColor;
   opacity: 0.7;
+}
+
+.eyebrow-light {
+  color: rgba(255,255,255,0.76);
 }
 
 .hero-copy h1 {
@@ -312,8 +344,7 @@ button {
 
 .hero-mini-card,
 .stat-card,
-.claim-card,
-.state-card {
+.action-card {
   border: 1px solid rgba(218, 227, 238, 0.95);
   background: rgba(255,255,255,0.96);
   box-shadow: var(--shadow-sm);
@@ -400,6 +431,10 @@ button {
   color: var(--text-soft);
 }
 
+.actions-section {
+  margin-bottom: 28px;
+}
+
 .section-head {
   margin-bottom: 18px;
 }
@@ -412,103 +447,28 @@ button {
   font-weight: 800;
 }
 
-.claims-grid {
+.actions-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 
-.claim-card,
-.state-card {
-  border-radius: 24px;
+.action-card {
   padding: 22px;
+  border-radius: 24px;
 }
 
-.claim-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.claim-title-wrap h3 {
-  margin: 0 0 8px;
+.action-card h3 {
+  margin: 0 0 10px;
   font-size: 22px;
   font-weight: 800;
 }
 
-.claim-title-wrap p {
-  margin: 0;
+.action-card p {
+  margin: 0 0 18px;
   font-size: 14px;
-  line-height: 1.65;
+  line-height: 1.72;
   color: var(--text-soft);
-}
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.status-badge.pending {
-  background: var(--warning-bg);
-  color: var(--warning-text);
-}
-
-.status-badge.approved {
-  background: var(--success-bg);
-  color: var(--success-text);
-}
-
-.status-badge.rejected {
-  background: var(--danger-bg);
-  color: var(--danger-text);
-}
-
-.status-badge.closed,
-.status-badge.default {
-  background: var(--neutral-bg);
-  color: var(--neutral-text);
-}
-
-.claim-body {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.info-row {
-  padding: 14px;
-  border-radius: 16px;
-  background: #f8fbff;
-  border: 1px solid #e6edf7;
-}
-
-.label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #58708c;
-  font-weight: 700;
-}
-
-.info-row p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.65;
-  color: var(--text);
-}
-
-.claim-actions {
-  margin-top: 18px;
 }
 
 .action-btn,
@@ -533,10 +493,6 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
-.action-btn {
-  width: 100%;
-}
-
 .action-btn:hover,
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--primary-hover) 0%, #315a86 100%);
@@ -549,21 +505,51 @@ button {
   border: 1px solid var(--line-strong);
 }
 
-.state-card {
-  text-align: center;
-  font-size: 15px;
-  color: var(--text-soft);
+.btn-light {
+  color: var(--text);
+  background: #ffffff;
+  border: 1px solid #dde6f1;
 }
 
-.state-card.error {
-  color: var(--danger-text);
-  background: #fff7f5;
+.btn-outline-light {
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.26);
+}
+
+.bottom-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 34px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top left, rgba(127, 164, 218, 0.18), transparent 30%),
+    linear-gradient(135deg, #355d8d 0%, #4d7fb3 100%);
+  color: #ffffff;
+  box-shadow: var(--shadow-md);
+}
+
+.bottom-banner-content h2 {
+  max-width: 620px;
+  margin: 0;
+  font-size: clamp(26px, 2.5vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+  font-weight: 800;
+}
+
+.bottom-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 @media (max-width: 1180px) {
   .hero-shell,
   .stats-row,
-  .claims-grid {
+  .actions-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -587,30 +573,22 @@ button {
     padding-bottom: 8px;
   }
 
-  .hero-mini-grid,
-  .hero-actions,
-  .claim-body {
-    grid-template-columns: 1fr;
+  .header-user {
+    width: 100%;
+    justify-content: space-between;
   }
 
-  .hero-actions {
-    display: flex;
+  .hero-mini-grid,
+  .hero-actions,
+  .bottom-banner-content,
+  .bottom-banner-actions {
+    grid-template-columns: 1fr;
     flex-direction: column;
     align-items: stretch;
   }
 
   .hero-copy h1 span {
     display: inline;
-  }
-
-  .claim-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .btn,
-  .action-btn {
-    width: 100%;
   }
 }
 
@@ -621,9 +599,9 @@ button {
 
   .hero-shell,
   .hero-panel,
+  .bottom-banner-content,
   .stat-card,
-  .claim-card,
-  .state-card {
+  .action-card {
     padding: 18px;
   }
 
@@ -633,9 +611,5 @@ button {
 
   .section-head h2 {
     font-size: 22px;
-  }
-
-  .claim-title-wrap h3 {
-    font-size: 20px;
   }
 }

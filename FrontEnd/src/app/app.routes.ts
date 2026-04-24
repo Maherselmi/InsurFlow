@@ -31,12 +31,14 @@ import {ClaimValidationComponent} from "./BackOffice/claim-validation/claim-vali
 import {ParametresIaComponent} from "./BackOffice/parametres-ia/parametres-ia.component";
 import {FeedbackClaimsListComponent} from "./feedback-claims-list/feedback-claims-list.component";
 import {ExpertFeedbackFormComponent} from "./expert-feedback-form/expert-feedback-form.component";
+import {ExpertSpaceComponent} from "./expert-space/expert-space.component";
 
 export const routes: Routes = [
   { path: 'PolicesList', component: PolicesComponent },
   { path: 'Claim_Home', component: ClaimsHomeComponent },
 
   { path: 'ia_param', component: ParametresIaComponent },
+  { path: 'expert-space', component:ExpertSpaceComponent },
 
   { path: 'feedback-claims', component: FeedbackClaimsListComponent },
   { path: 'expert-feedback/:claimId', component: ExpertFeedbackFormComponent },

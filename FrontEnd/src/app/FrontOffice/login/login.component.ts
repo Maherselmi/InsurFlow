@@ -80,7 +80,7 @@ export class LoginComponent {
             this.router.navigate(['/dashboard']);
             break;
           case 'ROLE_EXPERT':
-            this.router.navigate(['/Validation']);
+            this.router.navigate(['/expert-space']);
             break;
           case 'ROLE_CLIENT':
             this.router.navigate(['/Client_Space']);

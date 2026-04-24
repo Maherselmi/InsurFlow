@@ -1,0 +1,180 @@
+<div class="expert-page">
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" routerLink="/">
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
+
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">expert workspace</span>
+        </span>
+      </a>
+
+      <nav class="main-nav">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="item.route"
+          [class.active]="isActiveNav(item.route)">
+          {{ item.label }}
+        </a>
+      </nav>
+
+      <div class="header-user">
+        <div class="header-user-text">
+          <strong>{{ expertName }}</strong>
+          <span>{{ expertEmail }}</span>
+        </div>
+
+        <button class="logout-btn" type="button" (click)="logout()">
+          Déconnexion
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="expert-main">
+    <div class="container">
+      <section class="hero-shell">
+        <div class="hero-copy">
+          <div class="hero-badge">Espace expert InsurFlow</div>
+
+          <h1>
+            Pilotez la validation humaine
+            <span>et améliorez les décisions IA.</span>
+          </h1>
+
+          <p class="hero-text">
+            Cet espace expert vous permet de revoir les dossiers sensibles,
+            corriger les décisions automatiques, enrichir les feedbacks métier
+            et renforcer la qualité du traitement des sinistres.
+          </p>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary" type="button" (click)="goTo('/HumanValidationList')">
+              Validation humaine
+            </button>
+
+            <button class="btn btn-secondary" type="button" (click)="goTo('/ExpertFeedbackList')">
+              Feedback expert
+            </button>
+          </div>
+
+          <div class="hero-points">
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Décision humaine</span>
+            </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Correction des agents IA</span>
+            </div>
+
+            <div class="hero-point">
+              <span class="hero-point-bullet"></span>
+              <span>Suivi des dossiers sensibles</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-side">
+          <div class="hero-panel">
+            <div class="hero-panel-kicker">Rôle connecté</div>
+
+            <div class="hero-mini-grid">
+              <article class="hero-mini-card">
+                <strong>{{ role }}</strong>
+                <span>Rôle actuel</span>
+              </article>
+
+              <article class="hero-mini-card">
+                <strong>IA + Expert</strong>
+                <span>Décision hybride</span>
+              </article>
+            </div>
+
+            <div class="hero-note">
+              <h3>Mission expert</h3>
+              <p>
+                Vérifier les dossiers critiques, confirmer les décisions et
+                transformer les retours terrain en apprentissage métier.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-row">
+        <article class="stat-card">
+          <span class="stat-label">Validation humaine</span>
+          <strong>Review</strong>
+          <p>Dossiers nécessitant une lecture et une décision experte.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Feedback métier</span>
+          <strong>Learning</strong>
+          <p>Corrections utilisées pour améliorer les agents IA.</p>
+        </article>
+
+        <article class="stat-card">
+          <span class="stat-label">Contrôle qualité</span>
+          <strong>Expertise</strong>
+          <p>Vérification de la cohérence des résultats automatiques.</p>
+        </article>
+
+        <article class="stat-card stat-highlight">
+          <span class="stat-label">Objectif</span>
+          <strong>Fiabilité</strong>
+          <p>Réduire les erreurs et renforcer la confiance décisionnelle.</p>
+        </article>
+      </section>
+
+      <section class="actions-section">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Actions rapides</p>
+            <h2>Outils de l’expert</h2>
+          </div>
+        </div>
+
+        <div class="actions-grid">
+          <article class="action-card" *ngFor="let action of quickActions">
+            <h3>{{ action.title }}</h3>
+            <p>{{ action.text }}</p>
+
+            <button class="action-btn" type="button" (click)="goTo(action.route)">
+              {{ action.button }}
+            </button>
+          </article>
+        </div>
+      </section>
+
+      <section class="bottom-banner">
+        <div class="bottom-banner-content">
+          <div>
+            <p class="eyebrow eyebrow-light">Expert review</p>
+            <h2>Accédez rapidement aux dossiers à valider et aux feedbacks expert.</h2>
+          </div>
+
+          <div class="bottom-banner-actions">
+            <button class="btn btn-light" type="button" (click)="goTo('/HumanValidationList')">
+              Ouvrir la validation
+            </button>
+
+            <button class="btn btn-outline-light" type="button" (click)="goTo('/ExpertFeedbackList')">
+              Ouvrir les feedbacks
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

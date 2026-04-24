@@ -4,6 +4,11 @@ import { Router, RouterModule } from '@angular/router';
 import { Claim } from '../models/Claim/claim.model';
 import { ClaimService } from '../services/claim.service';
 
+interface NavItem {
+  label: string;
+  route: string;
+}
+
 @Component({
   selector: 'app-feedback-claims-list',
   standalone: true,
@@ -15,6 +20,13 @@ export class FeedbackClaimsListComponent implements OnInit {
   claims: Claim[] = [];
   loading = true;
   errorMessage = '';
+
+  navItems: NavItem[] = [
+    { label: 'Espace expert', route: '/Expert_Space' },
+    { label: 'Validation humaine', route: '/HumanValidationList' },
+    { label: 'Feedback expert', route: '/ExpertFeedbackList' },
+    { label: 'Dossiers', route: '/AdminClaimsList' }
+  ];
 
   constructor(
     private claimService: ClaimService,
@@ -54,5 +66,55 @@ export class FeedbackClaimsListComponent implements OnInit {
 
   isPendingValidation(claim: Claim): boolean {
     return claim.status === 'PENDING_VALIDATION';
+  }
+
+  isActiveNav(route: string): boolean {
+    return this.router.url === route;
+  }
+
+  get totalClaims(): number {
+    return this.claims.length;
+  }
+
+  get pendingClaims(): number {
+    return this.claims.filter(claim => claim.status === 'PENDING_VALIDATION').length;
+  }
+
+  get processedClaims(): number {
+    return this.claims.filter(claim => claim.status !== 'PENDING_VALIDATION').length;
+  }
+
+  get reviewLabel(): string {
+    return this.pendingClaims > 0
+      ? `${this.pendingClaims} dossier(s) à traiter`
+      : 'Aucun dossier urgent';
+  }
+
+  getStatusLabel(status: string): string {
+    const map: Record<string, string> = {
+      PENDING_VALIDATION: 'En attente expert',
+      APPROVED: 'Approuvé',
+      REJECTED: 'Rejeté',
+      CLOSED: 'Clôturé',
+      IN_ANALYSIS: 'En analyse',
+      SUBMITTED: 'Soumis'
+    };
+
+    return map[status] || status;
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'PENDING_VALIDATION':
+        return 'pending';
+      case 'APPROVED':
+        return 'approved';
+      case 'REJECTED':
+        return 'rejected';
+      case 'CLOSED':
+        return 'closed';
+      default:
+        return 'default';
+    }
   }
 }

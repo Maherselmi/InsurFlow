@@ -1,206 +1,452 @@
-<div class="page" *ngIf="!loading && claim">
-  <div class="top-actions">
-    <button class="back-btn" (click)="back()">← Retour</button>
-  </div>
+<div class="feedback-page">
+  <div class="page-glow glow-left"></div>
+  <div class="page-glow glow-right"></div>
+  <div class="page-mesh"></div>
 
-  <div class="claim-card">
-    <h1>Feedback expert — dossier #{{ claim.id }}</h1>
-    <p><strong>Description :</strong> {{ claim.description }}</p>
-    <p><strong>Statut :</strong> {{ claim.status }}</p>
-    <p><strong>Date incident :</strong> {{ claim.incidentDate }}</p>
-    <p><strong>Police :</strong> {{ claim.policy?.policyNumber || '-' }}</p>
-    <p><strong>Type police :</strong> {{ claim.policy?.type || '-' }}</p>
-  </div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" routerLink="/">
+        <span class="brand-symbol">
+          <span class="brand-shape shape-back"></span>
+          <span class="brand-shape shape-front"></span>
+        </span>
 
-  <div class="section-card" *ngIf="reviewData">
-    <h2>Analyse IA</h2>
-    <pre class="report-box">{{ reviewData.aiReport }}</pre>
-  </div>
+        <span class="brand-copy">
+          <span class="brand-main">INsurFlow</span>
+          <span class="brand-sub">expert workspace</span>
+        </span>
+      </a>
 
-  <div class="section-card" *ngIf="shouldShowExpertDocuments && claim.documents?.length">
-    <h2>Documents du dossier</h2>
+      <nav class="main-nav">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="item.route"
+          [class.active]="isActiveNav(item.route)">
+          {{ item.label }}
+        </a>
+      </nav>
+    </div>
+  </header>
 
-    <div class="docs-group" *ngIf="imageDocuments.length">
-      <h3>Images du sinistre</h3>
+  <main class="feedback-main">
+    <div class="container">
+      <div class="state-card" *ngIf="loading">Chargement du feedback...</div>
 
-      <div class="docs-grid">
-        <div class="doc-card" *ngFor="let doc of imageDocuments">
-          <div class="doc-preview image-preview">
-            <img [src]="buildFileUrl(doc.filePath)" [alt]="doc.fileName" />
+      <div class="page-content" *ngIf="!loading && claim">
+        <section class="hero-shell">
+          <div class="hero-copy">
+            <div class="hero-badge">Formulaire QCM expert</div>
+
+            <h1>
+              Analysez le dossier #{{ claim.id }}
+              <span>et corrigez les résultats IA.</span>
+            </h1>
+
+            <p class="hero-text">
+              Complétez le feedback expert, contrôlez les agents IA et,
+              si nécessaire, prenez la décision humaine finale sur ce dossier.
+            </p>
+
+            <div class="hero-actions">
+              <button class="btn btn-secondary" type="button" (click)="back()">
+                Retour à la liste
+              </button>
+
+              <button class="btn btn-primary" type="button" (click)="submit()" [disabled]="saving || actionLoading">
+                {{ saving ? 'Enregistrement...' : 'Enregistrer le feedback' }}
+              </button>
+            </div>
+
+            <div class="hero-points">
+              <div class="hero-point">
+                <span class="hero-point-bullet"></span>
+                <span>{{ pendingLabel }}</span>
+              </div>
+
+              <div class="hero-point">
+                <span class="hero-point-bullet"></span>
+                <span>{{ totalDocuments }} document(s)</span>
+              </div>
+
+              <div class="hero-point">
+                <span class="hero-point-bullet"></span>
+                <span>Contrôle expert centralisé</span>
+              </div>
+            </div>
           </div>
 
-          <div class="doc-body">
-            <strong>{{ doc.fileName }}</strong>
-            <small>{{ doc.fileType }}</small>
+          <div class="hero-side">
+            <div class="hero-panel">
+              <div class="hero-panel-kicker">État du dossier</div>
+
+              <div class="hero-mini-grid">
+                <article class="hero-mini-card">
+                  <strong>#{{ claim.id }}</strong>
+                  <span>Référence</span>
+                </article>
+
+                <article class="hero-mini-card">
+                  <strong>{{ getStatusLabel(claim.status) }}</strong>
+                  <span>Statut</span>
+                </article>
+              </div>
+
+              <div class="hero-note">
+                <h3>Police</h3>
+                <p>{{ claim.policy?.policyNumber || '-' }} — {{ claim.policy?.type || '-' }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="messages success" *ngIf="successMessage">{{ successMessage }}</div>
+        <div class="messages error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+        <section class="top-summary-grid">
+          <article class="summary-card">
+            <span class="summary-label">Dossier</span>
+            <strong>#{{ claim.id }}</strong>
+            <p>{{ claim.description || 'Description non renseignée' }}</p>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">Statut</span>
+            <strong>
+              <span class="status-badge" [ngClass]="getStatusClass(claim.status)">
+                {{ getStatusLabel(claim.status) }}
+              </span>
+            </strong>
+            <p>Date incident : {{ claim.incidentDate }}</p>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">Police</span>
+            <strong>{{ claim.policy?.policyNumber || '-' }}</strong>
+            <p>Type police : {{ claim.policy?.type || '-' }}</p>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <div class="left-column">
+            <div class="section-card">
+              <div class="section-head">
+                <div>
+                  <p class="section-kicker">Dossier</p>
+                  <h2>Informations générales</h2>
+                </div>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">Description</span>
+                  <p>{{ claim.description }}</p>
+                </div>
+
+                <div class="info-item">
+                  <span class="label">Statut</span>
+                  <p>{{ getStatusLabel(claim.status) }}</p>
+                </div>
+
+                <div class="info-item">
+                  <span class="label">Date incident</span>
+                  <p>{{ claim.incidentDate }}</p>
+                </div>
+
+                <div class="info-item">
+                  <span class="label">Police</span>
+                  <p>{{ claim.policy?.policyNumber || '-' }}</p>
+                </div>
+
+                <div class="info-item">
+                  <span class="label">Type police</span>
+                  <p>{{ claim.policy?.type || '-' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card" *ngIf="reviewData">
+              <div class="section-head">
+                <div>
+                  <p class="section-kicker">Rapport IA</p>
+                  <h2>Analyse IA</h2>
+                </div>
+              </div>
+
+              <pre class="report-box">{{ reviewData.aiReport }}</pre>
+            </div>
+
+            <div class="section-card" *ngIf="shouldShowExpertDocuments && claim.documents?.length">
+              <div class="section-head">
+                <div>
+                  <p class="section-kicker">Justificatifs</p>
+                  <h2>Documents du dossier</h2>
+                </div>
+              </div>
+
+              <div class="docs-group" *ngIf="imageDocuments.length">
+                <h3>Images du sinistre</h3>
+
+                <div class="docs-grid">
+                  <div class="doc-card" *ngFor="let doc of imageDocuments">
+                    <div class="doc-preview image-preview">
+                      <img [src]="buildFileUrl(doc.filePath)" [alt]="doc.fileName" />
+                    </div>
+
+                    <div class="doc-body">
+                      <strong>{{ doc.fileName }}</strong>
+                      <small>{{ doc.fileType }}</small>
+                    </div>
+
+                    <div class="doc-actions">
+                      <a [href]="buildFileUrl(doc.filePath)" target="_blank" rel="noopener noreferrer">
+                        Ouvrir
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="docs-group" *ngIf="pdfDocuments.length">
+                <h3>Documents PDF</h3>
+
+                <div class="docs-grid">
+                  <div class="doc-card" *ngFor="let doc of pdfDocuments">
+                    <div class="doc-preview pdf-preview">
+                      <iframe [src]="getSafePdfUrl(doc.filePath)" title="PDF du dossier"></iframe>
+                    </div>
+
+                    <div class="doc-body">
+                      <strong>{{ doc.fileName }}</strong>
+                      <small>{{ doc.fileType }}</small>
+                    </div>
+
+                    <div class="doc-actions">
+                      <a [href]="buildFileUrl(doc.filePath)" target="_blank" rel="noopener noreferrer">
+                        Ouvrir PDF
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="doc-actions">
-            <a [href]="buildFileUrl(doc.filePath)" target="_blank" rel="noopener noreferrer">
-              Ouvrir
-            </a>
+          <div class="right-column">
+            <form class="feedback-form" (ngSubmit)="submit()">
+              <div class="section-card">
+                <div class="section-head">
+                  <div>
+                    <p class="section-kicker">Expert</p>
+                    <h2>Informations générales</h2>
+                  </div>
+                </div>
+
+                <div class="form-grid one-col">
+                  <div class="form-group">
+                    <label>Expert</label>
+                    <input [(ngModel)]="feedbackForm.reviewedBy" name="reviewedBy" />
+                  </div>
+
+                  <label class="toggle-row">
+                    <input type="checkbox" [(ngModel)]="feedbackForm.useForLearning" name="useForLearning" />
+                    <span>Utiliser ce dossier pour le learning</span>
+                  </label>
+
+                  <div class="form-group">
+                    <label>Commentaire global</label>
+                    <textarea [(ngModel)]="feedbackForm.globalComment" name="globalComment"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-card" *ngIf="isPendingValidation">
+                <div class="section-head">
+                  <div>
+                    <p class="section-kicker">Décision humaine</p>
+                    <h2>Validation finale</h2>
+                  </div>
+                </div>
+
+                <div class="form-grid one-col">
+                  <div class="form-group">
+                    <label>Commentaire gestionnaire</label>
+                    <textarea
+                      [(ngModel)]="decisionComment"
+                      name="decisionComment"
+                      placeholder="Commentaire pour approbation ou rejet..."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="decision-actions">
+                  <button type="button" class="reject-btn" (click)="rejectClaim()" [disabled]="actionLoading">
+                    {{ actionLoading && actionType === 'reject' ? 'Rejet...' : 'Rejeter le dossier' }}
+                  </button>
+
+                  <button type="button" class="approve-btn" (click)="approveClaim()" [disabled]="actionLoading">
+                    {{ actionLoading && actionType === 'approve' ? 'Approbation...' : 'Approuver le dossier' }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-head">
+                  <div>
+                    <p class="section-kicker">Agent Routeur</p>
+                    <h2>QCM classification</h2>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Type prédit</label>
+                    <input [(ngModel)]="feedbackForm.predictedType" name="predictedType" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Confiance</label>
+                    <input type="number" [(ngModel)]="feedbackForm.routeurConfidence" name="routeurConfidence" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Le type est correct ?</label>
+                    <select [(ngModel)]="feedbackForm.routeurCorrect" name="routeurCorrect">
+                      <option [ngValue]="null">Choisir</option>
+                      <option [ngValue]="true">Oui</option>
+                      <option [ngValue]="false">Non</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Type final</label>
+                    <select [(ngModel)]="feedbackForm.finalType" name="finalType">
+                      <option value="AUTO">AUTO</option>
+                      <option value="HABITATION">HABITATION</option>
+                      <option value="SANTE">SANTE</option>
+                      <option value="VOYAGE">VOYAGE</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group full">
+                    <label>Commentaire routeur</label>
+                    <textarea [(ngModel)]="feedbackForm.routeurComment" name="routeurComment"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-head">
+                  <div>
+                    <p class="section-kicker">Agent Validateur</p>
+                    <h2>QCM couverture</h2>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Décision prédite</label>
+                    <input [(ngModel)]="feedbackForm.predictedDecision" name="predictedDecision" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Confiance</label>
+                    <input type="number" [(ngModel)]="feedbackForm.validationConfidence" name="validationConfidence" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>La décision est correcte ?</label>
+                    <select [(ngModel)]="feedbackForm.validationCorrect" name="validationCorrect">
+                      <option [ngValue]="null">Choisir</option>
+                      <option [ngValue]="true">Oui</option>
+                      <option [ngValue]="false">Non</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label>Décision finale</label>
+                    <select [(ngModel)]="feedbackForm.finalDecision" name="finalDecision">
+                      <option value="COUVERT">COUVERT</option>
+                      <option value="EXCLU">EXCLU</option>
+                      <option value="INCONNU">INCONNU</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group full">
+                    <label>Commentaire validation</label>
+                    <textarea [(ngModel)]="feedbackForm.validationComment" name="validationComment"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-head">
+                  <div>
+                    <p class="section-kicker">Agent Estimateur</p>
+                    <h2>QCM estimation</h2>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Estimation min prédite</label>
+                    <input type="number" [(ngModel)]="feedbackForm.predictedEstimationMin" name="predictedEstimationMin" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Estimation moyenne prédite</label>
+                    <input type="number" [(ngModel)]="feedbackForm.predictedEstimationMoyenne" name="predictedEstimationMoyenne" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Estimation max prédite</label>
+                    <input type="number" [(ngModel)]="feedbackForm.predictedEstimationMax" name="predictedEstimationMax" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Confiance</label>
+                    <input type="number" [(ngModel)]="feedbackForm.estimateurConfidence" name="estimateurConfidence" readonly />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Évaluation expert</label>
+                    <select [(ngModel)]="feedbackForm.estimateEvaluation" name="estimateEvaluation">
+                      <option value="CORRECTE">CORRECTE</option>
+                      <option value="TROP_BASSE">TROP_BASSE</option>
+                      <option value="TROP_ELEVEE">TROP_ELEVEE</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group"></div>
+
+                  <div class="form-group">
+                    <label>Estimation finale min</label>
+                    <input type="number" [(ngModel)]="feedbackForm.finalEstimationMin" name="finalEstimationMin" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Estimation finale moyenne</label>
+                    <input type="number" [(ngModel)]="feedbackForm.finalEstimationMoyenne" name="finalEstimationMoyenne" />
+                  </div>
+
+                  <div class="form-group">
+                    <label>Estimation finale max</label>
+                    <input type="number" [(ngModel)]="feedbackForm.finalEstimationMax" name="finalEstimationMax" />
+                  </div>
+
+                  <div class="form-group full">
+                    <label>Commentaire estimateur</label>
+                    <textarea [(ngModel)]="feedbackForm.estimateurComment" name="estimateurComment"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <button class="save-btn" type="submit" [disabled]="saving || actionLoading">
+                {{ saving ? 'Enregistrement...' : 'Enregistrer le feedback expert' }}
+              </button>
+            </form>
           </div>
-        </div>
+        </section>
       </div>
     </div>
-
-    <div class="docs-group" *ngIf="pdfDocuments.length">
-      <h3>Documents PDF</h3>
-
-      <div class="docs-grid">
-        <div class="doc-card" *ngFor="let doc of pdfDocuments">
-          <div class="doc-preview pdf-preview">
-            <iframe [src]="getSafePdfUrl(doc.filePath)" title="PDF du dossier"></iframe>
-          </div>
-
-          <div class="doc-body">
-            <strong>{{ doc.fileName }}</strong>
-            <small>{{ doc.fileType }}</small>
-          </div>
-
-          <div class="doc-actions">
-            <a [href]="buildFileUrl(doc.filePath)" target="_blank" rel="noopener noreferrer">
-              Ouvrir PDF
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <form class="feedback-form" (ngSubmit)="submit()">
-    <div class="section-card">
-      <h2>Informations générales</h2>
-
-      <label>Expert</label>
-      <input [(ngModel)]="feedbackForm.reviewedBy" name="reviewedBy" />
-
-      <label class="checkbox-row">
-        <input type="checkbox" [(ngModel)]="feedbackForm.useForLearning" name="useForLearning" />
-        Utiliser ce dossier pour le learning
-      </label>
-
-      <label>Commentaire global</label>
-      <textarea [(ngModel)]="feedbackForm.globalComment" name="globalComment"></textarea>
-    </div>
-
-    <div class="section-card" *ngIf="isPendingValidation">
-      <h2>Décision humaine</h2>
-
-      <label>Commentaire gestionnaire</label>
-      <textarea
-        [(ngModel)]="decisionComment"
-        name="decisionComment"
-        placeholder="Commentaire pour approbation ou rejet..."
-      ></textarea>
-
-      <div class="decision-actions">
-        <button type="button" class="reject-btn" (click)="rejectClaim()" [disabled]="actionLoading">
-          {{ actionLoading && actionType === 'reject' ? 'Rejet...' : 'Rejeter le dossier' }}
-        </button>
-
-        <button type="button" class="approve-btn" (click)="approveClaim()" [disabled]="actionLoading">
-          {{ actionLoading && actionType === 'approve' ? 'Approbation...' : 'Approuver le dossier' }}
-        </button>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <h2>QCM Agent Routeur</h2>
-
-      <label>Type prédit</label>
-      <input [(ngModel)]="feedbackForm.predictedType" name="predictedType" readonly />
-
-      <label>Confiance</label>
-      <input type="number" [(ngModel)]="feedbackForm.routeurConfidence" name="routeurConfidence" readonly />
-
-      <label>Le type est correct ?</label>
-      <select [(ngModel)]="feedbackForm.routeurCorrect" name="routeurCorrect">
-        <option [ngValue]="null">Choisir</option>
-        <option [ngValue]="true">Oui</option>
-        <option [ngValue]="false">Non</option>
-      </select>
-
-      <label>Type final</label>
-      <select [(ngModel)]="feedbackForm.finalType" name="finalType">
-        <option value="AUTO">AUTO</option>
-        <option value="HABITATION">HABITATION</option>
-        <option value="SANTE">SANTE</option>
-        <option value="VOYAGE">VOYAGE</option>
-      </select>
-
-      <label>Commentaire routeur</label>
-      <textarea [(ngModel)]="feedbackForm.routeurComment" name="routeurComment"></textarea>
-    </div>
-
-    <div class="section-card">
-      <h2>QCM Agent Validateur</h2>
-
-      <label>Décision prédite</label>
-      <input [(ngModel)]="feedbackForm.predictedDecision" name="predictedDecision" readonly />
-
-      <label>Confiance</label>
-      <input type="number" [(ngModel)]="feedbackForm.validationConfidence" name="validationConfidence" readonly />
-
-      <label>La décision est correcte ?</label>
-      <select [(ngModel)]="feedbackForm.validationCorrect" name="validationCorrect">
-        <option [ngValue]="null">Choisir</option>
-        <option [ngValue]="true">Oui</option>
-        <option [ngValue]="false">Non</option>
-      </select>
-
-      <label>Décision finale</label>
-      <select [(ngModel)]="feedbackForm.finalDecision" name="finalDecision">
-        <option value="COUVERT">COUVERT</option>
-        <option value="EXCLU">EXCLU</option>
-        <option value="INCONNU">INCONNU</option>
-      </select>
-
-      <label>Commentaire validation</label>
-      <textarea [(ngModel)]="feedbackForm.validationComment" name="validationComment"></textarea>
-    </div>
-
-    <div class="section-card">
-      <h2>QCM Agent Estimateur</h2>
-
-      <label>Estimation min prédite</label>
-      <input type="number" [(ngModel)]="feedbackForm.predictedEstimationMin" name="predictedEstimationMin" readonly />
-
-      <label>Estimation moyenne prédite</label>
-      <input type="number" [(ngModel)]="feedbackForm.predictedEstimationMoyenne" name="predictedEstimationMoyenne" readonly />
-
-      <label>Estimation max prédite</label>
-      <input type="number" [(ngModel)]="feedbackForm.predictedEstimationMax" name="predictedEstimationMax" readonly />
-
-      <label>Confiance</label>
-      <input type="number" [(ngModel)]="feedbackForm.estimateurConfidence" name="estimateurConfidence" readonly />
-
-      <label>Évaluation expert</label>
-      <select [(ngModel)]="feedbackForm.estimateEvaluation" name="estimateEvaluation">
-        <option value="CORRECTE">CORRECTE</option>
-        <option value="TROP_BASSE">TROP_BASSE</option>
-        <option value="TROP_ELEVEE">TROP_ELEVEE</option>
-      </select>
-
-      <label>Estimation finale min</label>
-      <input type="number" [(ngModel)]="feedbackForm.finalEstimationMin" name="finalEstimationMin" />
-
-      <label>Estimation finale moyenne</label>
-      <input type="number" [(ngModel)]="feedbackForm.finalEstimationMoyenne" name="finalEstimationMoyenne" />
-
-      <label>Estimation finale max</label>
-      <input type="number" [(ngModel)]="feedbackForm.finalEstimationMax" name="finalEstimationMax" />
-
-      <label>Commentaire estimateur</label>
-      <textarea [(ngModel)]="feedbackForm.estimateurComment" name="estimateurComment"></textarea>
-    </div>
-
-    <div class="messages success" *ngIf="successMessage">{{ successMessage }}</div>
-    <div class="messages error" *ngIf="errorMessage">{{ errorMessage }}</div>
-
-    <button class="save-btn" type="submit" [disabled]="saving || actionLoading">
-      {{ saving ? 'Enregistrement...' : 'Enregistrer le feedback expert' }}
-    </button>
-  </form>
+  </main>
 </div>
-
-<div class="state-card" *ngIf="loading">Chargement du feedback...</div>

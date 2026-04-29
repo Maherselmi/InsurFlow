@@ -1,7 +1,6 @@
 package tn.esprit.insureflow_back.Orchestrator;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import tn.esprit.insureflow_back.Agent.AgentEstimateur;
@@ -18,9 +17,8 @@ import tn.esprit.insureflow_back.Service.RapportService;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Locale;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 @Slf4j
 @Service
@@ -37,8 +35,6 @@ public class OrchestratorService {
     private final RapportService rapportService;
     private final RapportClientService rapportClientService;
 
-    private final Executor agentExecutor;
-
     public OrchestratorService(
             AgentRouteur agentRouteur,
             AgentValidateur agentValidateur,
@@ -47,8 +43,7 @@ public class OrchestratorService {
             ClaimRepository claimRepository,
             ClaimPdfExtractorService pdfExtractorService,
             RapportService rapportService,
-            RapportClientService rapportClientService,
-            @Qualifier("agentExecutor") Executor agentExecutor
+            RapportClientService rapportClientService
     ) {
         this.agentRouteur = agentRouteur;
         this.agentValidateur = agentValidateur;
@@ -58,7 +53,6 @@ public class OrchestratorService {
         this.pdfExtractorService = pdfExtractorService;
         this.rapportService = rapportService;
         this.rapportClientService = rapportClientService;
-        this.agentExecutor = agentExecutor;
     }
 
     @Async("agentExecutor")
@@ -70,7 +64,7 @@ public class OrchestratorService {
             return;
         }
 
-        log.info("Orchestrator - démarrage traitement claim #{}", claim.getId());
+        log.info("Orchestrator - démarrage traitement séquentiel claim #{}", claim.getId());
 
         Claim freshClaim = claimRepository.findByIdWithDocuments(claim.getId())
                 .orElseThrow(() -> new RuntimeException("Claim introuvable : " + claim.getId()));
@@ -82,29 +76,28 @@ public class OrchestratorService {
         AgentResult estimationResult = null;
 
         try {
-            Instant parallelStart = Instant.now();
+            /*
+             * 1. Agent Routeur
+             */
+            log.info("===== ÉTAPE 1/5 : AGENT ROUTEUR claim #{} =====", freshClaim.getId());
 
-            CompletableFuture<String> pdfFuture = CompletableFuture.supplyAsync(
-                    () -> safeExtractPdfText(freshClaim),
-                    agentExecutor
-            );
-
-            CompletableFuture<AgentResult> routeFuture = CompletableFuture.supplyAsync(
-                    () -> safeRunRouteur(freshClaim),
-                    agentExecutor
-            );
-
-            routeResult = routeFuture.join();
+            routeResult = safeRunRouteur(freshClaim);
             routeResult.setClaim(freshClaim);
             agentResultRepository.save(routeResult);
 
-            logDuration("Routeur terminé", parallelStart);
-
             String routedType = extractRoutedType(routeResult);
-            log.info("Type transmis au validateur pour claim #{} : {}", freshClaim.getId(), routedType);
+
+            log.info(
+                    "Routeur terminé claim #{} | type={} | confidence={} | humanReview={}",
+                    freshClaim.getId(),
+                    routedType,
+                    routeResult.getConfidenceScore(),
+                    routeResult.isNeedsHumanReview()
+            );
 
             if (routeResult.isNeedsHumanReview()) {
                 log.warn("Confiance faible au routage -> PENDING_VALIDATION");
+
                 finalizeClaim(
                         freshClaim,
                         ClaimStatus.PENDING_VALIDATION,
@@ -116,24 +109,46 @@ public class OrchestratorService {
                 return;
             }
 
-            String claimPdfText = pdfFuture.join();
+            /*
+             * 2. Extraction PDF
+             */
+            log.info("===== ÉTAPE 2/5 : EXTRACTION PDF claim #{} =====", freshClaim.getId());
+
+            String claimPdfText = safeExtractPdfText(freshClaim);
+
             if (claimPdfText == null || claimPdfText.isBlank()) {
                 log.warn("Aucun PDF exploitable - utilisation de la description");
                 claimPdfText = safeText(freshClaim.getDescription());
             }
 
-            Instant validationStart = Instant.now();
+            /*
+             * 3. Agent Validateur
+             */
+            log.info("===== ÉTAPE 3/5 : AGENT VALIDATEUR claim #{} =====", freshClaim.getId());
 
-            validationResult = safeRunValidateur(freshClaim, claimPdfText, routedType);
+            validationResult = safeRunValidateur(
+                    freshClaim,
+                    claimPdfText,
+                    routedType
+            );
+
             validationResult.setClaim(freshClaim);
             agentResultRepository.save(validationResult);
 
-            logDuration("Validateur terminé", validationStart);
+            String validationDecision = safeText(validationResult.getConclusion())
+                    .toUpperCase(Locale.ROOT);
 
-            String validationDecision = safeText(validationResult.getConclusion()).toUpperCase(Locale.ROOT);
+            log.info(
+                    "Validateur terminé claim #{} | decision={} | confidence={} | humanReview={}",
+                    freshClaim.getId(),
+                    validationDecision,
+                    validationResult.getConfidenceScore(),
+                    validationResult.isNeedsHumanReview()
+            );
 
             if ("EXCLU".equals(validationDecision)) {
                 log.warn("Sinistre EXCLU -> REJECTED");
+
                 finalizeClaim(
                         freshClaim,
                         ClaimStatus.REJECTED,
@@ -147,6 +162,7 @@ public class OrchestratorService {
 
             if ("INCONNU".equals(validationDecision) || validationResult.isNeedsHumanReview()) {
                 log.warn("Validation contractuelle incertaine -> PENDING_VALIDATION");
+
                 finalizeClaim(
                         freshClaim,
                         ClaimStatus.PENDING_VALIDATION,
@@ -158,16 +174,37 @@ public class OrchestratorService {
                 return;
             }
 
-            Instant estimationStart = Instant.now();
+            /*
+             * 4. Agent Estimateur
+             * L'estimateur démarre seulement après une validation COUVERT.
+             */
+            log.info("===== ÉTAPE 4/5 : AGENT ESTIMATEUR claim #{} =====", freshClaim.getId());
 
-            estimationResult = safeRunEstimateur(freshClaim, routeResult, validationResult);
+            estimationResult = safeRunEstimateur(
+                    freshClaim,
+                    routeResult,
+                    validationResult
+            );
+
             estimationResult.setClaim(freshClaim);
             agentResultRepository.save(estimationResult);
 
-            logDuration("Estimateur terminé", estimationStart);
+            log.info(
+                    "Estimateur terminé claim #{} | conclusion={} | confidence={} | humanReview={}",
+                    freshClaim.getId(),
+                    estimationResult.getConclusion(),
+                    estimationResult.getConfidenceScore(),
+                    estimationResult.isNeedsHumanReview()
+            );
+
+            /*
+             * 5. Décision finale + rapports
+             */
+            log.info("===== ÉTAPE 5/5 : DÉCISION FINALE + RAPPORTS claim #{} =====", freshClaim.getId());
 
             if (estimationResult.isNeedsHumanReview()) {
-                log.warn("Estimation incertaine -> PENDING_VALIDATION");
+                log.warn("Estimation nécessite validation humaine -> PENDING_VALIDATION");
+
                 finalizeClaim(
                         freshClaim,
                         ClaimStatus.PENDING_VALIDATION,
@@ -178,6 +215,7 @@ public class OrchestratorService {
                 );
             } else {
                 log.info("Sinistre APPROUVÉ automatiquement");
+
                 finalizeClaim(
                         freshClaim,
                         ClaimStatus.APPROVED,
@@ -189,15 +227,29 @@ public class OrchestratorService {
             }
 
         } catch (Exception e) {
-            log.error("Erreur orchestrateur claim #{}: {}", freshClaim.getId(), e.getMessage(), e);
+            log.error(
+                    "Erreur orchestrateur claim #{}: {}",
+                    freshClaim.getId(),
+                    e.getMessage(),
+                    e
+            );
 
             updateStatus(freshClaim, ClaimStatus.PENDING_VALIDATION);
 
             try {
-                genererEtSauvegarderRapports(freshClaim, routeResult, validationResult, estimationResult);
+                genererEtSauvegarderRapports(
+                        freshClaim,
+                        routeResult,
+                        validationResult,
+                        estimationResult
+                );
             } catch (Exception reportError) {
-                log.error("Erreur sauvegarde rapports après échec orchestrateur claim #{}: {}",
-                        freshClaim.getId(), reportError.getMessage(), reportError);
+                log.error(
+                        "Erreur sauvegarde rapports après échec orchestrateur claim #{}: {}",
+                        freshClaim.getId(),
+                        reportError.getMessage(),
+                        reportError
+                );
             }
 
             logDuration("Workflow terminé en erreur", totalStart);
@@ -206,26 +258,48 @@ public class OrchestratorService {
 
     private String safeExtractPdfText(Claim claim) {
         Instant start = Instant.now();
+
         try {
             log.info("Extraction PDF démarrée pour claim #{}", claim.getId());
+
             String text = pdfExtractorService.extractTextFromClaim(claim);
+
             logDuration("Extraction PDF terminée", start);
+
             return text;
+
         } catch (Exception e) {
-            log.error("Erreur extraction PDF claim #{}: {}", claim.getId(), e.getMessage(), e);
+            log.error(
+                    "Erreur extraction PDF claim #{}: {}",
+                    claim.getId(),
+                    e.getMessage(),
+                    e
+            );
+
             return safeText(claim.getDescription());
         }
     }
 
     private AgentResult safeRunRouteur(Claim claim) {
         Instant start = Instant.now();
+
         try {
             log.info("AgentRouteur démarré pour claim #{}", claim.getId());
+
             AgentResult result = agentRouteur.classifier(claim);
+
             logDuration("AgentRouteur terminé", start);
+
             return result;
+
         } catch (Exception e) {
-            log.error("Erreur AgentRouteur claim #{}: {}", claim.getId(), e.getMessage(), e);
+            log.error(
+                    "Erreur AgentRouteur claim #{}: {}",
+                    claim.getId(),
+                    e.getMessage(),
+                    e
+            );
+
             return buildFallbackAgentResult(
                     "AgentRouteur",
                     "Type de sinistre classifié : INCONNU | Justification : erreur routeur",
@@ -237,12 +311,34 @@ public class OrchestratorService {
         }
     }
 
-    private AgentResult safeRunValidateur(Claim claim, String claimPdfText, String routedType) {
+    private AgentResult safeRunValidateur(
+            Claim claim,
+            String claimPdfText,
+            String routedType
+    ) {
+        Instant start = Instant.now();
+
         try {
             log.info("AgentValidateur démarré pour claim #{}", claim.getId());
-            return agentValidateur.validate(claim, claimPdfText, routedType);
+
+            AgentResult result = agentValidateur.validate(
+                    claim,
+                    claimPdfText,
+                    routedType
+            );
+
+            logDuration("AgentValidateur terminé", start);
+
+            return result;
+
         } catch (Exception e) {
-            log.error("Erreur AgentValidateur claim #{}: {}", claim.getId(), e.getMessage(), e);
+            log.error(
+                    "Erreur AgentValidateur claim #{}: {}",
+                    claim.getId(),
+                    e.getMessage(),
+                    e
+            );
+
             return buildFallbackAgentResult(
                     "AgentValidateur",
                     "INCONNU",
@@ -254,12 +350,34 @@ public class OrchestratorService {
         }
     }
 
-    private AgentResult safeRunEstimateur(Claim claim, AgentResult routeResult, AgentResult validationResult) {
+    private AgentResult safeRunEstimateur(
+            Claim claim,
+            AgentResult routeResult,
+            AgentResult validationResult
+    ) {
+        Instant start = Instant.now();
+
         try {
             log.info("AgentEstimateur démarré pour claim #{}", claim.getId());
-            return agentEstimateur.estimate(claim, routeResult, validationResult);
+
+            AgentResult result = agentEstimateur.estimate(
+                    claim,
+                    routeResult,
+                    validationResult
+            );
+
+            logDuration("AgentEstimateur terminé", start);
+
+            return result;
+
         } catch (Exception e) {
-            log.error("Erreur AgentEstimateur claim #{}: {}", claim.getId(), e.getMessage(), e);
+            log.error(
+                    "Erreur AgentEstimateur claim #{}: {}",
+                    claim.getId(),
+                    e.getMessage(),
+                    e
+            );
+
             return buildFallbackAgentResult(
                     "AgentEstimateur",
                     "Estimation min: 0.00 DT | moyenne: 0.00 DT | max: 0.00 DT",
@@ -271,17 +389,29 @@ public class OrchestratorService {
         }
     }
 
-    private void finalizeClaim(Claim claim,
-                               ClaimStatus finalStatus,
-                               AgentResult routeResult,
-                               AgentResult validationResult,
-                               AgentResult estimationResult,
-                               Instant totalStart) {
-
+    private void finalizeClaim(
+            Claim claim,
+            ClaimStatus finalStatus,
+            AgentResult routeResult,
+            AgentResult validationResult,
+            AgentResult estimationResult,
+            Instant totalStart
+    ) {
         updateStatus(claim, finalStatus);
-        genererEtSauvegarderRapports(claim, routeResult, validationResult, estimationResult);
 
-        log.info("Workflow terminé - claim #{} statut final: {}", claim.getId(), claim.getStatus());
+        genererEtSauvegarderRapports(
+                claim,
+                routeResult,
+                validationResult,
+                estimationResult
+        );
+
+        log.info(
+                "Workflow terminé - claim #{} statut final: {}",
+                claim.getId(),
+                claim.getStatus()
+        );
+
         logDuration("Temps total workflow", totalStart);
     }
 
@@ -290,47 +420,86 @@ public class OrchestratorService {
             return "INCONNU";
         }
 
-        String value = routeResult.getConclusion().trim().toUpperCase(Locale.ROOT);
+        String value = routeResult.getConclusion()
+                .trim()
+                .toUpperCase(Locale.ROOT);
 
-        if (value.contains("AUTO")) return "AUTO";
-        if (value.contains("SANTE")) return "SANTE";
-        if (value.contains("HABITATION")) return "HABITATION";
-        if (value.contains("VOYAGE")) return "VOYAGE";
+        if (value.contains("AUTO")) {
+            return "AUTO";
+        }
+
+        if (value.contains("SANTE") || value.contains("SANTÉ")) {
+            return "SANTE";
+        }
+
+        if (value.contains("HABITATION")) {
+            return "HABITATION";
+        }
+
+        if (value.contains("VOYAGE")) {
+            return "VOYAGE";
+        }
+
+        if (value.contains("VIE")) {
+            return "VIE";
+        }
 
         return "INCONNU";
     }
 
-    private void genererEtSauvegarderRapports(Claim claim,
-                                              AgentResult routeResult,
-                                              AgentResult validationResult,
-                                              AgentResult estimationResult) {
+    private void genererEtSauvegarderRapports(
+            Claim claim,
+            AgentResult routeResult,
+            AgentResult validationResult,
+            AgentResult estimationResult
+    ) {
         try {
             log.info("Génération rapport expert pour claim #{}", claim.getId());
+
             String rapportExpert = rapportService.genererRapport(
-                    claim, routeResult, validationResult, estimationResult);
+                    claim,
+                    routeResult,
+                    validationResult,
+                    estimationResult
+            );
+
             claim.setAiReport(rapportExpert);
 
             log.info("Génération rapport client pour claim #{}", claim.getId());
+
             String rapportClient = rapportClientService.genererRapportClient(
-                    claim, routeResult, validationResult, estimationResult);
+                    claim,
+                    routeResult,
+                    validationResult,
+                    estimationResult
+            );
+
             claim.setClientReport(rapportClient);
 
             claimRepository.save(claim);
+
             log.info("Rapports sauvegardés - claim #{}", claim.getId());
 
         } catch (Exception e) {
-            log.error("Erreur génération rapports claim #{}: {}", claim.getId(), e.getMessage(), e);
+            log.error(
+                    "Erreur génération rapports claim #{}: {}",
+                    claim.getId(),
+                    e.getMessage(),
+                    e
+            );
         }
     }
 
     private void updateStatus(Claim claim, ClaimStatus status) {
         claim.setStatus(status);
         claimRepository.save(claim);
+
         log.info("Statut claim #{} -> {}", claim.getId(), status);
     }
 
     private void logDuration(String label, Instant start) {
         long ms = Duration.between(start, Instant.now()).toMillis();
+
         log.info("{} en {} ms", label, ms);
     }
 
@@ -338,19 +507,24 @@ public class OrchestratorService {
         return value == null ? "" : value.trim();
     }
 
-    private AgentResult buildFallbackAgentResult(String agentName,
-                                                 String conclusion,
-                                                 double confidenceScore,
-                                                 boolean needsHumanReview,
-                                                 Claim claim,
-                                                 String rawLlmResponse) {
+    private AgentResult buildFallbackAgentResult(
+            String agentName,
+            String conclusion,
+            double confidenceScore,
+            boolean needsHumanReview,
+            Claim claim,
+            String rawLlmResponse
+    ) {
         AgentResult result = new AgentResult();
+
         result.setAgentName(agentName);
         result.setConclusion(conclusion);
         result.setConfidenceScore(confidenceScore);
         result.setNeedsHumanReview(needsHumanReview);
         result.setClaim(claim);
         result.setRawLlmResponse(rawLlmResponse);
+        result.setCreatedAt(LocalDateTime.now());
+
         return result;
     }
 }

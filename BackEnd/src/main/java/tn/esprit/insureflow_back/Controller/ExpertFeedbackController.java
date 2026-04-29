@@ -2,26 +2,30 @@ package tn.esprit.insureflow_back.Controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import tn.esprit.insureflow_back.DTO.ExpertFeedbackRequest;
-import tn.esprit.insureflow_back.Domain.Entities.ExpertFeedback;
-import tn.esprit.insureflow_back.Service.ExpertFeedbackService;
+import tn.esprit.insureflow_back.Service.ExpertFeedbackLearningService;
+
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/expert-feedback")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api/expert-feedback")
 @RequiredArgsConstructor
 public class ExpertFeedbackController {
 
-    private final ExpertFeedbackService expertFeedbackService;
+    private final ExpertFeedbackLearningService expertFeedbackLearningService;
 
     @PostMapping
-    public ResponseEntity<ExpertFeedback> saveFeedback(@RequestBody ExpertFeedbackRequest request) {
-        return ResponseEntity.ok(expertFeedbackService.saveFeedback(request));
-    }
+    public ResponseEntity<Map<String, Object>> saveExpertFeedback(@RequestBody ExpertFeedbackRequest request) {
+        int savedItems = expertFeedbackLearningService.saveExpertFeedback(request);
 
-    @GetMapping("/claim/{claimId}")
-    public ResponseEntity<ExpertFeedback> getByClaimId(@PathVariable Long claimId) {
-        return ResponseEntity.ok(expertFeedbackService.getByClaimId(claimId));
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Expert feedback saved successfully",
+                "learningItemsSaved", savedItems
+        ));
     }
 }

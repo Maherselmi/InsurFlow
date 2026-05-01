@@ -1,34 +1,22 @@
 <div class="claim-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>DÉCLARATION HABITATION</small>
         </span>
       </a>
 
-      <nav class="main-nav">
-        <a
-          *ngFor="let item of navItems"
-          [routerLink]="item.route"
-          [class.active]="isActiveNav(item.route)"
-        >
+      <nav class="nav-links">
+        <a *ngFor="let item of navItems" [routerLink]="item.route" [class.active]="isActiveNav(item.route)">
           {{ item.label }}
         </a>
       </nav>
 
-      <div class="header-chip">
-        <span class="chip-label">Déclaration habitation</span>
+      <div class="step-chip">
+        <span>Déclaration habitation</span>
         <strong>Étape 3 / 3</strong>
       </div>
     </div>
@@ -36,58 +24,23 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badge">Confirmation du dossier habitation</div>
-
-          <h1>
-            Votre sinistre habitation est bien enregistré
-            <span>et prêt pour expertise.</span>
-          </h1>
-
-          <p class="hero-text">
-            Votre déclaration a été transmise avec succès. Le dossier passe
-            maintenant en phase d’analyse et de traitement dans votre espace
-            InSurFlow, dans une interface plus claire et plus premium.
-          </p>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Dossier créé avec succès</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Documents bien reçus</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Expertise en cours</span>
-            </div>
-          </div>
+      <section class="claim-hero">
+        <div class="claim-welcome-card">
+          <span class="claim-label">Confirmation habitation</span>
+          <h1>Votre sinistre habitation est bien enregistré <span>et prêt pour expertise.</span></h1>
+          <p>Votre déclaration a été transmise avec succès. Le dossier passe maintenant en phase d’analyse.</p>
         </div>
 
-        <div class="hero-side">
-          <div class="hero-panel">
-            <div class="hero-panel-kicker">Référence dossier habitation</div>
+        <div class="claim-summary-card">
+          <div class="summary-header">
+            <span>Référence dossier</span>
+            <small>Étape 3</small>
+          </div>
 
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>✓</strong>
-                <span>Dossier transmis</span>
-              </article>
-
-              <article class="hero-mini-card">
-                <strong>48h</strong>
-                <span>Expertise cible</span>
-              </article>
-            </div>
-
-            <div class="hero-visual">
-              <img src="assets/images/home-insurance.jpg" alt="Confirmation sinistre habitation" />
-            </div>
+          <div class="summary-grid">
+            <article><strong>✓</strong><span>Dossier transmis</span></article>
+            <article><strong>48h</strong><span>Expertise cible</span></article>
+            <article><strong>3/3</strong><span>Parcours terminé</span></article>
           </div>
         </div>
       </section>
@@ -96,42 +49,16 @@
         <aside class="left-column">
           <div class="panel progress-panel">
             <p class="panel-kicker">Progression</p>
-
             <div class="step-list">
-              <div class="step-card done">
-                <div class="step-number">✓</div>
-                <div>
-                  <h3>Informations</h3>
-                  <p>Détails du sinistre</p>
-                </div>
-              </div>
-
-              <div class="step-card done">
-                <div class="step-number">✓</div>
-                <div>
-                  <h3>Justificatifs</h3>
-                  <p>Photos & documents</p>
-                </div>
-              </div>
-
-              <div class="step-card active">
-                <div class="step-number">3</div>
-                <div>
-                  <h3>Confirmation</h3>
-                  <p>Récapitulatif final</p>
-                </div>
-              </div>
+              <div class="step-card done"><div class="step-number">✓</div><div><h3>Informations</h3><p>Détails du sinistre</p></div></div>
+              <div class="step-card done"><div class="step-number">✓</div><div><h3>Justificatifs</h3><p>Photos & documents</p></div></div>
+              <div class="step-card active"><div class="step-number">3</div><div><h3>Confirmation</h3><p>Récapitulatif final</p></div></div>
             </div>
           </div>
 
           <div class="panel support-panel">
             <div class="support-icon">H</div>
-            <h2>Expertise habitation InSurFlow</h2>
-            <p>
-              Votre dossier suit maintenant le circuit d’analyse de votre sinistre
-              habitation avec un suivi centralisé dans votre espace client.
-            </p>
-
+            <h2>Expertise habitation</h2>
             <ul class="support-list">
               <li>Analyse des dégâts déclarés</li>
               <li>Étude des justificatifs transmis</li>
@@ -143,27 +70,11 @@
 
           <div class="panel summary-panel">
             <p class="panel-kicker">Résumé</p>
-
             <div class="summary-grid">
-              <article class="summary-card">
-                <span>Référence</span>
-                <strong>{{ reference }}</strong>
-              </article>
-
-              <article class="summary-card">
-                <span>Statut</span>
-                <strong>Transmis</strong>
-              </article>
-
-              <article class="summary-card">
-                <span>Étape</span>
-                <strong>3 / 3</strong>
-              </article>
-
-              <article class="summary-card">
-                <span>Suivi</span>
-                <strong>Espace client</strong>
-              </article>
+              <article class="summary-card"><span>Référence</span><strong>{{ reference }}</strong></article>
+              <article class="summary-card"><span>Statut</span><strong>Transmis</strong></article>
+              <article class="summary-card"><span>Étape</span><strong>3 / 3</strong></article>
+              <article class="summary-card"><span>Suivi</span><strong>Espace client</strong></article>
             </div>
           </div>
         </aside>
@@ -172,13 +83,9 @@
           <div class="panel success-panel">
             <div class="success-top">
               <div class="success-icon">✓</div>
-
               <div class="success-head">
                 <h2>Dossier habitation soumis avec succès</h2>
-                <p>
-                  Votre sinistre habitation a été transmis à notre service d’expertise.
-                  Un expert analysera les dégâts et vous contactera dans les meilleurs délais.
-                </p>
+                <p>Votre sinistre habitation a été transmis à notre service d’expertise.</p>
               </div>
             </div>
 
@@ -189,62 +96,35 @@
 
             <div class="timeline-card">
               <h3>Progression du dossier</h3>
-
               <div class="timeline">
-                <div class="timeline-step completed">
-                  <div class="timeline-icon">✓</div>
-                  <div class="timeline-text">Informations</div>
-                </div>
-
+                <div class="timeline-step completed"><div class="timeline-icon">✓</div><div class="timeline-text">Informations</div></div>
                 <div class="timeline-line"></div>
-
-                <div class="timeline-step completed">
-                  <div class="timeline-icon">✓</div>
-                  <div class="timeline-text">Documents</div>
-                </div>
-
+                <div class="timeline-step completed"><div class="timeline-icon">✓</div><div class="timeline-text">Documents</div></div>
                 <div class="timeline-line"></div>
-
-                <div class="timeline-step active">
-                  <div class="timeline-icon">⏳</div>
-                  <div class="timeline-text">Expertise</div>
-                </div>
+                <div class="timeline-step active"><div class="timeline-icon">⏳</div><div class="timeline-text">Expertise</div></div>
               </div>
             </div>
 
             <div class="next-steps-card">
               <h3>Prochaines étapes</h3>
-
               <div class="steps-grid">
                 <div class="mini-step-card" *ngFor="let step of nextSteps">
                   <span class="mini-step-icon">{{ step.id }}</span>
-                  <div>
-                    <strong>{{ step.title }}</strong>
-                    <p>{{ step.text }}</p>
-                  </div>
+                  <div><strong>{{ step.title }}</strong><p>{{ step.text }}</p></div>
                 </div>
               </div>
             </div>
 
             <div class="contact-card">
               <p class="contact-line">
-                Une question sur votre sinistre habitation ? Consultez votre espace client
-                ou votre suivi de dossiers pour voir les prochaines mises à jour.
+                Une question sur votre sinistre habitation ? Consultez votre espace client ou votre suivi de dossiers.
               </p>
             </div>
 
             <div class="actions-row">
-              <button class="btn btn-secondary" type="button" (click)="goToClaimsHome()">
-                Retour aux sinistres
-              </button>
-
-              <button class="btn btn-light" type="button" (click)="goToMyFiles()">
-                Voir mes dossiers
-              </button>
-
-              <button class="btn btn-primary" type="button" (click)="newClaim()">
-                Déclarer un nouveau sinistre habitation
-              </button>
+              <button class="btn btn-outline" type="button" (click)="goToClaimsHome()">Retour aux sinistres</button>
+              <button class="btn btn-outline" type="button" (click)="goToMyFiles()">Voir mes dossiers</button>
+              <button class="btn btn-primary" type="button" (click)="newClaim()">Déclarer un nouveau sinistre habitation</button>
             </div>
           </div>
         </section>

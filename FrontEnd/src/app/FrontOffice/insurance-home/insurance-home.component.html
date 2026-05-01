@@ -1,329 +1,422 @@
-<header class="site-header">
-    <div class="container header-inner">
-        <a class="brand" href="/">
-      <span class="brand-symbol">
-        <span class="brand-shape shape-back"></span>
-        <span class="brand-shape shape-front"></span>
+<header class="insur-header">
+  <div class="container header-inner">
+    <a class="brand" routerLink="/">
+      <span class="insurflow-logo"></span>
+      <span class="brand-text">
+        <strong>InSurFlow</strong>
+        <small>Assurance intelligente</small>
       </span>
+    </a>
 
-            <span class="brand-copy">
-        <span class="brand-main">INsurFlow</span>
-        <span class="brand-sub">insurance experience platform</span>
-      </span>
-        </a>
+    <nav class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#sinistres">Sinistres</a>
+      <a href="#ia">Analyse IA</a>
+      <a href="#dashboard">Tableau de bord</a>
+      <a href="#avantages">Avantages</a>
+      <a href="#contact">Contact</a>
+    </nav>
 
-        <nav class="main-nav">
-            <a *ngFor="let item of navItems" [href]="item.href">{{ item.label }}</a>
-        </nav>
-
-        <div class="header-actions">
-            <a class="btn btn-ghost" href="/login">Connexion</a>
-            <a class="btn btn-primary" href="/login">Espace client</a>
-        </div>
-    </div>
+    <a class="login-btn" routerLink="/login">Connexion</a>
+  </div>
 </header>
 
-<main class="page-shell">
-    <section class="hero">
-        <div class="hero-glow hero-glow-left"></div>
-        <div class="hero-glow hero-glow-right"></div>
+<main class="landing-page">
+  <section class="hero-section">
+    <div class="hero-bg"></div>
 
-        <div class="container hero-container">
-            <div class="hero-copy">
-                <div class="hero-badge">Plateforme d’assurance digitale nouvelle génération</div>
+    <div class="container hero-wrapper">
+      <div class="hero-card">
+        <span class="hero-label">Plateforme assurance augmentée par IA</span>
+        <h1>InSurFlow</h1>
+        <h2>Gérez vos contrats, vos sinistres et vos décisions dans un seul espace intelligent.</h2>
+        <p>
+          Une solution moderne pour connecter clients, experts et administrateurs dans un parcours assurance clair.
+        </p>
 
-                <h1>
-                    Une assurance plus lumineuse,
-                    <span>plus simple et plus élégante.</span>
-                </h1>
-
-                <p class="hero-text">
-                    InSurFlow centralise vos contrats, vos sinistres, vos documents et vos échanges
-                    dans une expérience plus claire. L’objectif n’est pas seulement d’être moderne,
-                    mais de rassurer, guider et simplifier chaque étape.
-                </p>
-
-                <div class="hero-actions">
-                    <a class="btn btn-primary" href="/login">Accéder à mon espace</a>
-                    <a class="btn btn-secondary" href="#offres">Découvrir nos offres</a>
-                </div>
-
-                <div class="hero-inline-stats">
-                    <div class="hero-inline-card" *ngFor="let stat of stats | slice:0:3">
-                        <strong>{{ stat.value }}</strong>
-                        <span>{{ stat.label }}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="hero-visual">
-                <div class="hero-visual-frame">
-                    <div class="visual-header">
-                        <div class="visual-dots">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <div class="visual-chip">Espace InSurFlow</div>
-                    </div>
-
-                    <div class="visual-body">
-                        <img src="assets/images/sinistre.png" alt="Plateforme InSurFlow" />
-                    </div>
-                </div>
-
-                <div class="floating-card floating-top">
-                    <span class="floating-label">Suivi</span>
-                    <strong>98%</strong>
-                    <p>des sinistres traités sous 7 jours</p>
-                </div>
-
-                <div class="floating-card floating-bottom">
-                    <span class="floating-label">Support</span>
-                    <strong>24/7</strong>
-                    <p>une assistance disponible à tout moment</p>
-                </div>
-            </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#sinistres">Déclarer un sinistre</a>
+          <a class="btn btn-outline" href="#services">Découvrir la plateforme</a>
         </div>
-    </section>
+      </div>
 
-    <section class="section stats-section">
-        <div class="container">
-            <div class="stats-grid">
-                <article class="stat-card" *ngFor="let stat of stats">
-                    <strong>{{ stat.value }}</strong>
-                    <span>{{ stat.label }}</span>
-                </article>
-            </div>
+      <div class="hero-banner-content">
+        <span>Contrats • Sinistres • IA • Suivi</span>
+        <h3>Une nouvelle façon de gérer l’assurance digitale.</h3>
+      </div>
+    </div>
+  </section>
+
+  <section class="overview-section">
+    <div class="container overview-grid">
+      <article class="overview-card main-overview">
+        <span class="eyebrow">Plateforme complète</span>
+        <h2>Tout le cycle assurance dans une seule solution.</h2>
+        <p>
+          InSurFlow relie le client, les contrats, les sinistres, les documents,
+          les agents IA et la décision expert dans un parcours clair.
+        </p>
+
+        <div class="overview-actions">
+          <a class="btn btn-primary" href="#services">Voir les services</a>
+          <a class="btn btn-outline" href="#dashboard">Voir le dashboard</a>
         </div>
-    </section>
+      </article>
 
-    <section id="plateforme" class="section section-soft">
-        <div class="container">
-            <div class="section-head centered">
-                <p class="section-kicker">Plateforme</p>
-                <h2>Une expérience d’assurance plus fluide, plus claire et plus rassurante.</h2>
-                <p class="section-text">
-                    Une interface plus douce visuellement, plus moderne dans sa structure,
-                    et pensée pour mettre en valeur ton propre univers InSurFlow.
-                </p>
-            </div>
+      <article class="overview-card small-card">
+        <strong>01</strong>
+        <h3>Espace client</h3>
+        <p>Le client consulte ses contrats, déclare un sinistre et suit ses dossiers.</p>
+      </article>
 
-            <div class="solutions-grid">
-                <article class="solution-card" *ngFor="let item of solutions">
-                    <div class="solution-icon" [ngSwitch]="item.icon">
-                        <svg *ngSwitchCase="'pilot'" viewBox="0 0 24 24" aria-hidden="true">
-                            <rect x="5" y="5" width="14" height="14" rx="4"></rect>
-                            <path d="M12 2v3"></path>
-                            <path d="M12 19v3"></path>
-                            <path d="M2 12h3"></path>
-                            <path d="M19 12h3"></path>
-                        </svg>
+      <article class="overview-card small-card">
+        <strong>02</strong>
+        <h3>Analyse IA</h3>
+        <p>Les agents IA vérifient la couverture et proposent une première estimation.</p>
+      </article>
 
-                        <svg *ngSwitchCase="'claim'" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M4 7h10"></path>
-                            <path d="M4 12h16"></path>
-                            <path d="M4 17h9"></path>
-                            <circle cx="18" cy="7" r="2"></circle>
-                            <circle cx="15" cy="17" r="2"></circle>
-                        </svg>
+      <article class="overview-card small-card">
+        <strong>03</strong>
+        <h3>Décision expert</h3>
+        <p>L’expert valide, corrige ou refuse la proposition avec contrôle final.</p>
+      </article>
+    </div>
+  </section>
 
-                        <svg *ngSwitchCase="'safe'" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"></path>
-                            <path d="m9.5 12 1.7 1.7 3.3-3.4"></path>
-                        </svg>
-                    </div>
+  <section class="process-strip-section">
+    <div class="container process-strip">
+      <div class="process-item">
+        <span>1</span>
+        <h3>Contrat</h3>
+        <p>Identification de la police et des garanties.</p>
+      </div>
 
-                    <h3>{{ item.title }}</h3>
-                    <p>{{ item.text }}</p>
-                </article>
-            </div>
+      <div class="process-line"></div>
+
+      <div class="process-item">
+        <span>2</span>
+        <h3>Sinistre</h3>
+        <p>Déclaration et dépôt des justificatifs.</p>
+      </div>
+
+      <div class="process-line"></div>
+
+      <div class="process-item">
+        <span>3</span>
+        <h3>IA</h3>
+        <p>Analyse, contrôle et estimation assistée.</p>
+      </div>
+
+      <div class="process-line"></div>
+
+      <div class="process-item">
+        <span>4</span>
+        <h3>Décision</h3>
+        <p>Validation finale par l’expert.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="products-section" id="services">
+    <div class="container">
+      <div class="section-title center">
+        <span class="eyebrow">Nos services</span>
+        <h2>Une plateforme complète pour simplifier l’assurance</h2>
+        <p>InSurFlow accompagne chaque étape du processus assurance.</p>
+      </div>
+
+      <div class="products-carousel">
+        <div class="product-card">
+          <div class="product-icon"><img src="assets/images/contrat.jpeg" alt="Contrats" /></div>
+          <span>Gestion</span>
+          <h3>Contrats</h3>
+          <p>Centralisation des polices, garanties, dates et informations client.</p>
         </div>
-    </section>
 
-    <section id="offres" class="section offers-section">
-        <div class="container">
-            <div class="section-head">
-                <div>
-                    <p class="section-kicker">Nos offres</p>
-                    <h2>Des protections essentielles dans un univers cohérent et plus premium.</h2>
-                </div>
-
-                <span class="section-count">04 domaines</span>
-            </div>
-
-            <div class="offers-grid">
-                <article class="offer-card" *ngFor="let offer of offers">
-                    <div class="offer-media">
-                        <img [src]="offer.image" [alt]="offer.title" />
-                        <span class="offer-index">{{ offer.id }}</span>
-                    </div>
-
-                    <div class="offer-body">
-                        <h3>{{ offer.title }}</h3>
-                        <p>{{ offer.description }}</p>
-
-                        <a class="offer-link" href="#">
-                            <span>{{ offer.cta }}</span>
-                            <span class="offer-arrow">→</span>
-                        </a>
-                    </div>
-                </article>
-            </div>
+        <div class="product-card">
+          <div class="product-icon"><img src="assets/images/sinistre_gestion.jpg" alt="Sinistres" /></div>
+          <span>Traitement</span>
+          <h3>Sinistres</h3>
+          <p>Déclaration, pièces justificatives, analyse et suivi en temps réel.</p>
         </div>
-    </section>
 
-    <section class="section product-section section-soft">
-        <div class="container product-layout">
-            <div class="product-visual">
-                <div class="product-visual-badge">Vue produit</div>
-                <img src="assets/images/sinistre.png" alt="Dashboard InSurFlow" />
-            </div>
-
-            <div class="product-copy">
-                <p class="section-kicker">Architecture expérience</p>
-                <h2>Une page d’accueil plus aérée, plus claire et visuellement plus haut de gamme.</h2>
-                <p class="section-text left">
-                    On garde ton identité InSurFlow, mais on retire l’effet “trop bleu foncé”.
-                    Le résultat est plus doux, plus contemporain et plus facile à lire.
-                </p>
-
-                <div class="product-cards">
-                    <article class="product-card" *ngFor="let item of productCards">
-                        <div class="product-mark"></div>
-                        <div>
-                            <h3>{{ item.title }}</h3>
-                            <p>{{ item.text }}</p>
-                        </div>
-                    </article>
-                </div>
-            </div>
+        <div class="product-card">
+          <div class="product-icon"><img src="assets/images/Analyse_ia.jpeg" alt="IA" /></div>
+          <span>Automatisation</span>
+          <h3>Analyse IA</h3>
+          <p>Classification, validation de couverture et estimation assistée.</p>
         </div>
-    </section>
 
-    <section id="sinistres" class="section process-section">
-        <div class="container">
-            <div class="process-shell process-shell-light">
-                <div class="section-head process-head">
-                    <div>
-                        <p class="section-kicker">Gestion des sinistres</p>
-                        <h2>Un parcours plus compréhensible, plus lisible et plus rassurant pour vos assurés.</h2>
-                    </div>
-                </div>
-
-                <div class="process-steps">
-                    <article class="process-step" *ngFor="let step of claimSteps">
-                        <div class="step-icon-wrap">
-                            <div class="step-icon" [ngSwitch]="step.icon">
-                                <svg *ngSwitchCase="'edit'" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M12 20h9"></path>
-                                    <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-                                </svg>
-
-                                <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path d="M20 21a8 8 0 0 0-16 0"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-
-                                <svg *ngSwitchCase="'check'" viewBox="0 0 24 24" aria-hidden="true">
-                                    <circle cx="12" cy="12" r="9"></circle>
-                                    <path d="m9 12 2 2 4-4"></path>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <span class="process-step-number">{{ step.id }}</span>
-                        <h3>{{ step.title }}</h3>
-                        <p>{{ step.text }}</p>
-                    </article>
-                </div>
-            </div>
+        <div class="product-card">
+          <div class="product-icon"><img src="assets/images/Login.png" alt="Client" /></div>
+          <span>Interface</span>
+          <h3>Espace client</h3>
+          <p>Un espace clair pour consulter contrats, sinistres et décisions.</p>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section id="pourquoi" class="section">
-        <div class="container">
-            <div class="section-head">
-                <div>
-                    <p class="section-kicker">Pourquoi InSurFlow</p>
-                    <h2>Une assurance plus humaine, plus experte et plus agréable à utiliser.</h2>
-                </div>
+  <section class="claims-section" id="sinistres">
+    <div class="container claims-layout">
+      <div class="claims-content">
+        <span class="mini-title">Gestion des sinistres</span>
+        <h2>Un parcours clair depuis la déclaration jusqu’à la décision finale.</h2>
+        <p>
+          Le client déclare son sinistre, ajoute ses documents, puis InSurFlow organise
+          le dossier pour faciliter le travail de l’expert.
+        </p>
+
+        <div class="steps">
+          <div class="step">
+            <span>01</span>
+            <div>
+              <h4>Déclaration du sinistre</h4>
+              <p>Le client décrit l’incident et ajoute les justificatifs nécessaires.</p>
             </div>
+          </div>
 
-            <div class="advantages-grid">
-                <article class="adv-card" *ngFor="let item of advantages">
-                    <div class="adv-icon" [ngSwitch]="item.icon">
-                        <svg *ngSwitchCase="'user'" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M20 21a8 8 0 0 0-16 0"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-
-                        <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9"></circle>
-                            <path d="M12 7v5l3 2"></path>
-                        </svg>
-
-                        <svg *ngSwitchCase="'pin'" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z"></path>
-                            <circle cx="12" cy="10" r="2.5"></circle>
-                        </svg>
-
-                        <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"></path>
-                        </svg>
-                    </div>
-
-                    <h3>{{ item.title }}</h3>
-                    <p>{{ item.text }}</p>
-                </article>
+          <div class="step">
+            <span>02</span>
+            <div>
+              <h4>Vérification du contrat</h4>
+              <p>La plateforme vérifie les garanties et les dates de validité.</p>
             </div>
+          </div>
+
+          <div class="step">
+            <span>03</span>
+            <div>
+              <h4>Analyse assistée par IA</h4>
+              <p>Les agents IA détectent les incohérences et proposent une estimation.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <span>04</span>
+            <div>
+              <h4>Validation expert</h4>
+              <p>L’expert garde le contrôle final de la décision.</p>
+            </div>
+          </div>
         </div>
-    </section>
+      </div>
 
-    <section id="contact" class="section section-soft">
-        <div class="container">
-            <div class="section-head centered">
-                <p class="section-kicker">Contact</p>
-                <h2>Des accès simples et plus élégants pour garder le lien avec vos assurés.</h2>
-            </div>
-
-            <div class="contact-grid">
-                <article class="contact-card" *ngFor="let item of contactMethods">
-                    <div class="contact-icon" [ngSwitch]="item.icon">
-                        <svg *ngSwitchCase="'phone'" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07A19.5 19.5 0 0 1 5.15 12.8 19.8 19.8 0 0 1 2.08 4.09 2 2 0 0 1 4.06 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.78.65 2.62a2 2 0 0 1-.45 2.11L8 9.71a16 16 0 0 0 6.29 6.29l1.26-1.26a2 2 0 0 1 2.11-.45c.84.31 1.72.53 2.62.65A2 2 0 0 1 22 16.92z"></path>
-                        </svg>
-
-                        <svg *ngSwitchCase="'mail'" viewBox="0 0 24 24" aria-hidden="true">
-                            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                            <path d="m3 7 9 6 9-6"></path>
-                        </svg>
-
-                        <svg *ngSwitchCase="'chat'" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
-                        </svg>
-                    </div>
-
-                    <h3>{{ item.title }}</h3>
-                    <p>{{ item.text }}</p>
-                    <a class="contact-link" [href]="item.href">{{ item.action }}</a>
-                </article>
-            </div>
+      <div class="claims-visual">
+        <img src="assets/images/parcours_sinistre.png" alt="Parcours sinistre InSurFlow" />
+        <div class="floating-status">
+          <span>Dossier #INS-2048</span>
+          <strong>87%</strong>
+          <p>Niveau de confiance IA</p>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section class="cta-panel">
-        <div class="container">
-            <div class="cta-panel-inner cta-panel-light">
-                <div class="cta-copy">
-                    <p class="eyebrow">Espace assuré</p>
-                    <h2>Offre à ton projet une page d’accueil plus claire, plus moderne et plus premium visuellement.</h2>
-                </div>
+  <section class="insurance-types-section">
+    <div class="container">
+      <div class="section-title center">
+        <span class="eyebrow">Domaines couverts</span>
+        <h2>Des parcours adaptés à chaque type d’assurance</h2>
+        <p>Auto, santé, habitation : chaque traitement suit ses règles métier.</p>
+      </div>
 
-                <div class="cta-actions">
-                    <a class="btn btn-primary" href="/login">Connexion à mon espace</a>
-                </div>
-            </div>
+      <div class="types-grid">
+        <article class="type-card">
+          <img src="assets/images/auto_sinistre.jpg" alt="Auto" />
+          <div>
+            <span>Automobile</span>
+            <h3>Sinistre auto</h3>
+            <p>Collision, bris de glace, panne et estimation du remboursement.</p>
+          </div>
+        </article>
+
+        <article class="type-card">
+          <img src="assets/images/Sante_assurance.png" alt="Santé" />
+          <div>
+            <span>Santé</span>
+            <h3>Remboursement santé</h3>
+            <p>Consultation, hospitalisation, soins médicaux et remboursements.</p>
+          </div>
+        </article>
+
+        <article class="type-card">
+          <img src="assets/images/Habitation_assurance.png" alt="Habitation" />
+          <div>
+            <span>Habitation</span>
+            <h3>Sinistre habitation</h3>
+            <p>Dégât des eaux, incendie, vol et rapport expert.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="ai-section" id="ia">
+    <div class="container ai-layout">
+      <div class="ai-visual">
+        <img src="assets/images/Analyse_ia.jpeg" alt="Analyse IA" />
+        <div class="ai-floating-card">
+          <span>Analyse en cours</span>
+          <strong>3 agents IA</strong>
+          <p>Routeur, validateur et estimateur</p>
         </div>
-    </section>
+      </div>
+
+      <div class="ai-content">
+        <span class="mini-title">Intelligence artificielle</span>
+        <h2>Des agents IA pour assister l’expert, sans remplacer la décision humaine.</h2>
+        <p>
+          L’IA prépare le dossier, accélère la lecture des informations et propose une aide à la décision.
+        </p>
+
+        <div class="ai-list">
+          <div>
+            <span>01</span>
+            <div>
+              <h4>Agent Routeur</h4>
+              <p>Identifie le type de sinistre et oriente le dossier.</p>
+            </div>
+          </div>
+
+          <div>
+            <span>02</span>
+            <div>
+              <h4>Agent Validateur</h4>
+              <p>Vérifie la couverture, les garanties et les exclusions.</p>
+            </div>
+          </div>
+
+          <div>
+            <span>03</span>
+            <div>
+              <h4>Agent Estimateur</h4>
+              <p>Propose une estimation initiale du remboursement.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-section" id="dashboard">
+    <div class="container dashboard-layout">
+      <div class="dashboard-content">
+        <span class="mini-title">Tableau de bord</span>
+        <h2>Une vision simple et rapide de tous les dossiers assurance.</h2>
+        <p>Suivez les contrats actifs, les sinistres en attente et les décisions validées.</p>
+
+        <div class="dashboard-points">
+          <div>
+            <strong>Contrats actifs</strong>
+            <span>Consultation rapide des garanties et informations client.</span>
+          </div>
+
+          <div>
+            <strong>Sinistres en cours</strong>
+            <span>Suivi par statut : reçu, en analyse, validé ou refusé.</span>
+          </div>
+
+          <div>
+            <strong>Décisions expert</strong>
+            <span>Historique clair des validations et commentaires.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-preview">
+        <div class="preview-top">
+          <span>InSurFlow Dashboard</span>
+          <small>Vue globale</small>
+        </div>
+
+        <div class="preview-stats">
+          <div><strong>128</strong><span>Contrats</span></div>
+          <div><strong>36</strong><span>Sinistres</span></div>
+          <div><strong>91%</strong><span>Dossiers traités</span></div>
+        </div>
+
+        <div class="preview-list">
+          <div><span class="dot purple"></span><p>Sinistre auto en analyse IA</p><strong>En cours</strong></div>
+          <div><span class="dot blue"></span><p>Contrat habitation vérifié</p><strong>Validé</strong></div>
+          <div><span class="dot green"></span><p>Remboursement santé estimé</p><strong>87%</strong></div>
+          <div><span class="dot orange"></span><p>Dossier expert à revoir</p><strong>Priorité</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="why-section" id="avantages">
+    <div class="container">
+      <div class="section-title center">
+        <span class="eyebrow">Pourquoi InSurFlow ?</span>
+        <h2>Une solution pensée pour gagner du temps et réduire les erreurs</h2>
+        <p>La plateforme rend les processus assurance plus lisibles, rapides et contrôlables.</p>
+      </div>
+
+      <div class="why-grid">
+        <article class="why-card"><span>01</span><h3>Centralisation</h3><p>Contrats, documents, sinistres et décisions dans une seule interface.</p></article>
+        <article class="why-card"><span>02</span><h3>Traçabilité</h3><p>Chaque action est suivie : dépôt, analyse, validation et décision finale.</p></article>
+        <article class="why-card"><span>03</span><h3>Assistance IA</h3><p>Les agents IA aident à vérifier les dossiers et proposer une estimation.</p></article>
+        <article class="why-card"><span>04</span><h3>Décision humaine</h3><p>L’expert reste responsable de la validation finale.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-section">
+    <div class="container stats-grid">
+      <div><strong>4</strong><span>Étapes de traitement</span></div>
+      <div><strong>3</strong><span>Agents IA spécialisés</span></div>
+      <div><strong>24/7</strong><span>Suivi accessible</span></div>
+      <div><strong>100%</strong><span>Contrôle expert final</span></div>
+    </div>
+  </section>
+
+  <section class="faq-section">
+    <div class="container faq-layout">
+      <div class="faq-heading">
+        <span class="mini-title">Questions fréquentes</span>
+        <h2>Tout comprendre sur le fonctionnement d’InSurFlow.</h2>
+        <p>Une plateforme claire pour gérer les contrats, les sinistres et les analyses intelligentes.</p>
+      </div>
+
+      <div class="faq-list">
+        <details open>
+          <summary>Est-ce que l’IA prend la décision finale ?</summary>
+          <p>Non. L’IA assiste l’expert, mais la validation finale reste humaine.</p>
+        </details>
+
+        <details>
+          <summary>Le client peut-il suivre son sinistre ?</summary>
+          <p>Oui. Le client peut consulter l’état du dossier et la décision finale.</p>
+        </details>
+
+        <details>
+          <summary>Quels types de sinistres peuvent être traités ?</summary>
+          <p>La plateforme gère l’automobile, la santé et l’habitation.</p>
+        </details>
+
+        <details>
+          <summary>À quoi sert le tableau de bord ?</summary>
+          <p>Il permet de visualiser les contrats, dossiers en cours et priorités.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section" id="contact">
+    <div class="container contact-box">
+      <span class="eyebrow">InSurFlow</span>
+      <h2>Prêt à simplifier la gestion de vos assurances ?</h2>
+      <p>
+        Centralisez vos contrats, automatisez l’analyse des sinistres et offrez
+        une expérience claire aux clients comme aux experts.
+      </p>
+
+      <div class="hero-actions center-actions">
+        <a class="btn btn-primary" href="#services">Explorer les services</a>
+        <a class="btn btn-outline" href="mailto:contact@insurflow.com">Nous contacter</a>
+      </div>
+    </div>
+  </section>
 </main>

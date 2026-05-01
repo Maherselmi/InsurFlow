@@ -25,7 +25,7 @@ interface SupportTip {
 export class ClaimStep1SanteComponent implements OnInit {
   navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
-    { label: 'Mes contrats', route: '/contrats' },
+    { label: 'Mes contrats', route: '/PolicesList' },
     { label: 'Sinistres', route: '/Claim_Home' },
     { label: 'Mes dossiers', route: '/Consulter' }
   ];
@@ -100,13 +100,30 @@ export class ClaimStep1SanteComponent implements OnInit {
     this.loadingPolicies = true;
     this.errorMessage = '';
 
+    const email = isPlatformBrowser(this.platformId)
+      ? localStorage.getItem('email')?.toLowerCase().trim()
+      : null;
+
+    if (!email) {
+      this.loadingPolicies = false;
+      this.errorMessage = 'Utilisateur non identifié. Veuillez vous reconnecter.';
+      return;
+    }
+
     this.claimService.getPolicies().subscribe({
       next: (res) => {
         const allPolicies = res || [];
 
-        this.policies = allPolicies.filter(
-          (p) => this.normalizeType(p.type) === 'SANTE'
-        );
+        this.policies = allPolicies.filter((p) => {
+          const policyType = this.normalizeType(p.type);
+          const clientEmail = p.client?.email?.toLowerCase().trim();
+
+          return (
+            policyType === 'SANTE' &&
+            clientEmail === email &&
+            this.isPolicyActive(p)
+          );
+        });
 
         this.loadingPolicies = false;
       },

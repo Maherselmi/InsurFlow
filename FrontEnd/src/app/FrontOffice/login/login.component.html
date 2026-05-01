@@ -1,201 +1,135 @@
-<div class="login-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="login-header">
-    <div class="container header-inner">
+<main class="login-page">
+  <section class="login-layout">
+    <div class="login-left">
       <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>Assurance intelligente</small>
         </span>
       </a>
 
-      <div class="header-actions">
-        <a class="header-link" routerLink="/">Retour à l’accueil</a>
+      <div class="welcome-block">
+        <span class="login-badge">Espace client sécurisé</span>
+
+        <h1>Bienvenue chez InSurFlow</h1>
+
+        <p>
+          Connectez-vous à votre espace personnalisé pour consulter vos contrats,
+          suivre vos sinistres et gérer vos dossiers en toute autonomie.
+        </p>
+      </div>
+
+      <form class="login-form" (ngSubmit)="onLogin()">
+        <div class="form-group">
+          <label for="email">Identifiant</label>
+
+          <div class="input-box">
+            <span class="input-icon email-icon"></span>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              [(ngModel)]="email"
+              placeholder="Votre adresse email"
+              autocomplete="email"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Mot de passe</label>
+
+          <div class="input-box">
+            <span class="input-icon lock-icon"></span>
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="Votre mot de passe"
+              autocomplete="current-password"
+            />
+
+            <button type="button" class="eye-btn" (click)="togglePassword()">
+              {{ showPassword ? 'Masquer' : 'Voir' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-row">
+            <input type="checkbox" hidden />
+            <span></span>
+            Se souvenir de moi
+          </label>
+
+          <a class="forgot-link" routerLink="/">
+            Mot de passe oublié ?
+          </a>
+        </div>
+
+        <p class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </p>
+
+        <button class="login-btn-main" type="submit" [disabled]="loading">
+          <span *ngIf="!loading">Me connecter</span>
+          <span *ngIf="loading">Connexion...</span>
+        </button>
+      </form>
+
+      <div class="bottom-area">
+        <div class="create-row">
+          <div>
+            <strong>Vous n’avez pas de compte ?</strong>
+            <p>Créez un compte pour accéder à vos services d’assurance.</p>
+          </div>
+
+          <a routerLink="/" class="create-btn">
+            Créer un compte
+          </a>
+        </div>
+
+        <div class="help-row">
+          <div>
+            <span>Besoin d’aide ?</span>
+            <strong>82 100 001</strong>
+          </div>
+
+          <a routerLink="/" class="contact-btn">
+            Contactez-nous
+          </a>
+        </div>
       </div>
     </div>
-  </header>
 
-  <main class="login-main">
-    <div class="container">
-      <div class="login-layout">
-        <section class="intro-panel">
-          <div class="intro-badge">Espace personnel sécurisé</div>
+    <div class="login-right">
+      <div class="right-logo">
+        <strong>InSurFlow</strong>
+        <span>BY INSURANCE PLATFORM</span>
+      </div>
 
-          <h1>
-            Une connexion plus simple,
-            <span>dans un univers plus clair.</span>
-          </h1>
+      <div class="plane"></div>
+      <div class="cloud cloud-one"></div>
+      <div class="cloud cloud-two"></div>
 
-          <p class="intro-text">
-            Accédez à vos contrats, vos documents et vos dossiers dans une interface
-            plus douce, plus moderne et mieux alignée avec l’identité InSurFlow.
-          </p>
+      <div class="right-card">
+        <span>Votre espace digital</span>
+        <h2>Contrats, sinistres et décisions réunis au même endroit.</h2>
+      </div>
 
-          <div class="intro-actions">
-            <a class="btn btn-primary" routerLink="/">Découvrir InSurFlow</a>
-            <a class="btn btn-secondary" routerLink="/">Voir les offres</a>
-          </div>
+      <div class="illustration">
+        <div class="house"></div>
+        <div class="car"></div>
 
-          <div class="trust-grid">
-            <article class="trust-card" *ngFor="let item of trustItems">
-              <strong>{{ item.value }}</strong>
-              <span>{{ item.label }}</span>
-            </article>
-          </div>
-
-          <div class="visual-card">
-            <div class="visual-topbar">
-              <div class="visual-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <div class="visual-chip">Expérience InSurFlow</div>
-            </div>
-
-            <div class="visual-content">
-              <div class="visual-copy">
-                <p class="visual-kicker">Connexion premium</p>
-                <h2>Retrouvez l’essentiel en un seul accès.</h2>
-                <p>
-                  Une authentification simple pour rejoindre un espace structuré,
-                  lumineux et pensé pour rassurer.
-                </p>
-              </div>
-
-              <div class="visual-image">
-                <img
-                  src="../../../assets/images/Login.png"
-                  alt="Illustration espace client InSurFlow"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="auth-panel">
-          <div class="auth-shell">
-            <div class="auth-badge">Connexion sécurisée</div>
-
-            <div class="auth-head">
-              <h2>Bienvenue</h2>
-              <p>
-                Saisissez vos identifiants pour accéder à votre espace personnel
-                et suivre vos services en toute simplicité.
-              </p>
-            </div>
-
-            <form class="login-form" (ngSubmit)="onLogin()">
-              <div class="form-group">
-                <label for="email">Adresse email</label>
-
-                <div class="input-wrap">
-                  <span class="input-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M4 6h16v12H4z"></path>
-                      <path d="M4 7l8 6 8-6"></path>
-                    </svg>
-                  </span>
-
-                  <input
-                    id="email"
-                    type="email"
-                    [(ngModel)]="email"
-                    name="email"
-                    placeholder="exemple@email.com"
-                  />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="password">Mot de passe</label>
-
-                <div class="input-wrap">
-                  <span class="input-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="5" y="11" width="14" height="9" rx="2"></rect>
-                      <path d="M8 11V8a4 4 0 1 1 8 0v3"></path>
-                    </svg>
-                  </span>
-
-                  <input
-                    id="password"
-                    [type]="showPassword ? 'text' : 'password'"
-                    [(ngModel)]="password"
-                    name="password"
-                    placeholder="Votre mot de passe"
-                  />
-
-                  <button
-                    type="button"
-                    class="toggle-password"
-                    (click)="togglePassword()"
-                    aria-label="Afficher ou masquer le mot de passe"
-                  >
-                    <svg *ngIf="!showPassword" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-
-                    <svg *ngIf="showPassword" viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M3 3l18 18"></path>
-                      <path d="M10.6 10.6A3 3 0 0 0 12 15a3 3 0 0 0 2.4-4.4"></path>
-                      <path d="M9.9 5.1A11.4 11.4 0 0 1 12 5c6.5 0 10 7 10 7a18.6 18.6 0 0 1-3.2 4.2"></path>
-                      <path d="M6.2 6.2A18.1 18.1 0 0 0 2 12s3.5 7 10 7a10.7 10.7 0 0 0 3-.4"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <div class="error-message" *ngIf="errorMessage">
-                {{ errorMessage }}
-              </div>
-
-              <button class="login-btn" type="submit" [disabled]="loading">
-                <span *ngIf="!loading">Se connecter</span>
-                <span *ngIf="loading">Connexion...</span>
-              </button>
-            </form>
-
-            <div class="info-strip">
-              <div class="info-pill">Accès rapide</div>
-              <p>Vos contrats, sinistres et documents restent accessibles depuis un seul espace.</p>
-            </div>
-
-            <div class="features-list">
-              <article class="feature-item" *ngFor="let item of featureItems">
-                <div class="feature-icon" [ngSwitch]="item.icon">
-                  <svg *ngSwitchCase="'shield'" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 3l7 3v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6l7-3z"></path>
-                  </svg>
-
-                  <svg *ngSwitchCase="'folder'" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"></path>
-                  </svg>
-
-                  <svg *ngSwitchCase="'clock'" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M12 7v5l3 2"></path>
-                  </svg>
-                </div>
-
-                <div class="feature-copy">
-                  <h3>{{ item.title }}</h3>
-                  <p>{{ item.text }}</p>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
+        <div class="family">
+          <div class="person father"></div>
+          <div class="person mother"></div>
+          <div class="person child"></div>
+          <div class="pet"></div>
+        </div>
       </div>
     </div>
-  </main>
-</div>
+  </section>
+</main>

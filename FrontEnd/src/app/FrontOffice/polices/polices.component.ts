@@ -1,19 +1,24 @@
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, DatePipe, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {Policy} from "../../claim.service";
-import {PolicyService} from "../../services/policy.service";
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { Policy } from '../../claim.service';
+import { PolicyService } from '../../services/policy.service';
+import { AuthService } from '../../services/auth.service';
+
+interface NavItem {
+  label: string;
+  route: string;
+}
 
 @Component({
   selector: 'app-polices',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe],
+  imports: [CommonModule, FormsModule, DatePipe, RouterModule],
   templateUrl: './polices.component.html',
   styleUrls: ['./polices.component.css']
 })
 export class PolicesComponent implements OnInit {
-
   allPolicies: Policy[] = [];
   policies: Policy[] = [];
   filteredPolicies: Policy[] = [];
@@ -24,33 +29,49 @@ export class PolicesComponent implements OnInit {
   selectedType = 'TOUS';
   expandedPolicyId: number | null = null;
 
-  currentClientId: number | null = null;
+  currentClientEmail: string | null = null;
+
+  navItems: NavItem[] = [
+    { label: 'Tableau de bord', route: '/Client_Space' },
+    { label: 'Mes contrats', route: '/PolicesList' },
+    { label: 'Sinistres', route: '/Claim_Home' },
+    { label: 'Mes dossiers', route: '/Consulter' }
+  ];
 
   constructor(
     private policyService: PolicyService,
+    private authService: AuthService,
     private router: Router,
-
-  @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
-    this.loadCurrentClientId();
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.loadCurrentClientEmail();
+
+    if (!this.currentClientEmail) {
+      this.loading = false;
+      this.errorMessage = 'Utilisateur non identifié. Veuillez vous reconnecter.';
+      return;
+    }
+
     this.loadPolicies();
   }
 
-  loadCurrentClientId(): void {
+  isActiveNav(route: string): boolean {
+    return this.router.url === route;
+  }
+
+  loadCurrentClientEmail(): void {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
 
-    const rawClientId =
-      localStorage.getItem('clientId') ||
-      localStorage.getItem('currentClientId') ||
-      localStorage.getItem('userClientId');
-
-    if (rawClientId) {
-      this.currentClientId = Number(rawClientId);
-    }
+    this.currentClientEmail = localStorage.getItem('email');
   }
 
   loadPolicies(): void {
@@ -61,14 +82,12 @@ export class PolicesComponent implements OnInit {
       next: (data) => {
         this.allPolicies = data ?? [];
 
-        // Filtrage des polices du client connecté
-        if (this.currentClientId) {
-          this.policies = this.allPolicies.filter(
-            (policy) => policy.client?.id === this.currentClientId
-          );
-        } else {
-          this.policies = this.allPolicies;
-        }
+        const email = this.currentClientEmail?.toLowerCase().trim();
+
+        this.policies = this.allPolicies.filter((policy) => {
+          const policyClientEmail = policy.client?.email?.toLowerCase().trim();
+          return policyClientEmail === email;
+        });
 
         this.applyFilters();
         this.loading = false;
@@ -150,50 +169,48 @@ export class PolicesComponent implements OnInit {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 
-  getTypeIcon(type: string | undefined): string {
-    const normalized = (type ?? '').toUpperCase();
-
-    if (normalized === 'AUTO') return '🚗';
-    if (normalized === 'SANTE') return '🏥';
-    if (normalized === 'HABITATION') return '🏠';
-    return '📄';
-  }
-
   getTypeClass(type: string | undefined): string {
     const normalized = (type ?? '').toUpperCase();
 
     if (normalized === 'AUTO') return 'type-auto';
     if (normalized === 'SANTE') return 'type-sante';
     if (normalized === 'HABITATION') return 'type-habitation';
+
     return 'type-default';
   }
 
   getActiveCount(): number {
-    return this.policies.filter((p) => this.isActive(p)).length;
+    return this.policies.filter((policy) => this.isActive(policy)).length;
   }
 
   getExpiredCount(): number {
-    return this.policies.filter((p) => !this.isActive(p)).length;
+    return this.policies.filter((policy) => !this.isActive(policy)).length;
   }
 
   getPolicyHolder(policy: Policy): string {
     const firstName = policy.client?.firstName ?? '';
     const lastName = policy.client?.lastName ?? '';
+
     return `${firstName} ${lastName}`.trim() || 'Client';
   }
 
+  getTypeLabel(type: string | undefined): string {
+    return (type ?? 'NON DÉFINI').toUpperCase();
+  }
+
   goToHome(): void {
-    console.log('🏠 Navigation vers la page d\'accueil');
     this.router.navigate(['/']);
   }
 
   goToDecisions(): void {
-    console.log('📋 Navigation vers la page des décisions');
     this.router.navigate(['/Consulter']);
   }
+
   logout(): void {
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
+
   goToPolice(): void {
     this.router.navigate(['/PolicesList']);
   }

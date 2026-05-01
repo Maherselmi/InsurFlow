@@ -3,6 +3,7 @@
   <div class="page-glow glow-right"></div>
   <div class="page-mesh"></div>
 
+  <!-- TOPBAR -->
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" routerLink="/">
@@ -12,7 +13,7 @@
         </span>
 
         <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
+          <span class="brand-main">InSurFlow</span>
           <span class="brand-sub">expert workspace</span>
         </span>
       </a>
@@ -21,12 +22,17 @@
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
-          [class.active]="isActiveNav(item.route)">
+          [class.active]="isActiveNav(item.route)"
+        >
           {{ item.label }}
         </a>
       </nav>
 
       <div class="header-user">
+        <div class="expert-avatar">
+          {{ expertName ? expertName.charAt(0).toUpperCase() : 'E' }}
+        </div>
+
         <div class="header-user-text">
           <strong>{{ expertName }}</strong>
           <span>{{ expertEmail }}</span>
@@ -39,29 +45,39 @@
     </div>
   </header>
 
+  <!-- MAIN -->
   <main class="expert-main">
     <div class="container">
+      <!-- HERO -->
       <section class="hero-shell">
         <div class="hero-copy">
-          <div class="hero-badge">Espace expert InsurFlow</div>
+          <div class="hero-badge">Espace expert InSurFlow</div>
 
           <h1>
-            Pilotez la validation humaine
+            Validez les dossiers sensibles
             <span>et améliorez les décisions IA.</span>
           </h1>
 
           <p class="hero-text">
-            Cet espace expert vous permet de revoir les dossiers sensibles,
-            corriger les décisions automatiques, enrichir les feedbacks métier
-            et renforcer la qualité du traitement des sinistres.
+            Cet espace permet aux experts de revoir les sinistres nécessitant une
+            validation humaine, corriger les décisions automatiques et enrichir
+            les feedbacks métier pour améliorer la fiabilité de la plateforme.
           </p>
 
           <div class="hero-actions">
-            <button class="btn btn-primary" type="button" (click)="goTo('/HumanValidationList')">
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="goTo('/HumanValidationList')"
+            >
               Validation humaine
             </button>
 
-            <button class="btn btn-secondary" type="button" (click)="goTo('/ExpertFeedbackList')">
+            <button
+              class="btn btn-secondary"
+              type="button"
+              (click)="goTo('/ExpertFeedbackList')"
+            >
               Feedback expert
             </button>
           </div>
@@ -79,64 +95,86 @@
 
             <div class="hero-point">
               <span class="hero-point-bullet"></span>
-              <span>Suivi des dossiers sensibles</span>
+              <span>Dossiers sensibles</span>
             </div>
           </div>
         </div>
 
         <div class="hero-side">
           <div class="hero-panel">
-            <div class="hero-panel-kicker">Rôle connecté</div>
-
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>{{ role }}</strong>
-                <span>Rôle actuel</span>
-              </article>
-
-              <article class="hero-mini-card">
-                <strong>IA + Expert</strong>
-                <span>Décision hybride</span>
-              </article>
-            </div>
+            <div class="ai-orb">AI</div>
 
             <div class="hero-note">
-              <h3>Mission expert</h3>
+              <span>Mission expert</span>
+
+              <h3>Contrôle humain intelligent</h3>
+
               <p>
-                Vérifier les dossiers critiques, confirmer les décisions et
-                transformer les retours terrain en apprentissage métier.
+                Vérifiez les dossiers critiques, confirmez les décisions et
+                transformez les retours terrain en amélioration continue.
               </p>
+            </div>
+
+            <div class="mini-status-list">
+              <div>
+                <span class="status-dot active"></span>
+                <p>Analyse automatique terminée</p>
+              </div>
+
+              <div>
+                <span class="status-dot pending"></span>
+                <p>Validation experte requise</p>
+              </div>
+
+              <div>
+                <span class="status-dot success"></span>
+                <p>Feedback enregistré</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- STATS -->
       <section class="stats-row">
         <article class="stat-card">
-          <span class="stat-label">Validation humaine</span>
-          <strong>Review</strong>
-          <p>Dossiers nécessitant une lecture et une décision experte.</p>
+          <span class="stat-icon review"></span>
+          <div>
+            <span class="stat-label">Validation humaine</span>
+            <strong>Review</strong>
+            <p>Dossiers nécessitant une lecture et une décision experte.</p>
+          </div>
         </article>
 
         <article class="stat-card">
-          <span class="stat-label">Feedback métier</span>
-          <strong>Learning</strong>
-          <p>Corrections utilisées pour améliorer les agents IA.</p>
+          <span class="stat-icon learning"></span>
+          <div>
+            <span class="stat-label">Feedback métier</span>
+            <strong>Learning</strong>
+            <p>Corrections utilisées pour améliorer les agents IA.</p>
+          </div>
         </article>
 
         <article class="stat-card">
-          <span class="stat-label">Contrôle qualité</span>
-          <strong>Expertise</strong>
-          <p>Vérification de la cohérence des résultats automatiques.</p>
+          <span class="stat-icon quality"></span>
+          <div>
+            <span class="stat-label">Contrôle qualité</span>
+            <strong>Expertise</strong>
+            <p>Vérification de la cohérence des résultats automatiques.</p>
+          </div>
         </article>
 
         <article class="stat-card stat-highlight">
-          <span class="stat-label">Objectif</span>
-          <strong>Fiabilité</strong>
-          <p>Réduire les erreurs et renforcer la confiance décisionnelle.</p>
+          <span class="stat-icon trust"></span>
+          <div>
+            <span class="stat-label">Objectif</span>
+            <strong>Fiabilité</strong>
+            <p>Réduire les erreurs et renforcer la confiance décisionnelle.</p>
+          </div>
         </article>
       </section>
 
+      <!-- ACTIONS -->
       <section class="actions-section">
         <div class="section-head">
           <div>
@@ -147,29 +185,49 @@
 
         <div class="actions-grid">
           <article class="action-card" *ngFor="let action of quickActions">
+            <div class="action-icon"></div>
+
             <h3>{{ action.title }}</h3>
+
             <p>{{ action.text }}</p>
 
-            <button class="action-btn" type="button" (click)="goTo(action.route)">
+            <button
+              class="action-btn"
+              type="button"
+              (click)="goTo(action.route)"
+            >
               {{ action.button }}
+              <span>→</span>
             </button>
           </article>
         </div>
       </section>
 
+      <!-- BOTTOM CTA -->
       <section class="bottom-banner">
         <div class="bottom-banner-content">
           <div>
             <p class="eyebrow eyebrow-light">Expert review</p>
-            <h2>Accédez rapidement aux dossiers à valider et aux feedbacks expert.</h2>
+
+            <h2>
+              Accédez rapidement aux dossiers à valider et aux feedbacks expert.
+            </h2>
           </div>
 
           <div class="bottom-banner-actions">
-            <button class="btn btn-light" type="button" (click)="goTo('/HumanValidationList')">
+            <button
+              class="btn btn-light"
+              type="button"
+              (click)="goTo('/HumanValidationList')"
+            >
               Ouvrir la validation
             </button>
 
-            <button class="btn btn-outline-light" type="button" (click)="goTo('/ExpertFeedbackList')">
+            <button
+              class="btn btn-outline-light"
+              type="button"
+              (click)="goTo('/ExpertFeedbackList')"
+            >
               Ouvrir les feedbacks
             </button>
           </div>

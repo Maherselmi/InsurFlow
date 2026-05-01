@@ -1,23 +1,15 @@
 <div class="claim-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>DÉCLARATION AUTO</small>
         </span>
       </a>
 
-      <nav class="main-nav">
+      <nav class="nav-links">
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
@@ -27,8 +19,8 @@
         </a>
       </nav>
 
-      <div class="header-chip">
-        <span class="chip-label">Déclaration auto</span>
+      <div class="step-chip">
+        <span>Déclaration auto</span>
         <strong>Étape 3 / 3</strong>
       </div>
     </div>
@@ -36,58 +28,41 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badge">Confirmation du dossier</div>
-
+      <section class="claim-hero">
+        <div class="claim-welcome-card">
+          <span class="claim-label">Confirmation du dossier</span>
           <h1>
             Votre sinistre auto est bien enregistré
             <span>et prêt pour analyse.</span>
           </h1>
 
-          <p class="hero-text">
+          <p>
             Votre déclaration a été transmise avec succès. Le dossier passe
-            maintenant en phase d’analyse et de traitement dans votre espace
-            InSurFlow, dans une expérience plus claire et plus premium.
+            maintenant en phase d’analyse dans votre espace InSurFlow.
           </p>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Dossier créé avec succès</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Documents bien reçus</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Traitement maintenant lancé</span>
-            </div>
-          </div>
         </div>
 
-        <div class="hero-side">
-          <div class="hero-panel">
-            <div class="hero-panel-kicker">Référence dossier</div>
+        <div class="claim-summary-card">
+          <div class="summary-header">
+            <span>Référence dossier</span>
+            <small>Étape 3</small>
+          </div>
 
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>✓</strong>
-                <span>Dossier transmis</span>
-              </article>
+          <div class="summary-grid">
+            <article>
+              <strong>✓</strong>
+              <span>Dossier transmis</span>
+            </article>
 
-              <article class="hero-mini-card">
-                <strong>72h</strong>
-                <span>Délai cible</span>
-              </article>
-            </div>
+            <article>
+              <strong>72h</strong>
+              <span>Délai cible</span>
+            </article>
 
-            <div class="hero-visual">
-              <img src="assets/images/demarche-auto.jpg" alt="Confirmation sinistre automobile" />
-            </div>
+            <article>
+              <strong>3/3</strong>
+              <span>Parcours terminé</span>
+            </article>
           </div>
         </div>
       </section>
@@ -128,8 +103,8 @@
             <div class="support-icon">✓</div>
             <h2>Traitement auto InSurFlow</h2>
             <p>
-              Votre dossier suit maintenant le circuit d’analyse de votre sinistre
-              automobile avec un suivi centralisé dans votre espace client.
+              Votre dossier suit maintenant le circuit d’analyse avec un suivi
+              centralisé dans votre espace client.
             </p>
 
             <ul class="support-list">
@@ -218,6 +193,7 @@
               <div class="steps-grid">
                 <div class="mini-step-card" *ngFor="let step of nextSteps">
                   <span class="mini-step-icon">{{ step.id }}</span>
+
                   <div>
                     <strong>{{ step.title }}</strong>
                     <p>{{ step.text }}</p>
@@ -228,17 +204,17 @@
 
             <div class="contact-card">
               <p class="contact-line">
-                Une question sur votre dossier ? Consultez votre espace client ou votre
-                suivi de dossiers pour voir les prochaines mises à jour.
+                Une question sur votre dossier ? Consultez votre espace client
+                ou votre suivi de dossiers pour voir les prochaines mises à jour.
               </p>
             </div>
 
             <div class="actions-row">
-              <button class="btn btn-secondary" type="button" (click)="goToClaimsHome()">
+              <button class="btn btn-outline" type="button" (click)="goToClaimsHome()">
                 Retour aux sinistres
               </button>
 
-              <button class="btn btn-light" type="button" (click)="goToMyFiles()">
+              <button class="btn btn-outline" type="button" (click)="goToMyFiles()">
                 Voir mes dossiers
               </button>
 

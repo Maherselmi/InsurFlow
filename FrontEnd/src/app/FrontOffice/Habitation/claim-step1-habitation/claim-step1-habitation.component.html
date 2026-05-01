@@ -1,34 +1,22 @@
 <div class="claim-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>DÉCLARATION HABITATION</small>
         </span>
       </a>
 
-      <nav class="main-nav">
-        <a
-          *ngFor="let item of navItems"
-          [routerLink]="item.route"
-          [class.active]="isActiveNav(item.route)"
-        >
+      <nav class="nav-links">
+        <a *ngFor="let item of navItems" [routerLink]="item.route" [class.active]="isActiveNav(item.route)">
           {{ item.label }}
         </a>
       </nav>
 
-      <div class="header-chip">
-        <span class="chip-label">Déclaration habitation</span>
+      <div class="step-chip">
+        <span>Déclaration habitation</span>
         <strong>Étape 1 / 3</strong>
       </div>
     </div>
@@ -36,68 +24,30 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badge">Sinistre habitation</div>
-
-          <h1>
-            Déclarez votre sinistre habitation
-            <span>dans un parcours plus clair et plus premium.</span>
-          </h1>
-
-          <p class="hero-text">
-            Renseignez les informations essentielles sur les dégâts matériels
-            pour lancer votre dossier habitation dans une expérience plus douce,
-            plus moderne et plus guidée.
-          </p>
+      <section class="claim-hero">
+        <div class="claim-welcome-card">
+          <span class="claim-label">Sinistre habitation</span>
+          <h1>Déclarez votre sinistre habitation <span>en quelques étapes.</span></h1>
+          <p>Renseignez les informations essentielles sur les dégâts matériels pour lancer votre dossier habitation.</p>
 
           <div class="hero-actions">
-            <button class="btn btn-secondary" type="button" (click)="goToClaimsHome()">
-              Retour aux sinistres
-            </button>
-
+            <button class="btn btn-outline" type="button" (click)="goToClaimsHome()">Retour aux sinistres</button>
             <button class="btn btn-primary" type="button" (click)="next()" [disabled]="loading || loadingPolicies">
               Continuer
             </button>
           </div>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Parcours en 3 étapes</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Vérification de la police</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Déclaration guidée</span>
-            </div>
-          </div>
         </div>
 
-        <div class="hero-side">
-          <div class="hero-panel">
-            <div class="hero-panel-kicker">Traitement habitation</div>
+        <div class="claim-summary-card">
+          <div class="summary-header">
+            <span>Progression</span>
+            <small>Étape 1</small>
+          </div>
 
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>24/7</strong>
-                <span>Déclaration disponible</span>
-              </article>
-
-              <article class="hero-mini-card">
-                <strong>3</strong>
-                <span>Étapes guidées</span>
-              </article>
-            </div>
-
-            <div class="hero-visual">
-              <img src="assets/images/home-insurance.jpg" alt="Sinistre habitation" />
-            </div>
+          <div class="summary-steps">
+            <div><strong>01</strong><span>Informations du sinistre</span></div>
+            <div><strong>02</strong><span>Photos & documents</span></div>
+            <div><strong>03</strong><span>Confirmation</span></div>
           </div>
         </div>
       </section>
@@ -106,41 +56,17 @@
         <aside class="left-column">
           <div class="panel progress-panel">
             <p class="panel-kicker">Progression</p>
-
             <div class="step-list">
-              <div class="step-card active">
-                <div class="step-number">1</div>
-                <div>
-                  <h3>Informations</h3>
-                  <p>Détails du sinistre</p>
-                </div>
-              </div>
-
-              <div class="step-card">
-                <div class="step-number">2</div>
-                <div>
-                  <h3>Justificatifs</h3>
-                  <p>Photos & documents</p>
-                </div>
-              </div>
-
-              <div class="step-card">
-                <div class="step-number">3</div>
-                <div>
-                  <h3>Confirmation</h3>
-                  <p>Récapitulatif final</p>
-                </div>
-              </div>
+              <div class="step-card active"><div class="step-number">1</div><div><h3>Informations</h3><p>Détails du sinistre</p></div></div>
+              <div class="step-card"><div class="step-number">2</div><div><h3>Justificatifs</h3><p>Photos & documents</p></div></div>
+              <div class="step-card"><div class="step-number">3</div><div><h3>Confirmation</h3><p>Récapitulatif final</p></div></div>
             </div>
           </div>
 
           <div class="panel support-panel">
             <div class="support-icon">H</div>
             <h2>Assistance habitation dédiée</h2>
-            <p>
-              Un parcours pensé pour les dégâts matériels, les incidents du logement
-              et la prise en charge rapide du dossier.
-            </p>
+            <p>Un parcours pensé pour les dégâts matériels, incidents du logement et réparations.</p>
 
             <div class="tips-list">
               <article class="tip-card" *ngFor="let tip of supportTips">
@@ -152,15 +78,8 @@
         </aside>
 
         <section class="right-column">
-          <div class="alert alert-error" *ngIf="errorMessage">
-            <span>⚠</span>
-            <span>{{ errorMessage }}</span>
-          </div>
-
-          <div class="alert alert-success" *ngIf="successMessage">
-            <span>✓</span>
-            <span>{{ successMessage }}</span>
-          </div>
+          <div class="alert alert-error" *ngIf="errorMessage"><span>⚠</span><span>{{ errorMessage }}</span></div>
+          <div class="alert alert-success" *ngIf="successMessage"><span>✓</span><span>{{ successMessage }}</span></div>
 
           <div class="panel form-panel">
             <div class="form-head">
@@ -171,119 +90,67 @@
               </div>
             </div>
 
-            <div class="form-body">
-              <div class="form-grid">
-                <div class="form-group full">
-                  <label class="form-label">Police d’assurance habitation</label>
-
-                  <div class="select-wrap">
-                    <select
-                      class="form-select"
-                      [(ngModel)]="claim.policyId"
-                      name="policyId"
-                      (change)="onPolicyChange()"
-                    >
-                      <option [ngValue]="null">
-                        {{ loadingPolicies ? 'Chargement des polices habitation...' : 'Sélectionnez votre police habitation' }}
-                      </option>
-                      <option *ngFor="let p of policies" [ngValue]="p.id">
-                        {{ p.policyNumber }} — {{ p.type }}
-                      </option>
-                    </select>
-                    <span class="select-arrow">▼</span>
-                  </div>
-
-                  <div class="helper-text" *ngIf="!loadingPolicies && policies.length === 0">
-                    Aucune police habitation active n’a été trouvée pour ce parcours.
-                  </div>
-
-                  <div class="selected-policy" *ngIf="selectedPolicy">
-                    <div class="policy-chip">
-                      <span class="chip-dot"></span>
-                      <span>{{ selectedPolicy.policyNumber }}</span>
-                    </div>
-
-                    <div class="policy-details">
-                      <div class="policy-detail">
-                        <span class="detail-label">Type</span>
-                        <strong>{{ selectedPolicy.type }}</strong>
-                      </div>
-
-                      <div class="policy-detail">
-                        <span class="detail-label">Période</span>
-                        <strong>{{ getSelectedPolicyPeriod() }}</strong>
-                      </div>
-
-                      <div class="policy-detail">
-                        <span class="detail-label">Statut</span>
-                        <strong>{{ getSelectedPolicyStatus() }}</strong>
-                      </div>
-
-                      <div class="policy-detail">
-                        <span class="detail-label">Code produit</span>
-                        <strong>{{ selectedPolicy.productCode || '-' }}</strong>
-                      </div>
-                    </div>
-                  </div>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label">Police d’assurance habitation</label>
+                <div class="select-wrap">
+                  <select class="form-select" [(ngModel)]="claim.policyId" name="policyId" (change)="onPolicyChange()">
+                    <option [ngValue]="null">
+                      {{ loadingPolicies ? 'Chargement des polices habitation...' : 'Sélectionnez votre police habitation' }}
+                    </option>
+                    <option *ngFor="let p of policies" [ngValue]="p.id">
+                      {{ p.policyNumber }} — {{ p.type }}
+                    </option>
+                  </select>
+                  <span class="select-arrow">▼</span>
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label">Date du sinistre</label>
-                  <input
-                    type="date"
-                    class="form-input"
-                    [(ngModel)]="claim.incidentDate"
-                    name="incidentDate"
-                  />
+                <div class="helper-text" *ngIf="!loadingPolicies && policies.length === 0">
+                  Aucune police habitation active n’a été trouvée pour ce parcours.
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label">Type de sinistre</label>
-
-                  <div class="select-wrap">
-                    <select
-                      class="form-select"
-                      [(ngModel)]="claim.type"
-                      name="type"
-                    >
-                      <option [ngValue]="null">Sélectionnez le type de sinistre</option>
-                      <option *ngFor="let t of habitationClaimTypes" [value]="t.value">
-                        {{ t.label }}
-                      </option>
-                    </select>
-                    <span class="select-arrow">▼</span>
+                <div class="selected-policy" *ngIf="selectedPolicy">
+                  <div class="policy-chip"><span class="chip-dot"></span><span>{{ selectedPolicy.policyNumber }}</span></div>
+                  <div class="policy-details">
+                    <div class="policy-detail"><span class="detail-label">Type</span><strong>{{ selectedPolicy.type }}</strong></div>
+                    <div class="policy-detail"><span class="detail-label">Période</span><strong>{{ getSelectedPolicyPeriod() }}</strong></div>
+                    <div class="policy-detail"><span class="detail-label">Statut</span><strong>{{ getSelectedPolicyStatus() }}</strong></div>
+                    <div class="policy-detail"><span class="detail-label">Code produit</span><strong>{{ selectedPolicy.productCode || '-' }}</strong></div>
                   </div>
                 </div>
+              </div>
 
-                <div class="form-group full">
-                  <label class="form-label">Description détaillée des dégâts</label>
-                  <textarea
-                    class="form-textarea"
-                    [(ngModel)]="claim.description"
-                    name="description"
-                    rows="5"
-                    placeholder="Décrivez les circonstances, les pièces touchées, les équipements endommagés et les éléments importants du sinistre."
-                  ></textarea>
+              <div class="form-group">
+                <label class="form-label">Date du sinistre</label>
+                <input type="date" class="form-input" [(ngModel)]="claim.incidentDate" name="incidentDate" />
+              </div>
 
-                  <div class="helper-text">
-                    Conseil : précisez les pièces concernées, les biens touchés et l’origine probable du dommage.
-                  </div>
+              <div class="form-group">
+                <label class="form-label">Type de sinistre</label>
+                <div class="select-wrap">
+                  <select class="form-select" [(ngModel)]="claim.type" name="type">
+                    <option [ngValue]="null">Sélectionnez le type de sinistre</option>
+                    <option *ngFor="let t of habitationClaimTypes" [value]="t.value">{{ t.label }}</option>
+                  </select>
+                  <span class="select-arrow">▼</span>
                 </div>
+              </div>
+
+              <div class="form-group full">
+                <label class="form-label">Description détaillée des dégâts</label>
+                <textarea
+                  class="form-textarea"
+                  [(ngModel)]="claim.description"
+                  name="description"
+                  rows="5"
+                  placeholder="Décrivez les circonstances, les pièces touchées, les équipements endommagés et les éléments importants."
+                ></textarea>
               </div>
             </div>
 
             <div class="form-footer">
-              <div class="footer-note">
-                <span class="footer-bullet"></span>
-                <span>Étape 1 sur 3 — Informations du sinistre habitation</span>
-              </div>
-
-              <button
-                type="button"
-                class="submit-btn"
-                (click)="next()"
-                [disabled]="loading || loadingPolicies"
-              >
+              <div class="footer-note"><span class="footer-bullet"></span><span>Étape 1 sur 3 — Informations habitation</span></div>
+              <button type="button" class="submit-btn" (click)="next()" [disabled]="loading || loadingPolicies">
                 <span *ngIf="loading">Traitement en cours...</span>
                 <span *ngIf="!loading">Continuer vers les justificatifs</span>
               </button>

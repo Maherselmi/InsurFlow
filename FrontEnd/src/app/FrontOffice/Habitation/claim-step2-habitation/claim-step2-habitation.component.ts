@@ -25,7 +25,7 @@ interface UploadTip {
 export class ClaimStep2HabitationComponent implements OnInit {
   navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
-    { label: 'Mes contrats', route: '/contrats' },
+    { label: 'Mes contrats', route: '/PolicesList' },
     { label: 'Sinistres', route: '/Claim_Home' },
     { label: 'Mes dossiers', route: '/Consulter' }
   ];
@@ -219,7 +219,7 @@ export class ClaimStep2HabitationComponent implements OnInit {
                 this.successMessage = 'Documents habitation envoyés avec succès. Redirection...';
 
                 setTimeout(() => {
-                  this.router.navigate(['/claim/habitation/step3']);
+                  this.router.navigate(['/Habitation/step3']);
                 }, 1000);
               },
               error: (err) => {

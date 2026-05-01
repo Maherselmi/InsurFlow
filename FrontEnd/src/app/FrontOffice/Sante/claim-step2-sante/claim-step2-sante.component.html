@@ -1,23 +1,15 @@
 <div class="claim-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>DÉCLARATION SANTÉ</small>
         </span>
       </a>
 
-      <nav class="main-nav">
+      <nav class="nav-links">
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
@@ -27,8 +19,8 @@
         </a>
       </nav>
 
-      <div class="header-chip">
-        <span class="chip-label">Déclaration santé</span>
+      <div class="step-chip">
+        <span>Déclaration santé</span>
         <strong>Étape 2 / 3</strong>
       </div>
     </div>
@@ -36,69 +28,58 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badge">Justificatifs santé</div>
+      <section class="claim-hero">
+        <div class="claim-welcome-card">
+          <span class="claim-label">Justificatifs santé</span>
 
           <h1>
             Ajoutez vos documents médicaux
-            <span>pour compléter votre dossier santé.</span>
+            <span>pour compléter votre dossier.</span>
           </h1>
 
-          <p class="hero-text">
+          <p>
             Déposez vos ordonnances, comptes-rendus, factures ou documents médicaux
-            afin de finaliser votre demande de prise en charge dans une interface
-            plus claire, plus moderne et plus premium.
+            pour finaliser votre demande de prise en charge.
           </p>
 
           <div class="hero-actions">
-            <button class="btn btn-secondary" type="button" (click)="back()">
+            <button class="btn btn-outline" type="button" (click)="back()">
               Retour
             </button>
 
-            <button class="btn btn-primary" type="button" (click)="upload()" [disabled]="!canUpload">
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="upload()"
+              [disabled]="!canUpload"
+            >
               <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
               <span *ngIf="!loading">Soumettre les justificatifs</span>
             </button>
           </div>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Ordonnances et factures</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>PDF, JPG ou PNG</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>10 Mo maximum par fichier</span>
-            </div>
-          </div>
         </div>
 
-        <div class="hero-side">
-          <div class="hero-panel">
-            <div class="hero-panel-kicker">Documents santé</div>
+        <div class="claim-summary-card">
+          <div class="summary-header">
+            <span>Résumé documents</span>
+            <small>Étape 2</small>
+          </div>
 
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>{{ totalFiles }}</strong>
-                <span>Fichier(s)</span>
-              </article>
+          <div class="summary-grid">
+            <article>
+              <strong>{{ totalFiles }}</strong>
+              <span>Document(s)</span>
+            </article>
 
-              <article class="hero-mini-card">
-                <strong>{{ totalSize }}</strong>
-                <span>Taille totale</span>
-              </article>
-            </div>
+            <article>
+              <strong>{{ totalSize }}</strong>
+              <span>Taille totale</span>
+            </article>
 
-            <div class="hero-visual">
-              <img src="assets/images/health-insurance.jpg" alt="Documents médicaux" />
-            </div>
+            <article>
+              <strong>10 Mo</strong>
+              <span>Maximum par fichier</span>
+            </article>
           </div>
         </div>
       </section>
@@ -129,7 +110,7 @@
                 <div class="step-number">3</div>
                 <div>
                   <h3>Confirmation</h3>
-                  <p>Récapitulatif final</p>
+                  <p>Validation finale</p>
                 </div>
               </div>
             </div>
@@ -137,11 +118,7 @@
 
           <div class="panel support-panel">
             <div class="support-icon">S</div>
-            <h2>Documents médicaux acceptés</h2>
-            <p>
-              Ajoutez les pièces les plus utiles pour accélérer le traitement
-              du dossier santé.
-            </p>
+            <h2>Documents acceptés</h2>
 
             <ul class="support-list">
               <li>Ordonnance médicale</li>
@@ -200,90 +177,81 @@
               </div>
             </div>
 
-            <div class="form-body">
-              <input
-                #fileInput
-                type="file"
-                multiple
-                accept="image/*,.pdf"
-                (change)="onFileSelected($event)"
-                hidden
-              />
+            <input
+              #fileInput
+              type="file"
+              multiple
+              accept="image/*,.pdf"
+              (change)="onFileSelected($event)"
+              hidden
+            />
 
-              <div
-                class="drop-zone"
-                (dragover)="onDragOver($event)"
-                (drop)="onDrop($event)"
-                (click)="fileInput.click()"
-              >
-                <div class="drop-icon">↑</div>
-                <h3>Glissez vos documents médicaux ici</h3>
-                <p>ou cliquez pour parcourir vos dossiers</p>
+            <div
+              class="drop-zone"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop($event)"
+              (click)="fileInput.click()"
+            >
+              <div class="drop-icon">↑</div>
+              <h3>Glissez vos documents médicaux ici</h3>
+              <p>ou cliquez pour parcourir vos dossiers</p>
 
-                <div class="drop-types">
-                  <span class="type-chip">PDF</span>
-                  <span class="type-chip">JPG / PNG</span>
-                  <span class="type-chip">Max 10 Mo</span>
-                  <span class="type-chip">Ordonnances</span>
+              <div class="drop-types">
+                <span class="type-chip">PDF</span>
+                <span class="type-chip">JPG / PNG</span>
+                <span class="type-chip">Max 10 Mo</span>
+                <span class="type-chip">Ordonnances</span>
+              </div>
+            </div>
+
+            <div class="tips-grid">
+              <div class="tip-card" *ngFor="let tip of uploadTips">
+                <span class="tip-icon">{{ tip.icon }}</span>
+                <div>
+                  <strong>{{ tip.title }}</strong>
+                  <p>{{ tip.text }}</p>
                 </div>
               </div>
+            </div>
 
-              <div class="tips-grid">
-                <div class="tip-card" *ngFor="let tip of uploadTips">
-                  <span class="tip-icon">{{ tip.icon }}</span>
-                  <div>
-                    <strong>{{ tip.title }}</strong>
-                    <p>{{ tip.text }}</p>
-                  </div>
-                </div>
+            <div class="file-list" *ngIf="files.length > 0">
+              <div class="file-list-header">
+                <span>{{ files.length }} document(s) sélectionné(s)</span>
+
+                <button class="btn-clear" type="button" (click)="clearFiles(fileInput)">
+                  Tout supprimer
+                </button>
               </div>
 
-              <div class="file-list" *ngIf="files.length > 0">
-                <div class="file-list-header">
-                  <span>{{ files.length }} document(s) médical(aux) sélectionné(s)</span>
-
-                  <button
-                    class="btn-clear"
-                    type="button"
-                    (click)="clearFiles(fileInput)"
-                  >
-                    Tout supprimer
-                  </button>
+              <div class="file-row" *ngFor="let file of files; let i = index">
+                <div
+                  class="file-type-icon"
+                  [class.pdf]="isPdf(file)"
+                  [class.img]="isImage(file)"
+                >
+                  {{ isPdf(file) ? 'PDF' : 'IMG' }}
                 </div>
 
-                <div class="file-row" *ngFor="let file of files; let i = index">
-                  <div
-                    class="file-type-icon"
-                    [class.pdf]="isPdf(file)"
-                    [class.img]="isImage(file)"
-                  >
-                    {{ isPdf(file) ? 'PDF' : 'IMG' }}
-                  </div>
-
-                  <div class="file-meta">
-                    <div class="file-name">{{ file.name }}</div>
-                    <div class="file-size">{{ formatSize(file.size) }}</div>
-                  </div>
-
-                  <div class="file-status">Prêt</div>
-
-                  <button
-                    class="file-remove"
-                    type="button"
-                    (click)="removeFile(i)"
-                  >
-                    ×
-                  </button>
+                <div class="file-meta">
+                  <div class="file-name">{{ file.name }}</div>
+                  <div class="file-size">{{ formatSize(file.size) }}</div>
                 </div>
+
+                <div class="file-status">Prêt</div>
+
+                <button class="file-remove" type="button" (click)="removeFile(i)">
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div class="progress-wrap" *ngIf="loading">
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="uploadProgress"></div>
               </div>
 
-              <div class="progress-wrap" *ngIf="loading">
-                <div class="progress-track">
-                  <div class="progress-fill" [style.width.%]="uploadProgress"></div>
-                </div>
-                <div class="progress-text">
-                  Upload documents médicaux — {{ uploadProgress }}%
-                </div>
+              <div class="progress-text">
+                Upload documents médicaux — {{ uploadProgress }}%
               </div>
             </div>
 

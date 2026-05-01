@@ -1,17 +1,26 @@
 import { ApplicationConfig } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import {
+  provideRouter,
+  withInMemoryScrolling
+} from '@angular/router';
 import { provideClientHydration } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';  // AJOUTEZ CET IMPORT
+import { provideHttpClient } from '@angular/common/http';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app.routes';
-import {provideCharts, withDefaultRegisterables} from "ng2-charts";
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
-    provideCharts(withDefaultRegisterables()),
+    provideRouter(
+      routes,
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'top',
+        anchorScrolling: 'enabled'
+      })
+    ),
 
+    provideCharts(withDefaultRegisterables()),
     provideClientHydration(),
-    provideHttpClient()  // AJOUTEZ CE PROVIDER
+    provideHttpClient()
   ]
 };

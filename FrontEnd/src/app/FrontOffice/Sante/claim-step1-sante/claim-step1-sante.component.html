@@ -1,23 +1,15 @@
 <div class="claim-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>DÉCLARATION SANTÉ</small>
         </span>
       </a>
 
-      <nav class="main-nav">
+      <nav class="nav-links">
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
@@ -27,8 +19,8 @@
         </a>
       </nav>
 
-      <div class="header-chip">
-        <span class="chip-label">Déclaration santé</span>
+      <div class="step-chip">
+        <span>Déclaration santé</span>
         <strong>Étape 1 / 3</strong>
       </div>
     </div>
@@ -36,67 +28,56 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badge">Sinistre santé</div>
+      <section class="claim-hero">
+        <div class="claim-welcome-card">
+          <span class="claim-label">Sinistre santé</span>
 
           <h1>
             Déclarez votre dossier santé
-            <span>dans un parcours plus clair et plus premium.</span>
+            <span>en quelques étapes.</span>
           </h1>
 
-          <p class="hero-text">
-            Renseignez les informations médicales essentielles pour démarrer
-            la prise en charge de votre dossier santé dans une expérience plus
-            fluide, plus lisible et cohérente avec l’univers InSurFlow.
+          <p>
+            Renseignez les informations médicales nécessaires pour démarrer votre
+            demande de prise en charge.
           </p>
 
           <div class="hero-actions">
-            <button class="btn btn-secondary" type="button" (click)="goToClaimsHome()">
+            <button class="btn btn-outline" type="button" (click)="goToClaimsHome()">
               Retour aux sinistres
             </button>
 
-            <button class="btn btn-primary" type="button" (click)="next()" [disabled]="loading || loadingPolicies">
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="next()"
+              [disabled]="loading || loadingPolicies"
+            >
               Continuer
             </button>
           </div>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Parcours en 3 étapes</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Validation de mutuelle</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Prise en charge rapide</span>
-            </div>
-          </div>
         </div>
 
-        <div class="hero-side">
-          <div class="hero-panel">
-            <div class="hero-panel-kicker">Traitement santé</div>
+        <div class="claim-summary-card">
+          <div class="summary-header">
+            <span>Progression</span>
+            <small>Étape 1</small>
+          </div>
 
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>24/7</strong>
-                <span>Déclaration disponible</span>
-              </article>
-
-              <article class="hero-mini-card">
-                <strong>3</strong>
-                <span>Étapes guidées</span>
-              </article>
+          <div class="summary-steps">
+            <div>
+              <strong>01</strong>
+              <span>Informations médicales</span>
             </div>
 
-            <div class="hero-visual">
-              <img src="assets/images/health-insurance.jpg" alt="Sinistre santé" />
+            <div>
+              <strong>02</strong>
+              <span>Documents médicaux</span>
+            </div>
+
+            <div>
+              <strong>03</strong>
+              <span>Confirmation</span>
             </div>
           </div>
         </div>
@@ -112,7 +93,7 @@
                 <div class="step-number">1</div>
                 <div>
                   <h3>Informations</h3>
-                  <p>Détails du dossier</p>
+                  <p>Détails du dossier santé</p>
                 </div>
               </div>
 
@@ -128,7 +109,7 @@
                 <div class="step-number">3</div>
                 <div>
                   <h3>Confirmation</h3>
-                  <p>Récapitulatif final</p>
+                  <p>Validation finale</p>
                 </div>
               </div>
             </div>
@@ -139,7 +120,7 @@
             <h2>Assistance santé dédiée</h2>
             <p>
               Un parcours pensé pour les consultations, hospitalisations,
-              médicaments et autres frais médicaux.
+              médicaments et remboursements médicaux.
             </p>
 
             <div class="tips-list">
@@ -166,109 +147,104 @@
             <div class="form-head">
               <div class="form-head-icon">S</div>
               <div>
-                <h2>Informations médicales du sinistre</h2>
-                <p>Renseignez les informations nécessaires pour lancer votre dossier santé.</p>
+                <h2>Informations médicales</h2>
+                <p>Complétez les informations nécessaires pour ouvrir votre dossier santé.</p>
               </div>
             </div>
 
-            <div class="form-body">
-              <div class="form-grid">
-                <div class="form-group full">
-                  <label class="form-label">Mutuelle / assurance santé</label>
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label">Mutuelle / assurance santé</label>
 
-                  <div class="select-wrap">
-                    <select
-                      class="form-select"
-                      [(ngModel)]="claim.policyId"
-                      name="policyId"
-                      (change)="onPolicyChange()"
-                    >
-                      <option [ngValue]="null">
-                        {{ loadingPolicies ? 'Chargement des polices santé...' : 'Sélectionnez votre mutuelle' }}
-                      </option>
-                      <option *ngFor="let p of policies" [ngValue]="p.id">
-                        {{ p.policyNumber }} — {{ p.type }}
-                      </option>
-                    </select>
-                    <span class="select-arrow">▼</span>
+                <div class="select-wrap">
+                  <select
+                    class="form-select"
+                    [(ngModel)]="claim.policyId"
+                    name="policyId"
+                    (change)="onPolicyChange()"
+                  >
+                    <option [ngValue]="null">
+                      {{ loadingPolicies ? 'Chargement des polices santé...' : 'Sélectionnez votre mutuelle' }}
+                    </option>
+
+                    <option *ngFor="let p of policies" [ngValue]="p.id">
+                      {{ p.policyNumber }} — {{ p.type }}
+                    </option>
+                  </select>
+
+                  <span class="select-arrow">▼</span>
+                </div>
+
+                <div class="helper-text" *ngIf="!loadingPolicies && policies.length === 0">
+                  Aucune police santé active n’a été trouvée pour ce parcours.
+                </div>
+
+                <div class="selected-policy" *ngIf="selectedPolicy">
+                  <div class="policy-chip">
+                    <span class="chip-dot"></span>
+                    <span>{{ selectedPolicy.policyNumber }}</span>
                   </div>
 
-                  <div class="helper-text" *ngIf="!loadingPolicies && policies.length === 0">
-                    Aucune police santé active n’a été trouvée pour ce parcours.
-                  </div>
-
-                  <div class="selected-policy" *ngIf="selectedPolicy">
-                    <div class="policy-chip">
-                      <span class="chip-dot"></span>
-                      <span>{{ selectedPolicy.policyNumber }}</span>
+                  <div class="policy-details">
+                    <div class="policy-detail">
+                      <span class="detail-label">Type</span>
+                      <strong>{{ selectedPolicy.type }}</strong>
                     </div>
 
-                    <div class="policy-details">
-                      <div class="policy-detail">
-                        <span class="detail-label">Type</span>
-                        <strong>{{ selectedPolicy.type }}</strong>
-                      </div>
+                    <div class="policy-detail">
+                      <span class="detail-label">Période</span>
+                      <strong>{{ getSelectedPolicyPeriod() }}</strong>
+                    </div>
 
-                      <div class="policy-detail">
-                        <span class="detail-label">Période</span>
-                        <strong>{{ getSelectedPolicyPeriod() }}</strong>
-                      </div>
+                    <div class="policy-detail">
+                      <span class="detail-label">Statut</span>
+                      <strong>{{ getSelectedPolicyStatus() }}</strong>
+                    </div>
 
-                      <div class="policy-detail">
-                        <span class="detail-label">Statut</span>
-                        <strong>{{ getSelectedPolicyStatus() }}</strong>
-                      </div>
-
-                      <div class="policy-detail">
-                        <span class="detail-label">Code produit</span>
-                        <strong>{{ selectedPolicy.productCode || '-' }}</strong>
-                      </div>
+                    <div class="policy-detail">
+                      <span class="detail-label">Code produit</span>
+                      <strong>{{ selectedPolicy.productCode || '-' }}</strong>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <div class="form-group">
-                  <label class="form-label">Date des soins</label>
-                  <input
-                    type="date"
-                    class="form-input"
-                    [(ngModel)]="claim.incidentDate"
-                    name="incidentDate"
-                  />
+              <div class="form-group">
+                <label class="form-label">Date des soins</label>
+                <input
+                  type="date"
+                  class="form-input"
+                  [(ngModel)]="claim.incidentDate"
+                  name="incidentDate"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Type de soins</label>
+
+                <div class="select-wrap">
+                  <select class="form-select" [(ngModel)]="claim.type" name="type">
+                    <option [ngValue]="null">Sélectionnez le type de soins</option>
+
+                    <option *ngFor="let t of healthClaimTypes" [value]="t.value">
+                      {{ t.label }}
+                    </option>
+                  </select>
+
+                  <span class="select-arrow">▼</span>
                 </div>
+              </div>
 
-                <div class="form-group">
-                  <label class="form-label">Type de soins</label>
+              <div class="form-group full">
+                <label class="form-label">Description détaillée</label>
 
-                  <div class="select-wrap">
-                    <select
-                      class="form-select"
-                      [(ngModel)]="claim.type"
-                      name="type"
-                    >
-                      <option [ngValue]="null">Sélectionnez le type de soins</option>
-                      <option *ngFor="let t of healthClaimTypes" [value]="t.value">
-                        {{ t.label }}
-                      </option>
-                    </select>
-                    <span class="select-arrow">▼</span>
-                  </div>
-                </div>
-
-                <div class="form-group full">
-                  <label class="form-label">Description détaillée des soins</label>
-                  <textarea
-                    class="form-textarea"
-                    [(ngModel)]="claim.description"
-                    name="description"
-                    rows="5"
-                    placeholder="Décrivez la nature des soins, les symptômes, les traitements prescrits et les éléments importants du dossier."
-                  ></textarea>
-
-                  <div class="helper-text">
-                    Conseil : mentionnez le type d’acte médical, le contexte, les traitements prescrits et les informations utiles pour l’analyse.
-                  </div>
-                </div>
+                <textarea
+                  class="form-textarea"
+                  [(ngModel)]="claim.description"
+                  name="description"
+                  rows="5"
+                  placeholder="Décrivez la nature des soins, les symptômes, les traitements prescrits et les éléments importants du dossier."
+                ></textarea>
               </div>
             </div>
 

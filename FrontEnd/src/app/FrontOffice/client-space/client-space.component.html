@@ -1,23 +1,15 @@
 <div class="client-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>ESPACE CLIENT</small>
         </span>
       </a>
 
-      <nav class="main-nav">
+      <nav class="nav-links">
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
@@ -27,346 +19,438 @@
         </a>
       </nav>
 
-      <div class="header-user" *ngIf="!loadingProfile && client">
-        <div class="header-user-text">
-          <strong>{{ fullName }}</strong>
-          <span>{{ client.email }}</span>
-        </div>
-        <div class="avatar">{{ initials }}</div>
-      </div>
-
-      <div class="header-user" *ngIf="loadingProfile">
-        <div class="header-user-text">
-          <strong>Chargement...</strong>
-          <span>lecture du profil</span>
-        </div>
-        <div class="avatar">...</div>
-      </div>
+      <button class="login-btn" type="button" (click)="logout()">
+        Déconnexion
+      </button>
     </div>
   </header>
 
-  <main class="client-main">
-    <div class="container">
-      <section class="welcome-shell">
-        <div class="welcome-copy">
-          <div class="welcome-badge">Espace client premium</div>
+  <main>
+    <section class="client-hero">
+      <div class="container client-hero-layout">
+        <div class="client-welcome-card">
+          <div class="client-profile">
+            <div class="client-avatar">{{ initials }}</div>
 
-          <h1>
-            Bonjour, {{ fullName }}.
-            <span>Votre assurance devient plus fluide à piloter.</span>
-          </h1>
-
-          <p class="welcome-text" *ngIf="client">
-            Retrouvez vos contrats, vos dossiers, vos documents et vos prochaines
-            échéances dans un environnement plus clair, plus lumineux et pensé pour
-            aller à l’essentiel sans surcharge.
-          </p>
-
-          <p class="welcome-text error-text" *ngIf="profileError">
-            {{ profileError }}
-          </p>
-
-          <div class="welcome-actions">
-            <a class="btn btn-primary" routerLink="/contrats">Mes contrats</a>
-            <a class="btn btn-secondary" routerLink="/Claim_Home">Déclarer un sinistre</a>
-            <a class="btn btn-ghost" routerLink="/Consulter">Mes dossiers</a>
-          </div>
-
-          <div class="welcome-contact" *ngIf="client">
-            <div class="contact-item">
-              <span class="contact-label">Adresse email</span>
-              <strong>{{ client.email }}</strong>
-            </div>
-
-            <div class="contact-item">
-              <span class="contact-label">Téléphone</span>
-              <strong>{{ client.phone || '-' }}</strong>
+            <div>
+              <span class="client-label">Espace client sécurisé</span>
+              <h1>Bonjour, {{ fullName }}</h1>
+              <p>
+                Retrouvez vos contrats, sinistres, documents, échéances et décisions
+                dans un tableau de bord moderne et centralisé.
+              </p>
             </div>
           </div>
-        </div>
 
-        <div class="welcome-side">
-          <div class="overview-card">
-            <div class="overview-top">
-              <div class="overview-profile">
-                <div class="overview-avatar">{{ initials }}</div>
-                <div>
-                  <p class="overview-kicker">Votre espace</p>
-                  <h2>{{ fullName }}</h2>
-                </div>
-              </div>
-
-              <span class="overview-pill">Vue personnelle</span>
+          <div class="client-info-grid">
+            <div>
+              <span>Email</span>
+              <strong *ngIf="client">{{ client.email }}</strong>
+              <strong *ngIf="!client">Non disponible</strong>
             </div>
 
-            <div class="overview-grid">
-              <article class="metric-card">
-                <strong>{{ activeContractsCount }}</strong>
-                <span>Contrats actifs</span>
-              </article>
-
-              <article class="metric-card">
-                <strong>{{ activeClaimsCount }}</strong>
-                <span>Dossiers suivis</span>
-              </article>
-
-              <article class="metric-card metric-soft">
-                <strong>{{ policies.length }}</strong>
-                <span>Contrats trouvés</span>
-              </article>
-
-              <article class="metric-card metric-soft">
-                <strong>{{ expiredContractsCount }}</strong>
-                <span>Contrats expirés</span>
-              </article>
+            <div>
+              <span>Statut du compte</span>
+              <strong>Actif</strong>
             </div>
 
-            <div class="renewal-strip">
-              <span class="renewal-label">Prochaine échéance</span>
-              <strong>{{ nextRenewalLabel }}</strong>
+            <div>
+              <span>Dernière connexion</span>
+              <strong>Aujourd’hui</strong>
             </div>
+          </div>
+
+          <div class="client-actions">
+            <a class="btn btn-primary" routerLink="/PolicesList">
+              Consulter mes contrats
+            </a>
+
+            <a class="btn btn-outline" routerLink="/Claim_Home">
+              Déclarer un sinistre
+            </a>
           </div>
         </div>
-      </section>
 
-      <section class="overview-row">
-        <article class="overview-item">
-          <span class="overview-item-label">Portefeuille</span>
-          <strong>{{ policies.length }}</strong>
-          <p>Contrats enregistrés dans votre espace client.</p>
-        </article>
-
-        <article class="overview-item">
-          <span class="overview-item-label">Familles de contrats</span>
-          <strong>{{ totalTypesCount }}</strong>
-          <p>Types d’assurances présents dans votre portefeuille.</p>
-        </article>
-
-        <article class="overview-item">
-          <span class="overview-item-label">Dossiers en cours</span>
-          <strong>{{ activeClaimsCount }}</strong>
-          <p>Suivis clients affichés dans votre tableau de bord.</p>
-        </article>
-
-        <article class="overview-item overview-item-highlight">
-          <span class="overview-item-label">Expérience</span>
-          <strong>Simple</strong>
-          <p>Un espace unique pour vos contrats, documents et démarches.</p>
-        </article>
-      </section>
-
-      <section class="action-grid">
-        <article class="action-card" *ngFor="let action of quickActions" [routerLink]="action.route">
-          <div class="action-icon" [ngSwitch]="action.icon">
-            <svg *ngSwitchCase="'contracts'" viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-              <path d="M8 9h8"></path>
-              <path d="M8 13h5"></path>
-            </svg>
-
-            <svg *ngSwitchCase="'claims'" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 20h9"></path>
-              <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-            </svg>
-
-            <svg *ngSwitchCase="'documents'" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
+        <div class="client-summary-card">
+          <div class="summary-header">
+            <span>Résumé de mon compte</span>
+            <small>Mis à jour aujourd’hui</small>
           </div>
 
-          <div class="action-copy">
+          <div class="summary-grid">
+            <div>
+              <strong>{{ activeContractsCount }}</strong>
+              <span>Contrats actifs</span>
+            </div>
+
+            <div>
+              <strong>{{ activeClaimsCount }}</strong>
+              <span>Sinistres ouverts</span>
+            </div>
+
+            <div>
+              <strong>{{ expiredContractsCount }}</strong>
+              <span>Contrats expirés</span>
+            </div>
+          </div>
+
+          <div class="next-renewal">
+            <span>Prochaine échéance</span>
+            <strong>{{ nextRenewalLabel }}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="overview-section">
+      <div class="container">
+        <div class="section-title">
+          <span class="eyebrow">Tableau de bord</span>
+          <h2>Vos informations importantes</h2>
+          <p>
+            Un aperçu rapide de votre situation actuelle : contrats, sinistres,
+            échéances et documents.
+          </p>
+        </div>
+
+        <div class="overview-grid">
+          <article class="overview-card">
+            <span class="overview-icon">📄</span>
+            <h3>Contrats actifs</h3>
+            <strong>{{ activeContractsCount }}</strong>
+            <p>Polices actuellement valides et couvertures en cours.</p>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-icon">🛡️</span>
+            <h3>Sinistres suivis</h3>
+            <strong>{{ activeClaimsCount }}</strong>
+            <p>Dossiers ouverts ou nécessitant une action de votre part.</p>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-icon">⏳</span>
+            <h3>Échéances</h3>
+            <strong>{{ expiredContractsCount }}</strong>
+            <p>Contrats expirés ou proches de leur date de fin.</p>
+          </article>
+
+          <article class="overview-card">
+            <span class="overview-icon">📁</span>
+            <h3>Types couverts</h3>
+            <strong>{{ totalTypesCount }}</strong>
+            <p>Catégories d’assurance associées à votre profil.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="timeline-section">
+      <div class="container timeline-layout">
+        <div>
+          <span class="mini-title">Mon parcours assurance</span>
+          <h2>Un espace client pensé pour suivre chaque étape.</h2>
+          <p>
+            Depuis la consultation de vos contrats jusqu’à la décision finale sur vos
+            sinistres, votre espace centralise toutes vos démarches.
+          </p>
+        </div>
+
+        <div class="timeline-grid">
+          <article>
+            <span>01</span>
+            <h3>Consulter mes contrats</h3>
+            <p>Vérifiez vos garanties, dates de validité et informations principales.</p>
+          </article>
+
+          <article>
+            <span>02</span>
+            <h3>Déclarer un sinistre</h3>
+            <p>Choisissez auto, santé ou habitation et ajoutez vos justificatifs.</p>
+          </article>
+
+          <article>
+            <span>03</span>
+            <h3>Suivre le dossier</h3>
+            <p>Consultez l’état de traitement et les prochaines actions nécessaires.</p>
+          </article>
+
+          <article>
+            <span>04</span>
+            <h3>Voir la décision</h3>
+            <p>Accédez au rapport final et aux informations de décision.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions-section">
+      <div class="container">
+        <div class="section-title center">
+          <span class="eyebrow">Actions rapides</span>
+          <h2>Accédez rapidement à vos services</h2>
+          <p>
+            Gagnez du temps avec les raccourcis principaux de votre espace client.
+          </p>
+        </div>
+
+        <div class="products-carousel">
+          <a
+            class="product-card"
+            *ngFor="let action of quickActions"
+            [routerLink]="action.route"
+          >
+            <div class="product-icon">
+              <span *ngIf="action.icon === 'contracts'">📄</span>
+              <span *ngIf="action.icon === 'claims'">🛡️</span>
+              <span *ngIf="action.icon === 'documents'">📁</span>
+            </div>
+
+            <span>Service client</span>
             <h3>{{ action.title }}</h3>
             <p>{{ action.text }}</p>
-          </div>
+          </a>
+        </div>
+      </div>
+    </section>
 
-          <span class="action-arrow">→</span>
-        </article>
-      </section>
+    <section class="services-section">
+      <div class="container">
+        <div class="section-title center">
+          <span class="eyebrow">Mes services</span>
+          <h2>Tout ce dont vous avez besoin dans votre espace.</h2>
+          <p>
+            Votre tableau de bord regroupe les services essentiels pour gérer votre assurance.
+          </p>
+        </div>
 
-      <section class="dashboard-layout">
-        <div class="main-column">
-          <div class="panel panel-large">
-            <div class="section-head">
+        <div class="services-grid">
+          <article class="service-card">
+            <span>🚗</span>
+            <h3>Assurance auto</h3>
+            <p>Suivez vos contrats auto et déclarez rapidement un accident ou un bris de glace.</p>
+          </article>
+
+          <article class="service-card">
+            <span>💚</span>
+            <h3>Assurance santé</h3>
+            <p>Déposez vos justificatifs médicaux et suivez vos demandes de remboursement.</p>
+          </article>
+
+          <article class="service-card">
+            <span>🏠</span>
+            <h3>Assurance habitation</h3>
+            <p>Déclarez un dégât des eaux, incendie, vol ou dommage matériel.</p>
+          </article>
+
+          <article class="service-card">
+            <span>📊</span>
+            <h3>Rapports & décisions</h3>
+            <p>Consultez les décisions finales et les rapports liés à vos dossiers.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="contracts-section">
+      <div class="container">
+        <div class="section-title">
+          <span class="eyebrow">Mes contrats</span>
+          <h2>Vos polices d’assurance</h2>
+
+          <p *ngIf="!policiesError">
+            Consultez l’état de vos contrats, leurs dates de validité, leurs
+            garanties et leurs informations principales.
+          </p>
+
+          <p *ngIf="policiesError">{{ policiesError }}</p>
+        </div>
+
+        <div class="contracts-grid" *ngIf="loadingPolicies">
+          <article class="contract-card">
+            <span>...</span>
+            <h3>Chargement</h3>
+            <p>Récupération de vos contrats en cours.</p>
+          </article>
+        </div>
+
+        <div class="contracts-grid" *ngIf="!loadingPolicies && sortedPolicies.length">
+          <article
+            class="contract-card"
+            *ngFor="let policy of sortedPolicies"
+            [ngClass]="getPolicyTone(policy)"
+          >
+            <span>{{ getPolicyStatus(policy) }}</span>
+            <h3>{{ getPolicyTitle(policy) }}</h3>
+            <p>{{ getPolicySubtitle(policy) }}</p>
+
+            <div class="contract-details">
               <div>
-                <p class="section-kicker">Portefeuille</p>
-                <h2>Vos contrats d’assurance</h2>
+                <small>Numéro</small>
+                <strong>{{ policy.policyNumber }}</strong>
               </div>
 
-              <a class="section-link" routerLink="/contrats">Voir tout →</a>
-            </div>
-
-            <div class="policy-grid" *ngIf="!loadingPolicies && sortedPolicies.length > 0">
-              <article
-                class="policy-card"
-                *ngFor="let policy of sortedPolicies"
-                [ngClass]="getPolicyTone(policy)"
-              >
-                <div class="policy-top">
-                  <div class="policy-meta">
-                    <span
-                      class="status-pill"
-                      [class.status-active]="getPolicyStatus(policy) === 'ACTIF'"
-                      [class.status-expired]="getPolicyStatus(policy) === 'EXPIRÉ'"
-                    >
-                      {{ getPolicyStatus(policy) }}
-                    </span>
-
-                    <span class="policy-ref">N° {{ policy.policyNumber }}</span>
-                  </div>
-
-                  <span class="policy-type">{{ policy.type }}</span>
-                </div>
-
-                <div class="policy-body">
-                  <h3>{{ getPolicyTitle(policy) }}</h3>
-                  <p>{{ getPolicySubtitle(policy) }}</p>
-                </div>
-
-                <div class="policy-footer">
-                  <div class="policy-detail">
-                    <span>Début</span>
-                    <strong>{{ formatDate(policy.startDate) }}</strong>
-                  </div>
-
-                  <div class="policy-detail">
-                    <span>Fin</span>
-                    <strong>{{ formatDate(policy.endDate) }}</strong>
-                  </div>
-
-                  <div class="policy-detail">
-                    <span>Produit</span>
-                    <strong>{{ policy.productCode || '-' }}</strong>
-                  </div>
-                </div>
-              </article>
-            </div>
-
-            <div class="empty-panel" *ngIf="loadingPolicies">
-              Chargement des contrats...
-            </div>
-
-            <div class="empty-panel error" *ngIf="!loadingPolicies && policiesError">
-              {{ policiesError }}
-            </div>
-
-            <div class="empty-panel" *ngIf="!loadingPolicies && !policiesError && sortedPolicies.length === 0">
-              Aucun contrat trouvé pour ce client.
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="section-head">
               <div>
-                <p class="section-kicker">Repères utiles</p>
-                <h2>Un espace conçu pour vous simplifier la vie</h2>
+                <small>Date début</small>
+                <strong>{{ formatDate(policy.startDate) }}</strong>
+              </div>
+
+              <div>
+                <small>Date fin</small>
+                <strong>{{ formatDate(policy.endDate) }}</strong>
               </div>
             </div>
+          </article>
+        </div>
 
-            <div class="service-grid">
-              <article class="service-card">
-                <div class="service-icon">01</div>
-                <div>
-                  <h3>Suivi centralisé</h3>
-                  <p>Retrouvez vos contrats, dossiers et documents sans changer d’espace.</p>
-                </div>
-              </article>
+        <div
+          class="contracts-grid"
+          *ngIf="!loadingPolicies && !sortedPolicies.length && !policiesError"
+        >
+          <article class="contract-card">
+            <span>0</span>
+            <h3>Aucun contrat</h3>
+            <p>Aucune police d’assurance n’est encore associée à votre compte.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-              <article class="service-card">
-                <div class="service-icon">02</div>
-                <div>
-                  <h3>Lecture plus claire</h3>
-                  <p>Des informations structurées, plus lisibles et plus rassurantes au quotidien.</p>
-                </div>
-              </article>
+    <section class="claims-section">
+      <div class="container claims-layout">
+        <div class="claims-content">
+          <span class="mini-title">Sinistres récents</span>
+          <h2>Suivez vos démarches en cours</h2>
+          <p>
+            Retrouvez les dernières actions nécessaires pour vos déclarations
+            et suivez l’évolution de vos dossiers.
+          </p>
 
-              <article class="service-card">
-                <div class="service-icon">03</div>
-                <div>
-                  <h3>Actions rapides</h3>
-                  <p>Déclarez un sinistre, consultez vos contrats ou suivez vos décisions en quelques clics.</p>
-                </div>
-              </article>
+          <div class="steps">
+            <div class="step" *ngFor="let claim of claims">
+              <span>!</span>
+              <div>
+                <h4>{{ claim.title }}</h4>
+                <p>{{ claim.meta }}</p>
+                <p>{{ claim.message }}</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <aside class="side-column">
-          <div class="panel">
-            <div class="section-head compact-head">
-              <div>
-                <p class="section-kicker">Suivi</p>
-                <h2>Vos dossiers en cours</h2>
-              </div>
-            </div>
-
-            <div class="claim-list">
-              <article
-                class="claim-card"
-                *ngFor="let claim of claims"
-                [class.claim-danger]="claim.statusClass === 'danger'"
-                [class.claim-warning]="claim.statusClass === 'warning'"
-              >
-                <span class="claim-status">{{ claim.status }}</span>
-                <h3>{{ claim.title }}</h3>
-                <p class="claim-meta">{{ claim.meta }}</p>
-                <div class="claim-message">{{ claim.message }}</div>
-              </article>
-            </div>
-
-            <a class="section-link side-link" routerLink="/Claim_Home">Tous les sinistres →</a>
+        <div class="dashboard-preview">
+          <div class="preview-top">
+            <span>État des sinistres</span>
+            <small>{{ activeClaimsCount }} ouverts</small>
           </div>
 
-          <div class="panel profile-panel">
-            <div class="section-head compact-head">
-              <div>
-                <p class="section-kicker">Profil</p>
-                <h2>Vos informations</h2>
-              </div>
+          <div class="preview-list">
+            <div *ngFor="let claim of claims">
+              <span
+                class="dot"
+                [class.orange]="claim.statusClass === 'warning'"
+                [class.blue]="claim.statusClass === 'info'"
+                [class.purple]="claim.statusClass === 'danger'"
+              ></span>
+
+              <p>{{ claim.title }}</p>
+              <strong>{{ claim.status }}</strong>
             </div>
-
-            <article class="profile-card" *ngIf="client">
-              <div class="profile-top">
-                <div class="profile-avatar">{{ initials }}</div>
-                <div>
-                  <h3>{{ fullName }}</h3>
-                  <p>Client InSurFlow</p>
-                </div>
-              </div>
-
-              <div class="profile-info">
-                <div class="profile-line">
-                  <span>Email</span>
-                  <strong>{{ client.email }}</strong>
-                </div>
-
-                <div class="profile-line">
-                  <span>Téléphone</span>
-                  <strong>{{ client.phone || '-' }}</strong>
-                </div>
-              </div>
-
-              <button class="primary-action" type="button" (click)="logout()">
-                Déconnexion
-              </button>
-            </article>
-
-            <article class="profile-card" *ngIf="!client && !loadingProfile">
-              <div class="profile-top">
-                <div class="profile-avatar">CI</div>
-                <div>
-                  <h3>Profil indisponible</h3>
-                  <p>Impossible de charger les informations client</p>
-                </div>
-              </div>
-
-              <button class="primary-action" type="button" (click)="logout()">
-                Déconnexion
-              </button>
-            </article>
           </div>
-        </aside>
-      </section>
-    </div>
+
+          <div class="hero-actions center-actions">
+            <a class="btn btn-primary" routerLink="/Claim_Home">
+              Déclarer un nouveau sinistre
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="documents-section">
+      <div class="container documents-layout">
+        <div>
+          <span class="mini-title">Documents</span>
+          <h2>Mes documents importants</h2>
+          <p>
+            Retrouvez rapidement vos attestations, conditions générales,
+            quittances et documents liés à vos contrats.
+          </p>
+        </div>
+
+        <div class="documents-grid">
+          <article class="document-card">
+            <span>📑</span>
+            <h3>Attestations</h3>
+            <p>Consultez vos attestations d’assurance disponibles.</p>
+          </article>
+
+          <article class="document-card">
+            <span>🧾</span>
+            <h3>Quittances</h3>
+            <p>Accédez à vos justificatifs et historiques de paiement.</p>
+          </article>
+
+          <article class="document-card">
+            <span>📘</span>
+            <h3>Conditions générales</h3>
+            <p>Retrouvez les détails de vos garanties et exclusions.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="account-section">
+      <div class="container account-box">
+        <div>
+          <span class="mini-title">Sécurité & assistance</span>
+          <h2>Votre compte reste sécurisé et accompagné.</h2>
+          <p>
+            Vos informations personnelles, contrats et dossiers sont regroupés dans un
+            espace clair avec un accès rapide à l’assistance.
+          </p>
+        </div>
+
+        <div class="account-grid">
+          <article>
+            <strong>24/7</strong>
+            <span>Accès à votre espace</span>
+          </article>
+
+          <article>
+            <strong>{{ activeContractsCount }}</strong>
+            <span>Contrats disponibles</span>
+          </article>
+
+          <article>
+            <strong>{{ activeClaimsCount }}</strong>
+            <span>Dossiers en suivi</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="support-section">
+      <div class="container support-box">
+        <div>
+          <span class="eyebrow">Besoin d’aide ?</span>
+          <h2>Notre équipe vous accompagne</h2>
+          <p>
+            Une question sur un contrat, un sinistre ou un document ?
+            Contactez votre conseiller depuis votre espace client.
+          </p>
+        </div>
+
+        <div class="support-actions">
+          <a class="btn btn-primary" routerLink="/Consulter">
+            Consulter mes dossiers
+          </a>
+
+          <a class="btn btn-outline" routerLink="/Claim_Home">
+            Ouvrir une demande
+          </a>
+        </div>
+      </div>
+    </section>
   </main>
 </div>

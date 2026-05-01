@@ -1,34 +1,22 @@
 <div class="claim-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>DÉCLARATION HABITATION</small>
         </span>
       </a>
 
-      <nav class="main-nav">
-        <a
-          *ngFor="let item of navItems"
-          [routerLink]="item.route"
-          [class.active]="isActiveNav(item.route)"
-        >
+      <nav class="nav-links">
+        <a *ngFor="let item of navItems" [routerLink]="item.route" [class.active]="isActiveNav(item.route)">
           {{ item.label }}
         </a>
       </nav>
 
-      <div class="header-chip">
-        <span class="chip-label">Déclaration habitation</span>
+      <div class="step-chip">
+        <span>Déclaration habitation</span>
         <strong>Étape 2 / 3</strong>
       </div>
     </div>
@@ -36,69 +24,31 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badge">Justificatifs habitation</div>
-
-          <h1>
-            Ajoutez vos documents habitation
-            <span>pour compléter votre dossier sinistre.</span>
-          </h1>
-
-          <p class="hero-text">
-            Déposez vos photos des dégâts, devis, constats et documents utiles
-            pour finaliser votre déclaration habitation dans une interface claire,
-            douce et premium.
-          </p>
+      <section class="claim-hero">
+        <div class="claim-welcome-card">
+          <span class="claim-label">Justificatifs habitation</span>
+          <h1>Ajoutez vos documents habitation <span>pour compléter votre dossier.</span></h1>
+          <p>Déposez vos photos des dégâts, devis, constats et documents utiles.</p>
 
           <div class="hero-actions">
-            <button class="btn btn-secondary" type="button" (click)="back()">
-              Retour
-            </button>
-
+            <button class="btn btn-outline" type="button" (click)="back()">Retour</button>
             <button class="btn btn-primary" type="button" (click)="upload()" [disabled]="!canUpload">
               <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
               <span *ngIf="!loading">Soumettre les justificatifs</span>
             </button>
           </div>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>JPG / PNG / PDF</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>10 Mo maximum</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Traitement lancé après envoi</span>
-            </div>
-          </div>
         </div>
 
-        <div class="hero-side">
-          <div class="hero-panel">
-            <div class="hero-panel-kicker">Documents habitation</div>
+        <div class="claim-summary-card">
+          <div class="summary-header">
+            <span>Résumé documents</span>
+            <small>Étape 2</small>
+          </div>
 
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>{{ totalFiles }}</strong>
-                <span>Fichier(s)</span>
-              </article>
-
-              <article class="hero-mini-card">
-                <strong>{{ totalSize }}</strong>
-                <span>Taille totale</span>
-              </article>
-            </div>
-
-            <div class="hero-visual">
-              <img src="assets/images/home-insurance.jpg" alt="Documents habitation" />
-            </div>
+          <div class="summary-grid">
+            <article><strong>{{ totalFiles }}</strong><span>Fichier(s)</span></article>
+            <article><strong>{{ totalSize }}</strong><span>Taille totale</span></article>
+            <article><strong>10 Mo</strong><span>Maximum par fichier</span></article>
           </div>
         </div>
       </section>
@@ -107,89 +57,40 @@
         <aside class="left-column">
           <div class="panel progress-panel">
             <p class="panel-kicker">Progression</p>
-
             <div class="step-list">
-              <div class="step-card done">
-                <div class="step-number">✓</div>
-                <div>
-                  <h3>Informations</h3>
-                  <p>Détails du sinistre</p>
-                </div>
-              </div>
-
-              <div class="step-card active">
-                <div class="step-number">2</div>
-                <div>
-                  <h3>Justificatifs</h3>
-                  <p>Photos & documents</p>
-                </div>
-              </div>
-
-              <div class="step-card">
-                <div class="step-number">3</div>
-                <div>
-                  <h3>Confirmation</h3>
-                  <p>Récapitulatif final</p>
-                </div>
-              </div>
+              <div class="step-card done"><div class="step-number">✓</div><div><h3>Informations</h3><p>Détails du sinistre</p></div></div>
+              <div class="step-card active"><div class="step-number">2</div><div><h3>Justificatifs</h3><p>Photos & documents</p></div></div>
+              <div class="step-card"><div class="step-number">3</div><div><h3>Confirmation</h3><p>Validation finale</p></div></div>
             </div>
           </div>
 
           <div class="panel support-panel">
             <div class="support-icon">H</div>
-            <h2>Documents habitation acceptés</h2>
-            <p>
-              Ajoutez les pièces les plus utiles pour accélérer le traitement
-              du dossier habitation.
-            </p>
-
+            <h2>Documents acceptés</h2>
             <ul class="support-list">
               <li>Photos des dégâts</li>
               <li>Devis de réparation</li>
               <li>Factures d’équipements endommagés</li>
               <li>Constat de dégât des eaux</li>
-              <li>Rapport utile ou justificatif complémentaire</li>
+              <li>Rapport ou justificatif complémentaire</li>
               <li>Diagnostic ou document d’expertise</li>
             </ul>
           </div>
 
           <div class="panel summary-panel">
             <p class="panel-kicker">Résumé</p>
-
             <div class="summary-grid">
-              <article class="summary-card">
-                <span>ID dossier</span>
-                <strong>{{ claimId || '-' }}</strong>
-              </article>
-
-              <article class="summary-card">
-                <span>Fichiers</span>
-                <strong>{{ totalFiles }}</strong>
-              </article>
-
-              <article class="summary-card">
-                <span>Taille</span>
-                <strong>{{ totalSize }}</strong>
-              </article>
-
-              <article class="summary-card">
-                <span>Étape</span>
-                <strong>2 / 3</strong>
-              </article>
+              <article class="summary-card"><span>ID dossier</span><strong>{{ claimId || '-' }}</strong></article>
+              <article class="summary-card"><span>Fichiers</span><strong>{{ totalFiles }}</strong></article>
+              <article class="summary-card"><span>Taille</span><strong>{{ totalSize }}</strong></article>
+              <article class="summary-card"><span>Étape</span><strong>2 / 3</strong></article>
             </div>
           </div>
         </aside>
 
         <section class="right-column">
-          <div class="alert alert-error" *ngIf="errorMessage">
-            <span>⚠</span>
-            <span>{{ errorMessage }}</span>
-          </div>
-
-          <div class="alert alert-success" *ngIf="successMessage">
-            <span>✓</span>
-            <span>{{ successMessage }}</span>
-          </div>
+          <div class="alert alert-error" *ngIf="errorMessage"><span>⚠</span><span>{{ errorMessage }}</span></div>
+          <div class="alert alert-success" *ngIf="successMessage"><span>✓</span><span>{{ successMessage }}</span></div>
 
           <div class="panel upload-panel">
             <div class="form-head">
@@ -200,105 +101,59 @@
               </div>
             </div>
 
-            <div class="form-body">
-              <input
-                #fileInput
-                type="file"
-                multiple
-                accept="image/*,.pdf"
-                (change)="onFileSelected($event)"
-                hidden
-              />
+            <input #fileInput type="file" multiple accept="image/*,.pdf" (change)="onFileSelected($event)" hidden />
 
-              <div
-                class="drop-zone"
-                (dragover)="onDragOver($event)"
-                (drop)="onDrop($event)"
-                (click)="fileInput.click()"
-              >
-                <div class="drop-icon">↑</div>
-                <h3>Glissez vos documents habitation ici</h3>
-                <p>ou cliquez pour parcourir vos dossiers</p>
+            <div class="drop-zone" (dragover)="onDragOver($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+              <div class="drop-icon">↑</div>
+              <h3>Glissez vos documents habitation ici</h3>
+              <p>ou cliquez pour parcourir vos dossiers</p>
 
-                <div class="drop-types">
-                  <span class="type-chip">PDF</span>
-                  <span class="type-chip">JPG / PNG</span>
-                  <span class="type-chip">Max 10 Mo</span>
-                  <span class="type-chip">Photos dégâts</span>
-                </div>
-              </div>
-
-              <div class="tips-grid">
-                <div class="tip-card" *ngFor="let tip of uploadTips">
-                  <span class="tip-icon">{{ tip.icon }}</span>
-                  <div>
-                    <strong>{{ tip.title }}</strong>
-                    <p>{{ tip.text }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="file-list" *ngIf="files.length > 0">
-                <div class="file-list-header">
-                  <span>{{ files.length }} document(s) habitation sélectionné(s)</span>
-
-                  <button
-                    class="btn-clear"
-                    type="button"
-                    (click)="clearFiles(fileInput)"
-                  >
-                    Tout supprimer
-                  </button>
-                </div>
-
-                <div class="file-row" *ngFor="let file of files; let i = index">
-                  <div
-                    class="file-type-icon"
-                    [class.pdf]="isPdf(file)"
-                    [class.img]="isImage(file)"
-                  >
-                    {{ isPdf(file) ? 'PDF' : 'IMG' }}
-                  </div>
-
-                  <div class="file-meta">
-                    <div class="file-name">{{ file.name }}</div>
-                    <div class="file-size">{{ formatSize(file.size) }}</div>
-                  </div>
-
-                  <div class="file-status">Prêt</div>
-
-                  <button
-                    class="file-remove"
-                    type="button"
-                    (click)="removeFile(i)"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-
-              <div class="progress-wrap" *ngIf="loading">
-                <div class="progress-track">
-                  <div class="progress-fill" [style.width.%]="uploadProgress"></div>
-                </div>
-                <div class="progress-text">
-                  Upload documents habitation — {{ uploadProgress }}%
-                </div>
+              <div class="drop-types">
+                <span class="type-chip">PDF</span>
+                <span class="type-chip">JPG / PNG</span>
+                <span class="type-chip">Max 10 Mo</span>
+                <span class="type-chip">Photos dégâts</span>
               </div>
             </div>
 
-            <div class="form-footer">
-              <div class="footer-note">
-                <span class="footer-bullet"></span>
-                <span>Étape 2 sur 3 — Ajout des justificatifs habitation</span>
+            <div class="tips-grid">
+              <div class="tip-card" *ngFor="let tip of uploadTips">
+                <span class="tip-icon">{{ tip.icon }}</span>
+                <div><strong>{{ tip.title }}</strong><p>{{ tip.text }}</p></div>
+              </div>
+            </div>
+
+            <div class="file-list" *ngIf="files.length > 0">
+              <div class="file-list-header">
+                <span>{{ files.length }} document(s) habitation sélectionné(s)</span>
+                <button class="btn-clear" type="button" (click)="clearFiles(fileInput)">Tout supprimer</button>
               </div>
 
-              <button
-                type="button"
-                class="submit-btn"
-                (click)="upload()"
-                [disabled]="!canUpload"
-              >
+              <div class="file-row" *ngFor="let file of files; let i = index">
+                <div class="file-type-icon" [class.pdf]="isPdf(file)" [class.img]="isImage(file)">
+                  {{ isPdf(file) ? 'PDF' : 'IMG' }}
+                </div>
+
+                <div class="file-meta">
+                  <div class="file-name">{{ file.name }}</div>
+                  <div class="file-size">{{ formatSize(file.size) }}</div>
+                </div>
+
+                <div class="file-status">Prêt</div>
+                <button class="file-remove" type="button" (click)="removeFile(i)">×</button>
+              </div>
+            </div>
+
+            <div class="progress-wrap" *ngIf="loading">
+              <div class="progress-track">
+                <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+              </div>
+              <div class="progress-text">Upload documents habitation — {{ uploadProgress }}%</div>
+            </div>
+
+            <div class="form-footer">
+              <div class="footer-note"><span class="footer-bullet"></span><span>Étape 2 sur 3 — Justificatifs habitation</span></div>
+              <button type="button" class="submit-btn" (click)="upload()" [disabled]="!canUpload">
                 <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
                 <span *ngIf="!loading">Continuer vers la confirmation</span>
               </button>

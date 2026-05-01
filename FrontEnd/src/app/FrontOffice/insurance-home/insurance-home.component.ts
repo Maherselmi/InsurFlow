@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import {RouterLink} from "@angular/router";
 
 interface NavItem {
   label: string;
@@ -54,7 +55,7 @@ interface ProductCard {
 @Component({
   selector: 'app-insurance-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './insurance-home.component.html',
   styleUrls: ['./insurance-home.component.css']
 })

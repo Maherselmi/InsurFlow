@@ -41,7 +41,7 @@ interface ProcessStep {
 export class ClaimsHomeComponent implements OnInit {
   navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
-    { label: 'Mes contrats', route: '/contrats' },
+    { label: 'Mes contrats', route: '/PolicesList' },
     { label: 'Sinistres', route: '/Claim_Home' },
     { label: 'Mes dossiers', route: '/Consulter' }
   ];

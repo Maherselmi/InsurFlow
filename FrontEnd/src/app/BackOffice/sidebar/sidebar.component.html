@@ -6,10 +6,7 @@
     <div class="sidebar-header">
       <div class="sidebar-logo">
         <div class="logo-mark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M12 2L4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z"></path>
-            <path d="M9 12l2 2 4-4"></path>
-          </svg>
+          <span class="logo-inner"></span>
         </div>
 
         <div class="logo-copy">
@@ -26,88 +23,95 @@
     </div>
 
     <div class="sidebar-content">
-      <div class="sidebar-group">
-        <div class="sidebar-section">Principal</div>
+      <ng-container *ngFor="let group of navGroups">
+        <div class="sidebar-group">
+          <div class="sidebar-section">{{ group.title }}</div>
 
-        <div
-          class="nav-item"
-          *ngFor="let item of mainNavItems"
-          [class.active]="isActive(item.route || '')"
-          (click)="navigate(item.route)"
-        >
-          <div class="nav-left">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <g [innerHTML]="getIconPath(item.icon)"></g>
-              </svg>
-            </span>
+          <div
+            class="nav-item"
+            *ngFor="let item of group.items"
+            [class.active]="isActive(item.route)"
+            (click)="navigate(item.route)"
+          >
+            <div class="nav-left">
+              <span class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                  <ng-container [ngSwitch]="item.icon">
+                    <ng-container *ngSwitchCase="'dashboard'">
+                      <path d="M4 13h6V4H4v9z"></path>
+                      <path d="M14 20h6v-9h-6v9z"></path>
+                      <path d="M4 20h6v-4H4v4z"></path>
+                      <path d="M14 8h6V4h-6v4z"></path>
+                    </ng-container>
 
-            <div class="nav-copy">
-              <span class="nav-title">{{ item.label }}</span>
+                    <ng-container *ngSwitchCase="'clients'">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'policies'">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <path d="M14 2v6h6"></path>
+                      <path d="M8 13h8"></path>
+                      <path d="M8 17h5"></path>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'claims'">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      <path d="M9 12l2 2 4-4"></path>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'agents'">
+                      <rect x="4" y="7" width="16" height="12" rx="3"></rect>
+                      <path d="M9 7V5a3 3 0 0 1 6 0v2"></path>
+                      <circle cx="9" cy="13" r="1"></circle>
+                      <circle cx="15" cy="13" r="1"></circle>
+                      <path d="M10 17h4"></path>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'ai'">
+                      <circle cx="12" cy="12" r="5"></circle>
+                      <path d="M12 2v4"></path>
+                      <path d="M12 18v4"></path>
+                      <path d="M2 12h4"></path>
+                      <path d="M18 12h4"></path>
+                      <path d="M10 12l1.5 1.5L15 10"></path>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'reports'">
+                      <path d="M4 19V5"></path>
+                      <path d="M4 19h16"></path>
+                      <path d="M8 15v-4"></path>
+                      <path d="M12 15V8"></path>
+                      <path d="M16 15v-6"></path>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'settings'">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M19 12a7 7 0 0 0-.1-1.1l2-1.5-2-3.5-2.4 1a7.5 7.5 0 0 0-1.9-1.1L14.2 3h-4.4l-.4 2.8a7.5 7.5 0 0 0-1.9 1.1l-2.4-1-2 3.5 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.1l-2 1.5 2 3.5 2.4-1a7.5 7.5 0 0 0 1.9 1.1l.4 2.8h4.4l.4-2.8a7.5 7.5 0 0 0 1.9-1.1l2.4 1 2-3.5-2-1.5c.1-.3.1-.7.1-1.1z"></path>
+                    </ng-container>
+                  </ng-container>
+                </svg>
+              </span>
+
+              <div class="nav-copy">
+                <span class="nav-title">{{ item.label }}</span>
+              </div>
             </div>
-          </div>
 
-          <span class="nav-badge" *ngIf="item.badge" [class.red]="item.badgeClass === 'red'">
-            {{ item.badge }}
-          </span>
-        </div>
-      </div>
-
-      <div class="sidebar-group">
-        <div class="sidebar-section">IA & Agents</div>
-
-        <div
-          class="nav-item"
-          *ngFor="let item of iaNavItems"
-          [class.active]="isActive(item.route || '')"
-          (click)="navigate(item.route)"
-        >
-          <div class="nav-left">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <g [innerHTML]="getIconPath(item.icon)"></g>
-              </svg>
+            <span class="nav-badge" *ngIf="item.badge" [class.red]="item.badgeClass === 'red'">
+              {{ item.badge }}
             </span>
-
-            <div class="nav-copy">
-              <span class="nav-title">{{ item.label }}</span>
-            </div>
-          </div>
-
-          <span class="nav-badge" *ngIf="item.badge" [class.red]="item.badgeClass === 'red'">
-            {{ item.badge }}
-          </span>
-        </div>
-      </div>
-
-      <div class="sidebar-group">
-        <div class="sidebar-section">Configuration</div>
-
-        <div
-          class="nav-item"
-          *ngFor="let item of configNavItems"
-          [class.active]="isActive(item.route || '')"
-          (click)="navigate(item.route)"
-        >
-          <div class="nav-left">
-            <span class="nav-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <g [innerHTML]="getIconPath(item.icon)"></g>
-              </svg>
-            </span>
-
-            <div class="nav-copy">
-              <span class="nav-title">{{ item.label }}</span>
-            </div>
           </div>
         </div>
-      </div>
+      </ng-container>
     </div>
 
     <div class="sidebar-bottom">
       <div class="admin-card">
         <div class="admin-avatar">{{ getAdminInitials() }}</div>
-
         <div class="admin-meta">
           <div class="admin-name">{{ getAdminName() }}</div>
           <div class="admin-role">{{ getAdminRole() }}</div>

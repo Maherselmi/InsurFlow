@@ -19,7 +19,7 @@ interface NavItem {
 export class ClaimReportPageComponent implements OnInit {
   navItems: NavItem[] = [
     { label: 'Tableau de bord', route: '/Client_Space' },
-    { label: 'Mes contrats', route: '/contrats' },
+    { label: 'Mes contrats', route: '/PolicesList' },
     { label: 'Sinistres', route: '/Claim_Home' },
     { label: 'Mes dossiers', route: '/Consulter' }
   ];

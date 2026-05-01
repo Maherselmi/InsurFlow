@@ -1,23 +1,15 @@
 <div class="claim-page">
-  <div class="page-glow glow-left"></div>
-  <div class="page-glow glow-right"></div>
-  <div class="page-mesh"></div>
-
-  <header class="site-header">
+  <header class="insur-header">
     <div class="container header-inner">
-      <a class="brand" routerLink="/">
-        <span class="brand-symbol">
-          <span class="brand-shape shape-back"></span>
-          <span class="brand-shape shape-front"></span>
-        </span>
-
-        <span class="brand-copy">
-          <span class="brand-main">INsurFlow</span>
-          <span class="brand-sub">insurance experience platform</span>
+      <a class="brand" routerLink="/Client_Space">
+        <span class="insurflow-logo"></span>
+        <span class="brand-text">
+          <strong>InSurFlow</strong>
+          <small>DÉCLARATION AUTO</small>
         </span>
       </a>
 
-      <nav class="main-nav">
+      <nav class="nav-links">
         <a
           *ngFor="let item of navItems"
           [routerLink]="item.route"
@@ -27,8 +19,8 @@
         </a>
       </nav>
 
-      <div class="header-chip">
-        <span class="chip-label">Déclaration auto</span>
+      <div class="step-chip">
+        <span>Déclaration auto</span>
         <strong>Étape 2 / 3</strong>
       </div>
     </div>
@@ -36,69 +28,57 @@
 
   <main class="claim-main">
     <div class="container">
-      <section class="hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badge">Justificatifs automobile</div>
-
+      <section class="claim-hero">
+        <div class="claim-welcome-card">
+          <span class="claim-label">Justificatifs automobile</span>
           <h1>
             Ajoutez vos documents
-            <span>pour compléter votre dossier auto.</span>
+            <span>pour compléter votre dossier.</span>
           </h1>
 
-          <p class="hero-text">
-            Déposez les photos du véhicule, le constat amiable et les pièces utiles
-            pour accélérer l’analyse de votre sinistre automobile dans un parcours
-            plus clair et plus rassurant.
+          <p>
+            Déposez les photos du véhicule, le constat amiable et les pièces
+            utiles pour accélérer l’analyse de votre sinistre automobile.
           </p>
 
           <div class="hero-actions">
-            <button class="btn btn-secondary" type="button" (click)="back()">
+            <button class="btn btn-outline" type="button" (click)="back()">
               Retour à l’étape 1
             </button>
 
-            <button class="btn btn-primary" type="button" (click)="upload()" [disabled]="!canUpload">
+            <button
+              class="btn btn-primary"
+              type="button"
+              (click)="upload()"
+              [disabled]="!canUpload"
+            >
               <span *ngIf="loading">Envoi {{ uploadProgress }}%</span>
               <span *ngIf="!loading">Soumettre les justificatifs</span>
             </button>
           </div>
-
-          <div class="hero-points">
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>JPG / PNG / PDF</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>10 Mo maximum par fichier</span>
-            </div>
-
-            <div class="hero-point">
-              <span class="hero-point-bullet"></span>
-              <span>Analyse déclenchée après envoi</span>
-            </div>
-          </div>
         </div>
 
-        <div class="hero-side">
-          <div class="hero-panel">
-            <div class="hero-panel-kicker">Résumé des pièces</div>
+        <div class="claim-summary-card">
+          <div class="summary-header">
+            <span>Résumé des pièces</span>
+            <small>Étape 2</small>
+          </div>
 
-            <div class="hero-mini-grid">
-              <article class="hero-mini-card">
-                <strong>{{ totalFiles }}</strong>
-                <span>Fichier(s)</span>
-              </article>
+          <div class="summary-grid">
+            <article>
+              <strong>{{ totalFiles }}</strong>
+              <span>Fichier(s)</span>
+            </article>
 
-              <article class="hero-mini-card">
-                <strong>{{ totalSize }}</strong>
-                <span>Taille totale</span>
-              </article>
-            </div>
+            <article>
+              <strong>{{ totalSize }}</strong>
+              <span>Taille totale</span>
+            </article>
 
-            <div class="hero-visual">
-              <img src="assets/images/demarche-auto.jpg" alt="Documents sinistre automobile" />
-            </div>
+            <article>
+              <strong>10 Mo</strong>
+              <span>Maximum par fichier</span>
+            </article>
           </div>
         </div>
       </section>
@@ -139,8 +119,7 @@
             <div class="support-icon">D</div>
             <h2>Documents auto acceptés</h2>
             <p>
-              Ajoutez les pièces les plus utiles pour accélérer le traitement
-              du dossier automobile.
+              Ajoutez les pièces les plus utiles pour accélérer le traitement du dossier.
             </p>
 
             <ul class="support-list">
@@ -195,7 +174,9 @@
               <div class="form-head-icon">D</div>
               <div>
                 <h2>Photos & documents justificatifs</h2>
-                <p>Déposez les éléments nécessaires pour finaliser votre déclaration auto.</p>
+                <p>
+                  Déposez les éléments nécessaires pour finaliser votre déclaration auto.
+                </p>
               </div>
             </div>
 
@@ -280,7 +261,10 @@
                 <div class="progress-track">
                   <div class="progress-fill" [style.width.%]="uploadProgress"></div>
                 </div>
-                <div class="progress-text">Upload en cours — {{ uploadProgress }}%</div>
+
+                <div class="progress-text">
+                  Upload en cours — {{ uploadProgress }}%
+                </div>
               </div>
             </div>
 

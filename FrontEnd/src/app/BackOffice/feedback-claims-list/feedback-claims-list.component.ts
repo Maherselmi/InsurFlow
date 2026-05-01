@@ -22,7 +22,7 @@ export class FeedbackClaimsListComponent implements OnInit {
   errorMessage = '';
 
   navItems: NavItem[] = [
-    { label: 'Espace expert', route: '/Expert_Space' },
+    { label: 'Espace expert', route: '/expert-space' },
     { label: 'Validation humaine', route: '/HumanValidationList' },
     { label: 'Feedback expert', route: '/ExpertFeedbackList' },
     { label: 'Dossiers', route: '/AdminClaimsList' }

@@ -26,5 +26,6 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
 
     List<Claim> findByStatus(ClaimStatus status);
+    List<Claim> findClaimsByClientId(@Param("clientId") Long clientId);
 
 }

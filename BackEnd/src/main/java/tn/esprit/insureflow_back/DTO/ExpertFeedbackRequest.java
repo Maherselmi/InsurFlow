@@ -24,21 +24,25 @@ public class ExpertFeedbackRequest {
 
     private String globalComment;
 
-    // ROUTEUR
+    // ─── ROUTEUR ───────────────────────────────────────────────────────────────
     private String predictedType;
     private Double routeurConfidence;
     private Boolean routeurCorrect;
     private String finalType;
     private String routeurComment;
+    /** Justification textuelle complète générée par l'agent ROUTEUR (raisonnement IA). */
+    private String routeurJustification;
 
-    // VALIDATION
+    // ─── VALIDATION ────────────────────────────────────────────────────────────
     private String predictedDecision;
     private Double validationConfidence;
     private Boolean validationCorrect;
     private String finalDecision;
     private String validationComment;
+    /** Justification textuelle complète générée par l'agent VALIDATION (raisonnement IA). */
+    private String validationJustification;
 
-    // ESTIMATEUR
+    // ─── ESTIMATEUR ────────────────────────────────────────────────────────────
     private Double predictedEstimationMin;
     private Double predictedEstimationMoyenne;
     private Double predictedEstimationMax;
@@ -49,4 +53,6 @@ public class ExpertFeedbackRequest {
     private Double finalEstimationMoyenne;
     private Double finalEstimationMax;
     private String estimateurComment;
+    /** Justification textuelle complète générée par l'agent ESTIMATEUR (raisonnement IA). */
+    private String estimateurJustification;
 }

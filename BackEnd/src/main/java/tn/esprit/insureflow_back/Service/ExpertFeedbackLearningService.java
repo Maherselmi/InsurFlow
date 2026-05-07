@@ -32,7 +32,7 @@ public class ExpertFeedbackLearningService {
                     claim,
                     AgentName.AGENT_ROUTEUR,
                     buildCommonInput(claim),
-                    buildRouteurAgentOutput(request),
+                    buildRouteurAgentOutput(request),   // <-- inclut maintenant la justification IA
                     normalizeType(request.getFinalType()),
                     request.getRouteurCorrect(),
                     request.getRouteurConfidence(),
@@ -47,7 +47,7 @@ public class ExpertFeedbackLearningService {
                     claim,
                     AgentName.AGENT_VALIDATION,
                     buildValidationInput(claim, request),
-                    buildValidationAgentOutput(request),
+                    buildValidationAgentOutput(request), // <-- inclut maintenant la justification IA
                     normalizeDecision(request.getFinalDecision()),
                     request.getValidationCorrect(),
                     request.getValidationConfidence(),
@@ -62,7 +62,7 @@ public class ExpertFeedbackLearningService {
                     claim,
                     AgentName.AGENT_ESTIMATEUR,
                     buildEstimateurInput(claim, request),
-                    buildEstimateurAgentOutput(request),
+                    buildEstimateurAgentOutput(request), // <-- inclut maintenant la justification IA
                     buildFinalEstimateOutput(request),
                     resolveEstimateurCorrect(request),
                     request.getEstimateurConfidence(),
@@ -74,6 +74,10 @@ public class ExpertFeedbackLearningService {
 
         return saved;
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // UPSERT CORE
+    // ─────────────────────────────────────────────────────────────────────────
 
     private void upsertLearningFeedback(
             Claim claim,
@@ -105,6 +109,10 @@ public class ExpertFeedbackLearningService {
         learningRepository.save(feedback);
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // VALIDATION
+    // ─────────────────────────────────────────────────────────────────────────
+
     private void validateRequest(ExpertFeedbackRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Feedback request is required");
@@ -118,6 +126,10 @@ public class ExpertFeedbackLearningService {
             throw new IllegalArgumentException("At least one final expert answer is required");
         }
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // INPUT BUILDERS
+    // ─────────────────────────────────────────────────────────────────────────
 
     private String buildCommonInput(Claim claim) {
         StringBuilder sb = new StringBuilder();
@@ -154,22 +166,55 @@ public class ExpertFeedbackLearningService {
                 + ", end=" + (policy.getEndDate() == null ? "N/A" : policy.getEndDate());
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // AGENT OUTPUT BUILDERS — FIX : justification IA incluse
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * CORRECTION : on inclut maintenant la justification textuelle de l'agent ROUTEUR.
+     * Avant : seules les valeurs numériques étaient sauvegardées.
+     * Maintenant : le raisonnement complet de l'IA est persisté pour le learning.
+     */
     private String buildRouteurAgentOutput(ExpertFeedbackRequest request) {
-        return "Predicted type: " + safe(request.getPredictedType())
-                + " | confidence: " + safeDouble(request.getRouteurConfidence());
+        StringBuilder sb = new StringBuilder();
+        sb.append("Predicted type: ").append(safe(request.getPredictedType()));
+        sb.append(" | confidence: ").append(safeDouble(request.getRouteurConfidence()));
+        if (hasText(request.getRouteurJustification())) {
+            sb.append("\nJustification IA:\n").append(request.getRouteurJustification().trim());
+        }
+        return sb.toString();
     }
 
+    /**
+     * CORRECTION : on inclut maintenant la justification textuelle de l'agent VALIDATION.
+     */
     private String buildValidationAgentOutput(ExpertFeedbackRequest request) {
-        return "Predicted decision: " + safe(request.getPredictedDecision())
-                + " | confidence: " + safeDouble(request.getValidationConfidence());
+        StringBuilder sb = new StringBuilder();
+        sb.append("Predicted decision: ").append(safe(request.getPredictedDecision()));
+        sb.append(" | confidence: ").append(safeDouble(request.getValidationConfidence()));
+        if (hasText(request.getValidationJustification())) {
+            sb.append("\nJustification IA:\n").append(request.getValidationJustification().trim());
+        }
+        return sb.toString();
     }
 
+    /**
+     * CORRECTION : on inclut maintenant la justification textuelle de l'agent ESTIMATEUR.
+     * C'est la correction principale pour le problème "min 100 moy 400 max 800 → min 100 moy 200 max 300".
+     * Le memory block contiendra désormais le raisonnement complet qui explique POURQUOI
+     * les valeurs ont été corrigées, ce qui permettra au modèle d'apprendre.
+     */
     private String buildEstimateurAgentOutput(ExpertFeedbackRequest request) {
-        return "Predicted estimation min: " + safeDouble(request.getPredictedEstimationMin())
-                + " | moyenne: " + safeDouble(request.getPredictedEstimationMoyenne())
-                + " | max: " + safeDouble(request.getPredictedEstimationMax())
-                + " | confidence: " + safeDouble(request.getEstimateurConfidence())
-                + " | evaluation: " + safe(request.getEstimateEvaluation());
+        StringBuilder sb = new StringBuilder();
+        sb.append("Predicted estimation min: ").append(safeDouble(request.getPredictedEstimationMin()));
+        sb.append(" | moyenne: ").append(safeDouble(request.getPredictedEstimationMoyenne()));
+        sb.append(" | max: ").append(safeDouble(request.getPredictedEstimationMax()));
+        sb.append(" | confidence: ").append(safeDouble(request.getEstimateurConfidence()));
+        sb.append(" | evaluation: ").append(safe(request.getEstimateEvaluation()));
+        if (hasText(request.getEstimateurJustification())) {
+            sb.append("\nJustification IA:\n").append(request.getEstimateurJustification().trim());
+        }
+        return sb.toString();
     }
 
     private String buildFinalEstimateOutput(ExpertFeedbackRequest request) {
@@ -178,17 +223,31 @@ public class ExpertFeedbackLearningService {
                 + " | max: " + safeDouble(request.getFinalEstimationMax());
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────────────────────────────────
+
     private Boolean resolveEstimateurCorrect(ExpertFeedbackRequest request) {
         if (request.getEstimateurCorrect() != null) {
             return request.getEstimateurCorrect();
         }
+
         String evaluation = safe(request.getEstimateEvaluation()).toUpperCase();
-        if (evaluation.contains("CORRECT") || evaluation.contains("ACCEPT")) {
-            return true;
-        }
-        if (evaluation.contains("INCORRECT") || evaluation.contains("SOUS") || evaluation.contains("SUR")) {
+
+        if (evaluation.contains("INCORRECT")
+                || evaluation.contains("SOUS")
+                || evaluation.contains("SUR")
+                || evaluation.contains("SOUS_ESTIME")
+                || evaluation.contains("SUR_ESTIME")) {
             return false;
         }
+
+        if (evaluation.contains("CORRECT")
+                || evaluation.contains("CORRECTE")
+                || evaluation.contains("ACCEPT")) {
+            return true;
+        }
+
         return estimatesAreEqual(request);
     }
 
@@ -216,6 +275,8 @@ public class ExpertFeedbackLearningService {
         if (v.contains("HABITATION")) return "HABITATION";
         if (v.contains("SANTE")) return "SANTE";
         if (v.contains("VOYAGE")) return "VOYAGE";
+        if (v.contains("VIE")) return "VIE";
+        if (v.contains("LIFE")) return "VIE";
         return "INCONNU";
     }
 

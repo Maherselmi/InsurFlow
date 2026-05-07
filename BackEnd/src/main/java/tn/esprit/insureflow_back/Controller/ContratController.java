@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tn.esprit.insureflow_back.Domain.Entities.ContratDocument;
+import tn.esprit.insureflow_back.Domain.Entities.ContratVectorFile;
+import tn.esprit.insureflow_back.Repository.ContratVectorFileRepository;
 import tn.esprit.insureflow_back.Service.ContratVectorService;
 import tn.esprit.insureflow_back.Service.PDFProcessingService;
 
@@ -19,6 +21,7 @@ public class ContratController {
 
     private final PDFProcessingService pdfProcessingService;
     private final ContratVectorService contratVectorService;
+    private final ContratVectorFileRepository contratVectorFileRepository;
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadPDF(
@@ -36,5 +39,18 @@ public class ContratController {
                     .internalServerError()
                     .body("❌ Erreur traitement PDF: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/documents")
+    public ResponseEntity<List<ContratVectorFile>> getVectorDocuments(
+            @RequestParam(value = "typeContrat", required = false) String typeContrat
+    ) {
+        if (typeContrat != null && !typeContrat.trim().isEmpty()) {
+            return ResponseEntity.ok(
+                    contratVectorFileRepository.findByTypeContratIgnoreCase(typeContrat.trim())
+            );
+        }
+
+        return ResponseEntity.ok(contratVectorFileRepository.findAll());
     }
 }

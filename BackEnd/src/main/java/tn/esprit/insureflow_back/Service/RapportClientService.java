@@ -3,6 +3,7 @@ package tn.esprit.insureflow_back.Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import tn.esprit.insureflow_back.Domain.ENUMS.ClaimStatus;
 import tn.esprit.insureflow_back.Domain.Entities.AgentResult;
 import tn.esprit.insureflow_back.Domain.Entities.Claim;
 
@@ -11,16 +12,30 @@ import tn.esprit.insureflow_back.Domain.Entities.Claim;
 @RequiredArgsConstructor
 public class RapportClientService {
 
-    public String genererRapportClient(Claim claim,
-                                       AgentResult routeResult,
-                                       AgentResult validationResult,
-                                       AgentResult estimationResult) {
+    public String genererRapportClient(
+            Claim claim,
+            AgentResult routeResult,
+            AgentResult validationResult,
+            AgentResult estimationResult
+    ) {
+        if (claim == null) {
+            throw new IllegalArgumentException("Claim obligatoire");
+        }
 
-        String statut = claim.getStatus() != null ? claim.getStatus().name() : "INCONNU";
+        ClaimStatus status = claim.getStatus();
 
-        log.info("Génération rapport client rapide - claim #{} statut: {}", claim.getId(), statut);
+        if (status == ClaimStatus.PENDING_VALIDATION) {
+            log.info("Pas de rapport client pour claim #{} car statut=PENDING_VALIDATION", claim.getId());
+            return null;
+        }
+
+        if (status != ClaimStatus.APPROVED && status != ClaimStatus.REJECTED) {
+            log.info("Pas de rapport client pour claim #{} car statut={}", claim.getId(), status);
+            return null;
+        }
 
         String clientName = buildClientName(claim);
+
         String policyType = claim.getPolicy() != null
                 ? safe(claim.getPolicy().getType())
                 : "Information non disponible";
@@ -33,10 +48,10 @@ public class RapportClientService {
                 ? safe(estimationResult.getConclusion())
                 : "Information non disponible";
 
-        String statutPhrase = buildClientStatusPhrase(statut);
-        String resume = buildClientResume(statut, policyType, validationConclusion, estimationConclusion);
-        String suite = buildClientNextStep(statut);
-        String closing = buildClientClosing(statut);
+        String statusPhrase = buildClientStatusPhrase(status);
+        String resume = buildClientResume(status, policyType, validationConclusion, estimationConclusion);
+        String suite = buildClientNextStep(status);
+        String closing = buildClientClosing(status);
 
         return """
                 Rapport client du dossier n°%s
@@ -52,7 +67,7 @@ public class RapportClientService {
                 Suite prévue :
                 %s
 
-                Message de clôture :
+                Message :
                 %s
 
                 DONNÉES DU DOSSIER :
@@ -63,12 +78,12 @@ public class RapportClientService {
                 Date du sinistre : %s
                 Statut final : %s
                 Résultat de couverture : %s
-                Estimation disponible : %s
+                Estimation retenue : %s
                 """
                 .formatted(
                         claim.getId(),
                         clientName,
-                        statutPhrase,
+                        statusPhrase,
                         resume,
                         suite,
                         closing,
@@ -77,90 +92,169 @@ public class RapportClientService {
                         policyType,
                         safe(claim.getDescription()),
                         claim.getIncidentDate() != null ? claim.getIncidentDate().toString() : "Information non disponible",
-                        statut,
+                        status.name(),
                         validationConclusion,
-                        estimationConclusion
+                        status == ClaimStatus.APPROVED ? estimationConclusion : "Non applicable"
                 )
                 .trim();
     }
 
+    public String genererRapportClientApresDecisionHumaine(
+            Claim claim,
+            String decisionHumaine,
+            String commentaire,
+            Double montantMinCorrige,
+            Double montantMoyenCorrige,
+            Double montantMaxCorrige
+    ) {
+        if (claim == null) {
+            throw new IllegalArgumentException("Claim obligatoire");
+        }
+
+        if (claim.getStatus() != ClaimStatus.APPROVED && claim.getStatus() != ClaimStatus.REJECTED) {
+            return null;
+        }
+
+        String clientName = buildClientName(claim);
+
+        String policyType = claim.getPolicy() != null
+                ? safe(claim.getPolicy().getType())
+                : "Information non disponible";
+
+        String statusPhrase = buildClientStatusPhrase(claim.getStatus());
+        String commentaireSafe = safe(commentaire);
+
+        String estimationRetenue = claim.getStatus() == ClaimStatus.APPROVED
+                ? buildEstimationRetenue(montantMinCorrige, montantMoyenCorrige, montantMaxCorrige)
+                : "Non applicable";
+
+        return """
+                Rapport client du dossier n°%s
+
+                Bonjour %s,
+
+                Statut de votre dossier :
+                %s
+
+                Décision finale :
+                %s
+
+                Commentaire du gestionnaire :
+                %s
+
+                Résumé :
+                Votre dossier relatif au contrat %s a été examiné par un expert.
+                Une décision finale a été prise après vérification humaine.
+
+                Suite prévue :
+                %s
+
+                Message :
+                %s
+
+                DONNÉES DU DOSSIER :
+                ID dossier : %s
+                Nom client : %s
+                Type de contrat : %s
+                Description du sinistre : %s
+                Date du sinistre : %s
+                Statut final : %s
+                Estimation retenue : %s
+                """
+                .formatted(
+                        claim.getId(),
+                        clientName,
+                        statusPhrase,
+                        decisionHumaine,
+                        commentaireSafe,
+                        policyType,
+                        buildClientNextStep(claim.getStatus()),
+                        buildClientClosing(claim.getStatus()),
+                        claim.getId(),
+                        clientName,
+                        policyType,
+                        safe(claim.getDescription()),
+                        claim.getIncidentDate() != null ? claim.getIncidentDate().toString() : "Information non disponible",
+                        claim.getStatus().name(),
+                        estimationRetenue
+                )
+                .trim();
+    }
+
+    private String buildEstimationRetenue(Double min, Double moyenne, Double max) {
+        if (min == null && moyenne == null && max == null) {
+            return "Information non disponible";
+        }
+
+        return "min=" + formatMontant(min)
+                + ", moyenne=" + formatMontant(moyenne)
+                + ", max=" + formatMontant(max);
+    }
+
+    private String formatMontant(Double value) {
+        return value == null ? "-" : String.format(java.util.Locale.US, "%.2f DT", value);
+    }
+
     private String buildClientName(Claim claim) {
         if (claim.getClient() != null) {
-            String firstName = safe(claim.getClient().getFirstName());
-            String lastName = safe(claim.getClient().getLastName());
-            String fullName = (firstName + " " + lastName).trim();
-            if (!fullName.isBlank() && !"Information non disponible Information non disponible".equals(fullName)) {
-                return fullName;
-            }
+            String fullName = (safe(claim.getClient().getFirstName()) + " " + safe(claim.getClient().getLastName())).trim();
+            if (!fullName.isBlank()) return fullName;
         }
 
         if (claim.getPolicy() != null && claim.getPolicy().getClient() != null) {
-            String firstName = safe(claim.getPolicy().getClient().getFirstName());
-            String lastName = safe(claim.getPolicy().getClient().getLastName());
-            String fullName = (firstName + " " + lastName).trim();
-            if (!fullName.isBlank() && !"Information non disponible Information non disponible".equals(fullName)) {
-                return fullName;
-            }
+            String fullName = (safe(claim.getPolicy().getClient().getFirstName()) + " " + safe(claim.getPolicy().getClient().getLastName())).trim();
+            if (!fullName.isBlank()) return fullName;
         }
 
         return "Client";
     }
 
-    private String buildClientStatusPhrase(String statut) {
-        return switch (statut) {
-            case "APPROVED" -> "Votre dossier a été accepté.";
-            case "REJECTED" -> "Votre dossier a été refusé.";
-            case "PENDING_VALIDATION" -> "Votre dossier est en cours de vérification complémentaire.";
+    private String buildClientStatusPhrase(ClaimStatus status) {
+        return switch (status) {
+            case APPROVED -> "Votre dossier a été accepté.";
+            case REJECTED -> "Votre dossier a été refusé.";
             default -> "Le traitement de votre dossier est en cours.";
         };
     }
 
-    private String buildClientResume(String statut,
-                                     String policyType,
-                                     String validationConclusion,
-                                     String estimationConclusion) {
-        return switch (statut) {
-            case "APPROVED" -> """
+    private String buildClientResume(
+            ClaimStatus status,
+            String policyType,
+            String validationConclusion,
+            String estimationConclusion
+    ) {
+        return switch (status) {
+            case APPROVED -> """
                     Votre déclaration a été analysée et la prise en charge a été confirmée au regard de votre contrat %s.
-                    Une estimation du sinistre a également été préparée : %s.
+                    Une estimation du sinistre a été préparée : %s.
                     """.formatted(policyType, estimationConclusion).trim();
 
-            case "REJECTED" -> """
+            case REJECTED -> """
                     Après analyse du dossier et du contrat %s, votre demande n’a pas pu être retenue.
                     Résultat de l’analyse de couverture : %s.
                     """.formatted(policyType, validationConclusion).trim();
 
-            case "PENDING_VALIDATION" -> """
-                    Votre dossier nécessite encore une vérification complémentaire avant décision finale.
-                    Le contrat concerné est de type %s et une revue humaine est en cours.
-                    """.formatted(policyType).trim();
-
-            default -> """
-                    Votre dossier est en cours de traitement.
-                    Le contrat concerné est de type %s.
-                    """.formatted(policyType).trim();
+            default -> "Votre dossier est en cours de traitement.";
         };
     }
 
-    private String buildClientNextStep(String statut) {
-        return switch (statut) {
-            case "APPROVED" -> "Nous allons poursuivre la procédure d’indemnisation selon les éléments validés dans votre dossier.";
-            case "REJECTED" -> "Vous pouvez consulter le détail de votre dossier ou contacter votre gestionnaire pour toute précision complémentaire.";
-            case "PENDING_VALIDATION" -> "Une vérification complémentaire est en cours. Vous serez informé dès qu’une décision finale sera prise.";
+    private String buildClientNextStep(ClaimStatus status) {
+        return switch (status) {
+            case APPROVED -> "Nous allons poursuivre la procédure d’indemnisation selon les éléments validés.";
+            case REJECTED -> "Vous pouvez consulter le détail de votre dossier ou contacter votre gestionnaire.";
             default -> "Veuillez suivre l’évolution du dossier depuis votre espace client.";
         };
     }
 
-    private String buildClientClosing(String statut) {
-        return switch (statut) {
-            case "APPROVED" -> "Nous vous remercions pour votre confiance et restons à votre disposition pour la suite de votre prise en charge.";
-            case "REJECTED" -> "Nous restons à votre disposition pour toute question complémentaire concernant votre dossier.";
-            case "PENDING_VALIDATION" -> "Merci de votre patience. Nous reviendrons vers vous dès que l’analyse sera finalisée.";
+    private String buildClientClosing(ClaimStatus status) {
+        return switch (status) {
+            case APPROVED -> "Nous vous remercions pour votre confiance.";
+            case REJECTED -> "Nous restons à votre disposition pour toute question complémentaire.";
             default -> "Merci de votre confiance.";
         };
     }
 
     private String safe(String value) {
-        return value == null || value.isBlank() ? "Information non disponible" : value.trim();
+        return value == null || value.isBlank() ? "" : value.trim();
     }
 }

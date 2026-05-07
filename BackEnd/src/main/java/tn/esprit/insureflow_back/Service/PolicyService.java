@@ -71,4 +71,14 @@ public class PolicyService {
         return policyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Policy not found"));
     }
+    public List<Policy> getPoliciesByClientId(Long clientId) {
+        if (clientId == null) {
+            throw new RuntimeException("Client id is required");
+        }
+
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        return policyRepository.findByClient_Id(client.getId());
+    }
 }

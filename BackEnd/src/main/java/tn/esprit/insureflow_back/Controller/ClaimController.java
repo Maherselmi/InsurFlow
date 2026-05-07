@@ -25,8 +25,6 @@ public class ClaimController {
     private final ClaimRepository claimRepository;
     private final HumanValidationService humanValidationService;
 
-    // ─── endpoints existants ───────────────────────────────────────────────
-
     @PostMapping
     public Claim createClaim(@RequestBody Claim claim) {
         return claimService.createClaim(claim);
@@ -42,16 +40,12 @@ public class ClaimController {
         return claimService.getClaimById(id);
     }
 
-    // ─── NOUVEAUX endpoints validation humaine ────────────────────────────
-
-    //  Liste tous les claims en attente de validation humaine
     @GetMapping("/pending-validation")
     public ResponseEntity<List<Claim>> getPendingValidation() {
         List<Claim> pending = claimRepository.findByStatus(ClaimStatus.PENDING_VALIDATION);
         return ResponseEntity.ok(pending);
     }
 
-    // Détail d'un claim + rapport IA pour le gestionnaire
     @GetMapping("/{id}/review")
     public ResponseEntity<Map<String, Object>> getClaimForReview(@PathVariable Long id) {
         Claim claim = claimRepository.findById(id)
@@ -59,50 +53,81 @@ public class ClaimController {
 
         if (!claim.getStatus().equals(ClaimStatus.PENDING_VALIDATION)) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Ce claim n'est pas en attente de validation",
-                            "statut", claim.getStatus().name()));
+                    .body(Map.of(
+                            "error", "Ce claim n'est pas en attente de validation",
+                            "statut", claim.getStatus().name()
+                    ));
         }
 
         return ResponseEntity.ok(Map.of(
-                "id",           claim.getId(),
-                "description",  claim.getDescription(),
-                "status",       claim.getStatus(),
+                "id", claim.getId(),
+                "description", claim.getDescription(),
+                "status", claim.getStatus(),
                 "incidentDate", claim.getIncidentDate(),
-                "createdAt",    claim.getCreatedAt(),
-                "aiReport",     claim.getAiReport() != null
+                "createdAt", claim.getCreatedAt(),
+                "aiReport", claim.getAiReport() != null
                         ? claim.getAiReport()
                         : "Aucun rapport disponible"
         ));
     }
 
-    // ✅ Gestionnaire APPROUVE
     @PostMapping("/{id}/approve")
     public ResponseEntity<Map<String, Object>> approveClaim(
             @PathVariable Long id,
             @RequestBody HumanDecisionRequest request) {
 
-        Claim updated = humanValidationService.approuverClaim(id, request.comment());
+        Claim updated = humanValidationService.approuverClaimAvecCorrection(
+                id,
+                request.comment(),
+                request.finalEstimationMin(),
+                request.finalEstimationMoyenne(),
+                request.finalEstimationMax()
+        );
+
         return ResponseEntity.ok(Map.of(
                 "message", "Claim approuvé avec succès",
                 "claimId", updated.getId(),
-                "status",  updated.getStatus().name()
+                "status", updated.getStatus().name()
         ));
     }
 
-    // ✅ Gestionnaire REJETTE
     @PostMapping("/{id}/reject")
     public ResponseEntity<Map<String, Object>> rejectClaim(
             @PathVariable Long id,
             @RequestBody HumanDecisionRequest request) {
 
         Claim updated = humanValidationService.rejeterClaim(id, request.comment());
+
         return ResponseEntity.ok(Map.of(
                 "message", "Claim rejeté avec succès",
                 "claimId", updated.getId(),
-                "status",  updated.getStatus().name()
+                "status", updated.getStatus().name()
         ));
     }
 
-    // DTO décision humaine
-    public record HumanDecisionRequest(String comment) {}
+    public record HumanDecisionRequest(
+            String comment,
+            Double finalEstimationMin,
+            Double finalEstimationMoyenne,
+            Double finalEstimationMax
+    ) {}
+
+    @GetMapping("/{id}/reports")
+    public ResponseEntity<Map<String, Object>> getClaimReports(@PathVariable Long id) {
+        Claim claim = claimRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Claim introuvable"));
+
+        return ResponseEntity.ok(Map.of(
+                "claimId", claim.getId(),
+                "description", claim.getDescription(),
+                "status", claim.getStatus() != null ? claim.getStatus().name() : "INCONNU",
+                "incidentDate", claim.getIncidentDate(),
+                "aiReport", claim.getAiReport() != null
+                        ? claim.getAiReport()
+                        : "Aucun rapport IA expert disponible",
+                "clientReport", claim.getClientReport() != null
+                        ? claim.getClientReport()
+                        : "Aucun rapport client disponible"
+        ));
+    }
 }

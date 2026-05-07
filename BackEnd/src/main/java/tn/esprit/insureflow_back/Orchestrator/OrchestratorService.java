@@ -76,9 +76,6 @@ public class OrchestratorService {
         AgentResult estimationResult = null;
 
         try {
-            /*
-             * 1. Agent Routeur
-             */
             log.info("===== ÉTAPE 1/5 : AGENT ROUTEUR claim #{} =====", freshClaim.getId());
 
             routeResult = safeRunRouteur(freshClaim);
@@ -109,9 +106,6 @@ public class OrchestratorService {
                 return;
             }
 
-            /*
-             * 2. Extraction PDF
-             */
             log.info("===== ÉTAPE 2/5 : EXTRACTION PDF claim #{} =====", freshClaim.getId());
 
             String claimPdfText = safeExtractPdfText(freshClaim);
@@ -121,9 +115,6 @@ public class OrchestratorService {
                 claimPdfText = safeText(freshClaim.getDescription());
             }
 
-            /*
-             * 3. Agent Validateur
-             */
             log.info("===== ÉTAPE 3/5 : AGENT VALIDATEUR claim #{} =====", freshClaim.getId());
 
             validationResult = safeRunValidateur(
@@ -174,10 +165,6 @@ public class OrchestratorService {
                 return;
             }
 
-            /*
-             * 4. Agent Estimateur
-             * L'estimateur démarre seulement après une validation COUVERT.
-             */
             log.info("===== ÉTAPE 4/5 : AGENT ESTIMATEUR claim #{} =====", freshClaim.getId());
 
             estimationResult = safeRunEstimateur(
@@ -197,9 +184,6 @@ public class OrchestratorService {
                     estimationResult.isNeedsHumanReview()
             );
 
-            /*
-             * 5. Décision finale + rapports
-             */
             log.info("===== ÉTAPE 5/5 : DÉCISION FINALE + RAPPORTS claim #{} =====", freshClaim.getId());
 
             if (estimationResult.isNeedsHumanReview()) {
@@ -235,6 +219,7 @@ public class OrchestratorService {
             );
 
             updateStatus(freshClaim, ClaimStatus.PENDING_VALIDATION);
+            freshClaim.setClientReport(null);
 
             try {
                 genererEtSauvegarderRapports(
@@ -415,6 +400,71 @@ public class OrchestratorService {
         logDuration("Temps total workflow", totalStart);
     }
 
+    private void genererEtSauvegarderRapports(
+            Claim claim,
+            AgentResult routeResult,
+            AgentResult validationResult,
+            AgentResult estimationResult
+    ) {
+        try {
+            log.info("Génération rapport expert pour claim #{}", claim.getId());
+
+            String rapportExpert = rapportService.genererRapport(
+                    claim,
+                    routeResult,
+                    validationResult,
+                    estimationResult
+            );
+
+            claim.setAiReport(rapportExpert);
+
+            if (ClaimStatus.PENDING_VALIDATION.equals(claim.getStatus())) {
+                log.info(
+                        "Aucun rapport client généré pour claim #{} car statut=PENDING_VALIDATION",
+                        claim.getId()
+                );
+
+                claim.setClientReport(null);
+
+            } else if (
+                    ClaimStatus.APPROVED.equals(claim.getStatus())
+                            || ClaimStatus.REJECTED.equals(claim.getStatus())
+            ) {
+                log.info("Génération rapport client pour claim #{}", claim.getId());
+
+                String rapportClient = rapportClientService.genererRapportClient(
+                        claim,
+                        routeResult,
+                        validationResult,
+                        estimationResult
+                );
+
+                claim.setClientReport(rapportClient);
+
+            } else {
+                log.info(
+                        "Aucun rapport client généré pour claim #{} car statut={}",
+                        claim.getId(),
+                        claim.getStatus()
+                );
+
+                claim.setClientReport(null);
+            }
+
+            claimRepository.save(claim);
+
+            log.info("Rapports sauvegardés - claim #{}", claim.getId());
+
+        } catch (Exception e) {
+            log.error(
+                    "Erreur génération rapports claim #{}: {}",
+                    claim.getId(),
+                    e.getMessage(),
+                    e
+            );
+        }
+    }
+
     private String extractRoutedType(AgentResult routeResult) {
         if (routeResult == null || routeResult.getConclusion() == null) {
             return "INCONNU";
@@ -445,49 +495,6 @@ public class OrchestratorService {
         }
 
         return "INCONNU";
-    }
-
-    private void genererEtSauvegarderRapports(
-            Claim claim,
-            AgentResult routeResult,
-            AgentResult validationResult,
-            AgentResult estimationResult
-    ) {
-        try {
-            log.info("Génération rapport expert pour claim #{}", claim.getId());
-
-            String rapportExpert = rapportService.genererRapport(
-                    claim,
-                    routeResult,
-                    validationResult,
-                    estimationResult
-            );
-
-            claim.setAiReport(rapportExpert);
-
-            log.info("Génération rapport client pour claim #{}", claim.getId());
-
-            String rapportClient = rapportClientService.genererRapportClient(
-                    claim,
-                    routeResult,
-                    validationResult,
-                    estimationResult
-            );
-
-            claim.setClientReport(rapportClient);
-
-            claimRepository.save(claim);
-
-            log.info("Rapports sauvegardés - claim #{}", claim.getId());
-
-        } catch (Exception e) {
-            log.error(
-                    "Erreur génération rapports claim #{}: {}",
-                    claim.getId(),
-                    e.getMessage(),
-                    e
-            );
-        }
     }
 
     private void updateStatus(Claim claim, ClaimStatus status) {

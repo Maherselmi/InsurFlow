@@ -16,6 +16,7 @@ public class AgentResult {
     private Long id;
 
     private String agentName;
+    @Column(columnDefinition = "TEXT")
     private String conclusion;
     private Double confidenceScore;
     private boolean needsHumanReview;
